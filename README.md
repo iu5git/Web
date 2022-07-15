@@ -75,8 +75,8 @@
 Создание мобильного приложения с подключением к web-сервису. Просмотр 
 товаров, без бронирования и редактирования. 
 
-* [iOS (Swift)](https://github.com/iu5team/iu5web-fall-2021/blob/main/tutorials/android_tutorial/android_tutorial.md)
-* [Android (Java)](https://github.com/iu5team/iu5web-fall-2021/blob/main/tutorials/ios_tutorial/ios_tutorial.md)
+* [iOS (Swift)](https://github.com/iu5git/web-2022/blob/main/tutorials/android_tutorial/android_tutorial.md)
+* [Android (Java)](https://github.com/iu5git/web-2022/blob/main/tutorials/ios_tutorial/ios_tutorial.md)
 
 ## Домашнее задание
 Добавление роли менеджера контента, доработка под эту роль фронта и сервиса (редактирование таблицы словаря, изменение статусов таблицы фактов, фильтрация фактов). Доработка ролевой модели - ограничение прав на интерфейс
