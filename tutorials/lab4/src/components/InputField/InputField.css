@@ -1,0 +1,11 @@
+.inputField{
+    display: flex;
+    padding: 12px 0;
+}
+.inputField > input{
+    width: 200px;
+    margin-right: 12px;
+    border: 2px solid black;
+    border-radius: 4px;
+    outline: none;
+}
