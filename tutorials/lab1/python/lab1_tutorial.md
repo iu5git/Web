@@ -4,7 +4,7 @@
 
 **Для выполнения лабораторной работы потребуется [PyCharm Professional](https://www.jetbrains.com/pycharm/download/)\
 Лицензию можно получить через сайт JetBrains, указав бауманскую почту.**
-Также django-проект можно создать руками по этому [тьюториалу](https://docs.djangoproject.com/en/1.10/intro/tutorial01/)
+Также django-проект можно создать руками по этому [туториалу](https://docs.djangoproject.com/en/1.10/intro/tutorial01/)
 
 ## Создание проекта
 `File -> New Project...`\
