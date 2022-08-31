@@ -45,7 +45,9 @@
 
 На выбор Django, Go, Spring, Node.js
 
-* [Методические указания](https://github.com/iu5git/web-2022/blob/main/tutorials/lab1/lab1_tutorial.md)
+Методические указания:
+* [Python](https://github.com/iu5git/web-2022/blob/main/tutorials/lab1/python/lab1_tutorial.md)
+* [Golang](https://github.com/iu5git/web-2022/blob/main/tutorials/lab1/golang/README.md)
 
 #### Лабораторная работа №2
 Создание базы данных PostgreSQL (таблица словаря, таблица фактов с датами и статусом, три даты и менеджер), подключение к шаблонизатору. Создание админки
