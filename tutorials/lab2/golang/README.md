@@ -1,0 +1,178 @@
+# Методические указания по выполнению лабораторной работы №2  
+
+## Установка Postgresql и простые операции
+Postgresql одна из самых известных и используемых баз данных в современном IT,
+ее используют множество больших компаний: VK, Ozon и другие.
+
+### Виды установок
+##### Рекомендованная
+Полезные материалы:
+- Про docker: https://habr.com/ru/post/310460/?ysclid=l7ilstl2mt144186154
+- Официальная документация docker: https://docs.docker.com/get-started/overview/
+- Официальная документация Postgres на русском: https://postgrespro.ru/docs/postgrespro/9.5/tutorial-start
+
+Предисловие: данный вид установки окружения
+для вашего программного на данный момент 
+является самым известным и используемым 
+в средах разработчиков
+
+Для начала введем для себя 3 определения:
+* Docker - Программное обеспечение для автоматизации развёртывания и управления приложениями в средах с поддержкой контейнеризации, контейнеризатор приложений. Позволяет «упаковать» приложение со всем его окружением и зависимостями в контейнер.
+Говоря простым языком - это программа, позволяющая упаковывать ваши приложения так, чтобы вы не замечали разницу между языками,
+легко обменивались программным обеспечением.
+* Docker контейнер - сущности,
+которые предоставляют схожий с виртуальными машинами уровень изоляции,
+но благодаря правильному задействованию низкоуровневых механизмов основной операционной системы делают это с в разы меньшей нагрузкой.
+* Docker image - "образ" какого-то контейнера, контейнер который один разработчик передает другому в формате image`a
+
+Приступим непосредственно к установке:
+1. Установим Docker
+
+Один из самых важных навыков программиста - способность читать и понимать то, что вы должны сделать,
+потому постараюсь обойти подробную информацию о том как нажать на кнопочку скачать и как переводить тест на сайте.
+
+[Windows](https://docs.docker.com/desktop/install/windows-install/)
+[Linux](https://docs.docker.com/desktop/install/linux-install/)
+[MacOS](https://docs.docker.com/desktop/install/mac-install/)
+
+Проверим его работоспособность:
+
+Откройте консоль. Введите команду 
+```shell
+$ docker version
+Client:
+ Cloud integration: v1.0.22
+ Version:           20.10.12
+ API version:       1.41
+ Go version:        go1.16.12
+ Git commit:        e91ed57
+ Built:             Mon Dec 13 11:46:56 2021
+ OS/Arch:           darwin/arm64
+ Context:           default
+ Experimental:      true
+
+Server: Docker Desktop 4.5.0 (74594)
+ Engine:
+  Version:          20.10.12
+  API version:      1.41 (minimum version 1.12)
+  Go version:       go1.16.12
+  Git commit:       459d0df
+  Built:            Mon Dec 13 11:43:07 2021
+  OS/Arch:          linux/arm64
+  Experimental:     false
+ containerd:
+  Version:          1.4.12
+  GitCommit:        7b11cfaabd73bb80907dd23182b9347b4245eb5d
+ runc:
+  Version:          1.0.2
+  GitCommit:        v1.0.2-0-g52b36a2
+ docker-init:
+  Version:          0.19.0
+  GitCommit:        de40ad0
+```
+Если вдруг по какой-то причине вы видите ошибку, например:
+```shell
+Cannot connect to the Docker daemon at unix:///var/run/docker.sock. Is the docker daemon running?
+```
+Значит что-то пошло не так, если вы не найдете свою проблему в FAQ, постарайтесь сначала поискать ее в интернете.
+
+Вместе с программой докер, к вам должен был установиться docker compose. Проверим его установку:
+```shell
+$ docker compose version
+Docker Compose version v2.2.3
+# или, возможно, у вас сработает эта команда
+# проблема различия возникает из-за версии приложения и ОС
+$ docker-compose version
+docker-compose version 1.29.2, build 5becea4c
+docker-py version: 5.0.0
+CPython version: 3.9.0
+OpenSSL version: OpenSSL 1.1.1h  22 Sep 2020
+```
+Запустим нашу базу данных. На данном этапе вы поймете удобство настройки таким образом:
+вы можете в любой момент заменить image postgresql имеджем, например, mysql или tarantool.
+Создадим файл в корне проекта из нашего прошлого занятия:
+```shell
+$ nano docker-compose.yml # в unix системах это обозначает вызов тестового редактора из консоли
+```
+Впишем туда следующее:
+```yaml
+version: "3.8" # версия вашего docker-compose
+services: # имеджи, которые запустятся по вашему желанию
+  db: # название моего имеджа
+    image: postgres:12 # скачает image postgres 12 версии
+    volumes: # часть настроек для хранения данных, пока для нас это не важно
+      - type: volume
+        source: postgresdb-data
+        target: /var/lib/postgresql/data
+    ports: # порты
+      - "5432:5432"
+    environment: # переменные окружения, меняйте их если хотите поменять пароль, логин или название стартовой базы данных
+      POSTGRES_USER: bmstu_user
+      POSTGRES_DB: bmstu
+      POSTGRES_PASSWORD: bmstu_password
+
+volumes: # часть настроек для хранения данных
+  postgresdb-data:
+    driver: local
+```
+Теперь корень нашего проекта выглядит так:
+```shell
+# На Unix/Mac
+$ ls -la 
+drwxr-xr-x   6 maxim-konovalov  staff   192 Aug 31 02:28 .idea
+drwxr-xr-x   3 maxim-konovalov  staff    96 Aug 31 01:05 cmd
+-rw-r--r--   1 maxim-konovalov  staff   358 Sep  1 08:49 docker-compose.yml
+-rw-r--r--   1 maxim-konovalov  staff  1056 Aug 31 01:39 go.mod
+-rw-r--r--   1 maxim-konovalov  staff  6962 Aug 31 01:39 go.sum
+drwxr-xr-x   3 maxim-konovalov  staff    96 Aug 31 01:06 internal
+drwxr-xr-x   3 maxim-konovalov  staff    96 Aug 31 02:21 resources
+drwxr-xr-x   3 maxim-konovalov  staff    96 Aug 31 02:21 templates
+# На Windows
+$ dir
+...
+```
+Запустим наш Postgresql, для этого зайдем в терминал, убедимся что мы находимся в корне нашего проекта и введем следующее:
+```shell
+$ docker compose up -d # запустит ваш postgres
+Creating network "awesomeproject_default" with the default driver
+Creating volume "awesomeproject_postgresdb-data" with local driver
+Creating awesomeproject_db_1 ... done
+$ docker ps # проверим что база данных действительно запустилась
+CONTAINER ID   IMAGE         COMMAND                  CREATED          STATUS          PORTS                    NAMES
+2d14e669ff98   postgres:12   "docker-entrypoint.s…"   37 seconds ago   Up 35 seconds   0.0.0.0:5432->5432/tcp   awesomeproject_db_1
+```
+
+Если вы решили отключить ваш postgres
+```shell
+$ docker compose down
+```
+##### Физическим инсталлятором
+Скачиваем инсталлер с официального сайта: https://www.postgresql.org/download/windows/
+Далее идем согласно статье в https://winitpro.ru/index.php/2019/10/25/ustanovka-nastrojka-postgresql-v-windows/, если вы на Windows.
+Если вы на lunux или macOS:
+Linux:
+```shell
+$ apt install postgres
+```
+MacOS: 
+```shell
+$ brew install postgres 
+```
+
+## Запуск и подключение к Datagrip
+Визуально с базой данных мы будем работать с клиентом Datagrip.
+Datagrip также является продуктом JetBrains, потому установить его у вас не должно возникнуть трудностей. Сайт DataGrip: https://www.jetbrains.com/help/datagrip/installation-guide.html?ysclid=l7in6bbbyy935157824
+. После того как вы установили программу, запустим ее
+На данный момент моя программа выглядит так, но возможно вам придется еще выполнить парочку махинаций c простыми начальными настройками,
+чтобы проект у вас выглядел похожим образом
+![Создание проекта](docs/1.png)
+Нажимаем на кнопочку добавления новой базы данных
+![Создание проекта](docs/2.png)
+
+Находим PostgreSQL и нажимаем на него(клиент DataGrip особенно удобен тем, что может работать с множеством баз данных)
+![Создание проекта](docs/3.png)
+Так как вы зашли первый раз - у вас отсутсвует драйвер для PostgreSQL, установите его щелкнул в Download:
+![Создание проекта](docs/4.png)
+
+## Администрирование Postgresql
+## Обращения из кода

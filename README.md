@@ -52,7 +52,9 @@
 
 Статусы: введен, в работе, завершён, удалён
 
-* [Методические указания](https://github.com/iu5git/web-2022/blob/main/tutorials/lab2/lab2_tutorial.md)
+Методические указания:
+* [Python](https://github.com/iu5git/web-2022/blob/main/tutorials/lab2/python/lab2_tutorial.md)
+* [Golang](https://github.com/iu5git/web-2022/blob/main/tutorials/lab2/golang/README.md)
 
 #### Лабораторная работа №3
 Создание веб-сервиса для получения данных из БД. Проверка в swagger. 
