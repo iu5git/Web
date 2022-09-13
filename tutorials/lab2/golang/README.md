@@ -269,7 +269,6 @@ test=123
 - internal/app/config # пакет читающий конфигурацию из /config/config.toml (любой формат)
 - internal/app/repository # пакет отвечающий за обращения к хранилищам данных
 - internal/pkg/app # Сердце нашего приложения - оно создает подключение к базе данных, веб сервер, создает конфиг. Может создаваться и стартоваться.
-- internal/app/api # пакет отвечающий за веб серверную маршрутизацию(сейчас это почти все то что ранее было в api)
 - internal/app/dsn # пакет формирующий DSN - строку подключения к postgresql
 - .env  # файл, который определяет переменные окружения в вашей текущей папки(локальный энв)
 - internal/app/ds # пакет в котором будут храниться структуры данных, которые мы храним в базе данных
@@ -393,7 +392,7 @@ import (
 )
 
 type Product struct {
-	gorm.Model
+	ID        uint `gorm:"primarykey"`
 	Code  string
 	Price uint
 }
@@ -427,7 +426,7 @@ func main() {
 	}
 }
 ```
-Проверьте в Data Grip что ваша миграция прогла успешно
+Проверьте в Data Grip что ваша миграция прошла успешно
 
 Создадим пакет Repository:
 По сути для нас этот пакет будет выглядеть следующим образом:
@@ -438,6 +437,117 @@ func main() {
 - и другие ГОВОРЯЩИЕ методы.
 Будьте к этому внимательны,
 иначе можно забыть что делает этот метод и потратить время на изучение кода.
+В моем случае с примером получилось так:
+```go
+package repository
 
+import (
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 
+	"awesomeProject/internal/app/ds"
+)
 
+type Repository struct {
+	db *gorm.DB
+}
+
+func New(dsn string) (*Repository, error) {
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	if err != nil {
+		return nil, err
+	}
+
+	return &Repository{
+		db: db,
+	}, nil
+}
+
+func (r *Repository) GetProductByID(id int) (*ds.Product, error) {
+	product := &ds.Product{}
+
+	err := r.db.First(product, "id = ?", "1").Error // find product with code D42
+	if err != nil {
+		return nil, err
+	}
+
+	return product, nil
+}
+
+func (r *Repository) CreateProduct(product ds.Product) error {
+	return r.db.Create(product).Error
+}
+
+```
+Теперь давайте убедимся, что оно работает и подключим 2 наши части: web server и repository:
+
+`server.go`
+```go
+package app
+
+import (
+	"log"
+	"net/http"
+	"strconv"
+
+	"github.com/gin-gonic/gin"
+)
+
+func (a *Application) StartServer() {
+	log.Println("Server start up")
+
+	r := gin.Default()
+
+	r.GET("/ping", func(c *gin.Context) {
+		id := c.Query("id") // получаем из запроса query string
+
+		if id != "" {
+			log.Printf("id recived %s\n", id)
+			intID, err := strconv.Atoi(id) // пытаемся привести это к чиселке
+			if err != nil {                // если не получилось
+				log.Printf("cant convert id %v", err)
+				c.Error(err)
+				return
+			}
+
+			product, err := a.repo.GetProductByID(uint(intID))
+			if err != nil { // если не получилось
+				log.Printf("cant get product by id %v", err)
+				c.Error(err)
+				return
+			}
+
+			c.JSON(http.StatusOK, gin.H{
+				"product_price": product.Price,
+			})
+			return
+		}
+		c.JSON(http.StatusOK, gin.H{
+			"message": "pong",
+		})
+	})
+
+	r.LoadHTMLGlob("templates/*")
+
+	r.GET("/test", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "test.tmpl", gin.H{
+			"title": "Main website",
+			"test":  []string{"a", "b"},
+		})
+	})
+
+	r.Static("/image", "./resources")
+
+	r.Run() // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
+
+	log.Println("Server down")
+}
+
+```
+Вручную добавим запись с id=1.
+Пробуем сделать запрос:  http://127.0.0.1:8080/ping?id=1 и получаем ответ:
+```json
+{"product_price":123}
+```
+
+Самостоятельное задание - добавить еще 1 query параметр в запрос  http://127.0.0.1:8080/ping - `?create=true` и если он указан записывать новое значение в таблицу со случайными параметрами.
