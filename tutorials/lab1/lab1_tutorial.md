@@ -270,7 +270,7 @@ def hello(request):
 
 {% block content %}
 <ul>
-    {% for order in orders %}
+    {% for order in data.orders %}
         <li><a href="{% url 'order_url' order.id %}">{{ order.title }}</a> </li>
     {% empty %}
         <li>Список пуст</li>
