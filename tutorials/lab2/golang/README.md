@@ -265,4 +265,179 @@ test=123
 ### Новое устройство проекта и чтение конфигурации
 Частично расширим возможности нашего проекта и поменяем его структуру. Иначе логики станет слишком много в одном файле и не будет никакой сортировки.
 Это плохо, потому давайте слегка подредактируем расположение папок в нашем проекте:
+Добавим:
+- internal/app/config # пакет читающий конфигурацию из /config/config.toml (любой формат)
+- internal/app/repository # пакет отвечающий за обращения к хранилищам данных
+- internal/pkg/app # Сердце нашего приложения - оно создает подключение к базе данных, веб сервер, создает конфиг. Может создаваться и стартоваться.
+- internal/app/api # пакет отвечающий за веб серверную маршрутизацию(сейчас это почти все то что ранее было в api)
+- internal/app/dsn # пакет формирующий DSN - строку подключения к postgresql
+- .env  # файл, который определяет переменные окружения в вашей текущей папки(локальный энв)
+- internal/app/ds # пакет в котором будут храниться структуры данных, которые мы храним в базе данных
+
+Создадим тип Application в пакете ```app```. Пусть у него будет 1 метод Run.
+А в пакете появится публичная функция New(), которая будет возвращать Application.
+Функция New должна создавать объект Application, заполнять его конфигом, роутером веб сервера, подключением к базе данных.
+
+В пакете DSN добавим 1 новый публичный метод. 
+```go
+package dsn
+
+import (
+	"fmt"
+	"os"
+)
+
+// FromEnv собирает DSN строку из переменных окружения
+func FromEnv() string {
+	host := os.Getenv("DB_HOST")
+	if host == "" {
+		return ""
+	}
+
+	port := os.Getenv("DB_PORT")
+	user := os.Getenv("DB_USER")
+	pass := os.Getenv("DB_PASS")
+	dbname := os.Getenv("DB_NAME")
+
+	return fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", host, port, user, pass, dbname)
+}
+```
+В пакете config добавим 1 публичный метод:
+```go
+package config
+
+import (
+	"context"
+	"os"
+	"time"
+
+	"github.com/joho/godotenv"
+	log "github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
+)
+
+// Config Структура конфигурации;
+// Содержит все конфигурационные данные о сервисе;
+// автоподгружается при изменении исходного файла
+type Config struct {
+	ServiceHost string
+	ServicePort int
+}
+
+// NewConfig Создаёт новый объект конфигурации, загружая данные из файла конфигурации
+func NewConfig(ctx context.Context) (*Config, error) {
+	var err error
+
+	configName := "config"
+	_ = godotenv.Load()
+	if os.Getenv("CONFIG_NAME") != "" {
+		configName = os.Getenv("CONFIG_NAME")
+	}
+
+	viper.SetConfigName(configName)
+	viper.SetConfigType("toml")
+	viper.AddConfigPath("config")
+	viper.AddConfigPath(".")
+	viper.WatchConfig()
+
+	err = viper.ReadInConfig()
+	if err != nil {
+		return nil, err
+	}
+
+	cfg := &Config{}
+	err = viper.Unmarshal(cfg)
+	if err != nil {
+		return nil, err
+	}
+
+	log.Info("config parsed")
+
+	return cfg, nil
+}
+
+```
+
+Итого мы получаем следующую цепочку пакетов:
+* В main - создаем application, пишем логи что мы запустились/упали
+* В app - при вызове New - создаем объект, у которого есть роутер,репозиторий и конфиг, 
+* application.Run - запускает веб сервер
+* В репозитории - публичный метод New() для создания объекта репозитория
+* В конфиге - метод New() для создания метода конфигурации
+* В api - описания всех наших эндпоинтов
+
+Важно: далее увеличивать и улучшать наш проект по структуре мы не будим,
+потому лучше изначально усвоить назначения каждого пакета.
 ## Обращаемся к базе из кода
+Чтобы создать обращение к базе вам необходима строка DSN.
+Давайте договоримся что все данные о базе данных мы будем передавать не через конфиг,
+а через .env(будем считать что так безопаснее).
+Создадим в корне проекта файл .env, у меня он получился таким:
+```dotenv
+DB_HOST=0.0.0.0
+DB_NAME=bmstu
+DB_PORT=5432
+DB_USER=bmstu_user
+DB_PASS=bmstu_password
+```
+Будем использовать достаточно примитивную ORM gorm.
+Вот большой список гайдов на gorm: https://gorm.io/docs/index.html
+Прежде чем пойти дальше, давайте скажем что у нас есть предметная область магазин компьютерной техники.
+Прежде чем приступать к работе с пакетом Repository, давайте создадим миграции данных, создадим данные в таблице из кода:
+Создадим ```internal/app/ds/proudcts.go```. И опишем новую таблицу:
+```go
+package ds
+
+import (
+	"gorm.io/gorm"
+)
+
+type Product struct {
+	gorm.Model
+	Code  string
+	Price uint
+}
+
+```
+Создадим ```cmd/migrate/main.go```. 
+Это будет наш скрипт, который будет выполнять миграцию.
+```go
+package main
+
+import (
+	"github.com/joho/godotenv"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
+
+	"awesomeProject/internal/app/ds"
+	"awesomeProject/internal/app/dsn"
+)
+
+func main() {
+	_ = godotenv.Load()
+	db, err := gorm.Open(postgres.Open(dsn.FromEnv()), &gorm.Config{})
+	if err != nil {
+		panic("failed to connect database")
+	}
+
+	// Migrate the schema
+	err = db.AutoMigrate(&ds.Product{})
+	if err != nil {
+		panic("cant migrate db")
+	}
+}
+```
+Проверьте в Data Grip что ваша миграция прогла успешно
+
+Создадим пакет Repository:
+По сути для нас этот пакет будет выглядеть следующим образом:
+- New() - возвращает новый объект
+- repo.GetCPUs() - возвращает список всех cpu
+- repo.GetAllProducts() - возвращает вообще весь список товаров
+- repo.GetMotherboards() - возвращает все материнские платы
+- и другие ГОВОРЯЩИЕ методы.
+Будьте к этому внимательны,
+иначе можно забыть что делает этот метод и потратить время на изучение кода.
+
+
+
