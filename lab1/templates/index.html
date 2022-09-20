@@ -1,0 +1,16 @@
+<!doctype html>
+<html lang="en" class="h-100">
+<head>
+  <meta charset="utf-8">
+    <title>BMSTU</title>
+</head>
+<body>
+    Hello BMSTU students!
+    Today is {{ data.current_date }}
+<ul>
+    {% for var in data.list %}
+        <li> We like {{ var }}</li>
+    {% endfor %}
+</ul>
+</body>
+</html>
