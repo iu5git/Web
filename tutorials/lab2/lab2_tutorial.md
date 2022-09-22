@@ -69,7 +69,7 @@ CREATE TABLE `books` (
     `name` CHAR(30) NOT NULL,
     `dicription` CHAR(255) NOT NULL,
     PRIMARY KEY (`id`)
-)
+);
 ```
 
 Для добавления/чтения/обновления/удаления (CRUD) записей служат
@@ -247,6 +247,8 @@ def GetBook(request, id):
 </ul>
 {% endblock %}
 ```
+
+Содержимое `qw.html` здесь не описано. Его необходимо добавить самостоятельно на основе Лабораторной работы 1.
 
 `book.html`
 ```
