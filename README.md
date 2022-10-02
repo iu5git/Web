@@ -10,7 +10,7 @@
 
 [Лекция 3. Основы Web, шаблонизация, Django](https://github.com/iu5git/web-2022/blob/main/lectures/Lecture_3_Web_Django.pdf)
 
-Лекция 4. Базы данных, ER, PostgreSQL. ORM. Админка Django. Курсоры
+[Лекция 4. Базы данных, ER, PostgreSQL. ORM. Админка Django. Курсоры](https://github.com/iu5git/web-2022/blob/main/lectures/Lecture_4_Databases_Django_ORM.pdf)
 
 Лекция 5. Веб-сервис. Swagger. Микросервисы
 
