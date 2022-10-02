@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block title %} {{ data.product.brand }} {% endblock %}
+
+{% block content %}
+    {% comment %} <div>Информация о товаре {{ data.product.name }}</div> {% endcomment %}
+    <ul>
+        <li> Название: {{ data.product.name }}</li>
+        <li> Производитель: {{ data.product.brand }}</li>
+        <li> Тип: {{ data.product.type }}</li>
+        <li> Стоимость: {{ data.product.price }}</li>
+        <li> Крепость: {{ data.product.strength}}</li>
+
+    </ul>
+{% endblock %}
