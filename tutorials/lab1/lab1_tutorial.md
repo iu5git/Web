@@ -41,7 +41,7 @@
 ## Как работать с View и Urls
 
 `views.py`
-```
+```python
 from django.http import HttpResponse
 
 def hello(request):
@@ -49,7 +49,7 @@ def hello(request):
 ```
 
 `urls.py`
-```
+```python
 from bmstu_lab import views
 
 urlpatterns = [
@@ -79,7 +79,7 @@ urlpatterns = [
 Создаем html-файл в директории ‘templates’.
 
 `index.html`
-```
+```html
 <!doctype html>
 <html lang="en" class="h-100">
 <head>
@@ -96,7 +96,7 @@ urlpatterns = [
 папке templates.
 
 `views.py`
-```
+```python
 def hello(request):
     return render(request, 'index.html')
 ```
@@ -114,7 +114,7 @@ def hello(request):
 Добавим в статичную страницу переменные.
 
 `index.html`
-```
+```html
 <!doctype html>
 <html lang="en" class="h-100">
 <head>
@@ -131,7 +131,7 @@ def hello(request):
 Чтобы передать значение переменной из кода:
 
 `views.py`
-```
+```python
 from datetime import date
 
 def hello(request):
@@ -150,12 +150,12 @@ def hello(request):
 В качестве переменной может быть словарь, тогда к вложенным полям можно
 обращаться через точку.
 
-```
+```python
 def hello(request):
     return render(request, 'index.html', { 'data' : {'current_date': date.today()}})
 ```
 
-```
+```python
     Today is {{ data.current_date }}
 ```
 
@@ -168,7 +168,7 @@ def hello(request):
 Допустим, нам нужно вывести список элементов. Для этого воспользуемся `{% for %}`
 
 `index.html`
-```
+```html
 <!doctype html>
 <html lang="en" class="h-100">
 <head>
@@ -188,7 +188,7 @@ def hello(request):
 ```
 
 `views.py`
-```
+```python
 from datetime import date
 
 def hello(request):
@@ -210,7 +210,7 @@ def hello(request):
 Вместе с этим тегом можно использовать `{% elif %}`, `{% else %}`
 
 `index.html`
-```
+```html
 <ul>
     {% for var in data.list %}
         {% if var == 'python' %}
@@ -244,7 +244,7 @@ def hello(request):
 Допустим, есть базовый шаблон `base.html`:
 
 `base.html`
-```
+```html
 <!doctype html>
 <html lang="en" class="h-100">
 <head>
@@ -263,7 +263,7 @@ def hello(request):
 Создадим наследника `orders.html`, который будет выводить список заказов:
 
 `orders.html`
-```
+```html
 {% extends 'base.html' %}
 
 {% block title %}Список заказов{% endblock %}
@@ -280,7 +280,7 @@ def hello(request):
 ```
 
 `views.py`
-```
+```python
 def GetOrders(request):
     return render(request, 'orders.html', {'data' : {
         'current_date': date.today(),
@@ -298,7 +298,7 @@ def GetOrders(request):
 принимать id заказа:
 
 `urls.py`
-```
+```python
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.GetOrders),
@@ -309,7 +309,7 @@ urlpatterns = [
 Создадим шаблон для страницы товара `order.html` и ее view
 
 `order.html`
-```
+```html
 {% extends 'base.html' %}
 
 {% block title %}Заказ №{{ data.id }}{% endblock %}
@@ -320,7 +320,7 @@ urlpatterns = [
 ```
 
 `views.py`
-```
+```python
 def GetOrder(request, id):
     return render(request, 'order.html', {'data' : {
         'current_date': date.today(),
@@ -341,7 +341,7 @@ def GetOrder(request, id):
 Позволяет рендерить в месте использования тега другой шаблон
 
 `orders.html`
-```
+```html
 {% extends 'base.html' %}
 
 {% block title %}Список заказов{% endblock %}
@@ -358,8 +358,8 @@ def GetOrder(request, id):
 ```
 
 `order_element.html`
-```
- <li><a href="{% url 'order_url' elem.id %}">{{ elem.title }}</a> </li>
+```html
+ <li><a href="{% url 'order_url' element.id %}">{{ element.title }}</a> </li>
 ```
 
 **with** - позволяет сменить контекст. Т.е. в шаблоне `order_element.html` будут доступны не только *order*, *orders* , но и *element*
@@ -367,7 +367,7 @@ def GetOrder(request, id):
 ## Подключение статических файлов
 
 В `settings.py` указан путь до статических файлов
-```
+```python
 STATIC_URL = '/static/'
 ```
 
@@ -375,12 +375,27 @@ STATIC_URL = '/static/'
 
 ![Привет студенты!](assets/13.png)
 
+Файлы `.css` кладем в отдельную папку `static/css` 
+
 Перед использованием ссылки на статический файл, в шаблоне:
-```
+```html
 {% load static %}
 ```
 
 Используем ссылку:
-```
+```html
 <link rel="stylesheet" type="text/css" href="{% static 'css/examp.css' %}">
+```
+
+Пример `.css`
+```css
+.order-text {
+  font-size: 40px;
+}
+```
+
+Пример шаблона с `css`
+
+```html
+<div class="order-text">Информация о заказе №{{ data.id }}</div>
 ```
