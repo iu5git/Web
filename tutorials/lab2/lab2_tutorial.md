@@ -33,20 +33,20 @@ https://dev.mysql.com/doc/refman/8.0/en/windows-start-command-line.html
 Для начала необходимо создать пользователя базы данных. У него будет
 доступ к этой БД.
 
-```
+```sql
 CREATE USER dbuser@'localhost' IDENTIFIED BY '123';
 ```
 
 После этого нужно создать базу данных.
 
 
-```
+```sql
 CREATE DATABASE `first_db` CHARACTER SET utf8 COLLATE utf8_general_ci;
 ```
 
 И выдать права новому пользователю на эту базу данных.
 
-```
+```sql
 GRANT ALL PRIVILEGES ON first_db.* TO dbuser@'localhost';
 ```
 
@@ -63,7 +63,7 @@ GRANT ALL PRIVILEGES ON first_db.* TO dbuser@'localhost';
 Рассмотрим простой пример с созданием таблицы “книга”, в которой будет
 название книги и ее описание:
 
-```
+```sql
 CREATE TABLE `books` (
     `id` INT(11) NOT NULL AUTO_INCREMENT,
     `name` CHAR(30) NOT NULL,
@@ -76,7 +76,7 @@ CREATE TABLE `books` (
 команды INSERT, DELETE, UPDATE, SELECT. Подробно эти команды
 рассмотрены в курсе баз данных.
 
-```
+```sql
 INSERT INTO books VALUES(1, 'Мастер и Маргарита', 'Крутая книга');
 
 SELECT * FROM books;
@@ -103,7 +103,7 @@ https://github.com/PyMySQL/mysqlclient-python
 
 `Пример`
 
-```
+```python
 import MySQLdb
 
 db = MySQLdb.connect(
@@ -142,7 +142,7 @@ https://django.fun/docs/django/ru/3.2/topics/db/models/
 подключения БД в `settings.py`
 
 `settings.py`
-```
+```python
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
@@ -193,7 +193,7 @@ makemigrations <название приложения>`. После того, к
 `Пример`
 
 `models.py`
-```
+```python
 from django.db import models
 
 # Create your models here.
@@ -207,13 +207,13 @@ class Book(models.Model):
 ```
 
 `urls.py`
-```
+```python
     path('', views.bookList),
     path('book/<int:id>/', views.GetBook, name='book_url')
 ```
 
 `views.py`
-```
+```python
 from bmstu_lab.models import Book
 
 def bookList(request):
@@ -231,7 +231,7 @@ def GetBook(request, id):
 ```
 
 `books.html`
-```
+```html
 {% extends 'base.html' %}
 {% load static %}
 
@@ -251,7 +251,7 @@ def GetBook(request, id):
 Содержимое `qw.html` здесь не описано. Его необходимо добавить самостоятельно на основе Лабораторной работы 1.
 
 `book.html`
-```
+```html
 {% extends 'base.html' %}
 
 {% block title %}Книга №{{ data.book.id }}{% endblock %}
@@ -267,3 +267,21 @@ def GetBook(request, id):
 ![Создание проекта](assets/6.png)
 
 ![Создание проекта](assets/7.png)
+
+## Панель администратора Django
+
+Доступ к панели администратора доступен по ссылке [http://127.0.0.1:8000/admin]()
+
+Для администратора требуется установить пароль в командной строке:
+1. python manage.py createsuperuser
+2. Указать логин, почту и пароль
+
+![Панель администратора](assets/django_admin.png)
+
+Для добавления доступа к редактированию ваших таблиц в интерфейсе администратора, требуется добавить классы вашей модели в `admin.py`
+
+```python
+from .models import Book
+
+admin.site.register(Book)
+```
