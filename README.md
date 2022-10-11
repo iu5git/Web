@@ -14,7 +14,7 @@
 
 [Лекция 5. Веб-сервис. Swagger. Микросервисы](https://github.com/iu5git/web-2022/blob/main/lectures/Lecture_5_Web_Service.pdf)
 
-Лекция 6. Работа в git. Примеры специализированных сервисов - S3, уведомления, очереди
+[Лекция 6. Работа в git. Примеры специализированных сервисов - S3, уведомления, очереди](https://github.com/iu5git/web-2022/blob/main/lectures/Lecture_6_Special_Services.pdf)
 
 ### Фронтенд
 Лекция 7. HTML, CSS, JS. Общие понятия frontend
