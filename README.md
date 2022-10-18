@@ -17,7 +17,7 @@
 [Лекция 6. Работа в git. Примеры специализированных сервисов - S3, уведомления, очереди](https://github.com/iu5git/web-2022/blob/main/lectures/Lecture_6_Special_Services.pdf)
 
 ### Фронтенд
-Лекция 7. HTML, CSS, JS. Общие понятия frontend
+[Лекция 7. Введение в фронтенд и React](https://github.com/iu5git/web-2022/blob/main/lectures/Lecture_7_React_Introduction.pdf)
 
 Лекция 8. React, навигация, TypeScript. 
 
