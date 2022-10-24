@@ -1,8 +1,6 @@
 # Методические указания по выполнению лабораторной работы №7
 
-## Что необходимо сделать в ЛР
-
-# Задачи:
+## Задачи:
 
 - реализовать сущность пользователя;
 - предоставить возможность пользователем создавать и использовать учетные записи;
@@ -110,3 +108,127 @@ class ExampleView(APIView):
         }
         return Response(content)
 ```
+
+## СУБД для хранения сессий
+
+Выше мы использовали встроенные механизмы аутентификации в Django. Но для достаточно нагруженных приложений, это не всегда может быть выгодно по производительности,
+так как под капотом у Django для хранения сессий используется подключенная нами ранее MySQL.
+
+Хранить сессий выгодно в in-memory хранилищах, таких как:
+
+- Redis
+- Memcache
+- Tarantool
+
+Давайте возьмем одну из них и попробуем воссоздать руками хранение и проверку сессий. Для этого будем использовать Redis.
+
+
+### Установка Redis
+
+Redis официально не поддерживается на Windows. Однако, есть возможность установить Redis на Windows через WSL2.
+
+WSL2 позволяет запускать бинарные файлы Linux нативно на Windows. Чтобы это работало необходима Windows 10 версия 2004 и выше или Windows 11.
+Инструкция по включению WSL2 доступна по [ссылке](https://learn.microsoft.com/en-us/windows/wsl/install). Рекомендуется ставить Ubuntu.
+
+Далее выполним действия:
+
+```shell
+curl -fsSL https://packages.redis.io/gpg | sudo gpg --dearmor -o /usr/share/keyrings/redis-archive-keyring.gpg
+
+echo "deb [signed-by=/usr/share/keyrings/redis-archive-keyring.gpg] https://packages.redis.io/deb $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/redis.list
+
+sudo apt-get update
+sudo apt-get install redis
+```
+
+Чтобы запустить демон Redis, пишем:
+```shell
+sudo service redis-server start
+```
+
+В итоге получаем:
+```shell
+redis-cli 
+127.0.0.1:6379> ping
+PONG
+```
+
+6379 - это порт на котором автоматически запускается Redis.
+
+### Использование Redis с Python
+
+Чтобы установить библиотеку для работы с Redis пропишем:
+
+```shell
+pip3 install redis
+```
+
+Далее рассмотрим пример кода, в котором она используется:
+
+```python
+import redis
+
+# создаем инстанс и указываем координаты БД на локальной машине
+r = redis.Redis(
+    host= 'localhost',
+    port= '6379')
+
+r.set('somekey', '1000-7') # сохраняем ключ 'somekey' с значением '1000-7!'
+value = r.get('somekey') # получаем значение по ключу
+print(value)
+```
+
+### Интеграция Redis с Django
+
+Для начала нам нужно канонично встроить подключение к БД через Django. Для этого зайдем в файл `settings.py` и пропишем туда координаты запущенной БД:
+
+```python
+REDIS_HOST = 'localhost'
+REDIS_PORT = 6379
+```
+
+Далее создадим библиотечный инстанс нашего хранилища сессий в файле `views.py`:
+
+```python
+from django.conf import settings
+import redis
+
+# Connect to our Redis instance
+session_storage = redis.StrictRedis(host=settings.REDIS_HOST, port=settings.REDIS_PORT)
+```
+
+Теперь внутри наших обработчиков мы можем использовать `session_storage` для того, чтобы понять, можно ли данному юзер просматривать контент.
+Для этого при авторизации пользователя, мы должно сгенерировать случайное значение (можно использовать uuid_v4), и сохранить запись, 
+где ключом будет случайно сгенерированная строка, а значением будет первичный ключ сущности пользователя (в нашем примере это username, т.к. он уникальный). 
+
+Итоговый обработчик `auth_view` преватится во что-то такое:
+
+```python
+from django.contrib.auth import authenticate, login
+from django.http import HttpResponse
+import uuid
+
+def auth_view(request):
+    username = request.POST["username"] # допустим передали username и password
+    password = request.POST["password"]
+    user = authenticate(request, username=username, password=password)
+    if user is not None:
+        random_key = uuid.uuid4()
+        session_storage.set(random_key, username)
+        
+        response = HttpResponse("{'status': 'ok'}")
+        response.set_cookie("session_id", random_key) # пусть ключем для куки будет session_id
+        return response
+    else:
+        return HttpResponse("{'status': 'error', 'error': 'login failed'}")
+```
+
+Соответственно в методах, в которых нужно проверить имеет ли пользователя доступ к запрашиваемой информации, мы должны:
+
+- взять из запроса куки (через `ssid = request.COOKIES["session_id"]`)
+- посмотреть есть ли в хранилище сессий такая запись, и достать идентификатор пользователя (`session_storage.get(ssid)`)
+- проверить, можно ли данному пользователю смотреть запрошенную информацию (зависит от бизнес-логики вашего проекта)
+
+Предлагаю вам такую проверку написать в коде самостоятельно.
+
+Для продвинутых студентов предлагается логику проверки доступности контента вынести в middleware.
