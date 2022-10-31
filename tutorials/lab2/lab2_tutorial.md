@@ -285,3 +285,5 @@ from .models import Book
 
 admin.site.register(Book)
 ```
+
+## to-do Использование методов модели
