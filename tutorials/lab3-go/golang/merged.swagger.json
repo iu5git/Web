@@ -1,0 +1,229 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "FV Parser",
+    "version": "1.0",
+    "contact": {
+      "name": "Maksim Konovalov",
+      "url": "vk.com/abmanyl",
+      "email": "djassange@yandex.ru"
+    }
+  },
+  "tags": [
+    {
+      "name": "FVParser"
+    }
+  ],
+  "host": "127.0.0.1:80",
+  "schemes": [
+    "http"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/live": {
+      "get": {
+        "operationId": "FVParser_Live",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/fv_parserLiveResp"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "tags": [
+          "FVParser"
+        ]
+      }
+    },
+    "/ready": {
+      "get": {
+        "operationId": "FVParser_Ready",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/fv_parserReadyResp"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "tags": [
+          "FVParser"
+        ]
+      }
+    },
+    "/v1/working-out": {
+      "get": {
+        "summary": "Получение отработок в запрошенный промежуток времени",
+        "description": "Получение отработок в запрошенный промежуток времени. Если начальная конечная дата одна и та же - то выдадутся отработки за один день",
+        "operationId": "FVParser_GetWorkingOut",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/fv_parserGetWorkingOutResp"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "start_date",
+            "description": "Дата с которой будут получены отработки включительно",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "end_date",
+            "description": "Дата по которую будут получены отработки включительно",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "FVParser"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "fv_parserGetWorkingOutResp": {
+      "type": "object",
+      "properties": {
+        "working_out_items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/fv_parserWorkingOut"
+          }
+        }
+      }
+    },
+    "fv_parserLiveResp": {
+      "type": "object",
+      "properties": {
+        "live": {
+          "type": "boolean"
+        }
+      }
+    },
+    "fv_parserReadyResp": {
+      "type": "object",
+      "properties": {
+        "ready": {
+          "type": "boolean"
+        }
+      }
+    },
+    "fv_parserWorkingOut": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "start_at": {
+          "type": "string"
+        },
+        "end_at": {
+          "type": "string"
+        },
+        "registration_end_at": {
+          "type": "string"
+        },
+        "address_title": {
+          "type": "string"
+        },
+        "address": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "count_users_max": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "count_users_available": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "event_id": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "category_id": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "category_name": {
+          "type": "string"
+        },
+        "points_general": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "points_extra": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "typeUrl": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string",
+          "format": "byte"
+        }
+      }
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    }
+  },
+  "externalDocs": {
+    "description": "BITOP Site",
+    "url": "bitop.ru"
+  }
+}
