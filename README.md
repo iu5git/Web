@@ -55,7 +55,8 @@
 
 Контрольные вопросы: MVC, Django, шаблонизация, HTTP, Web, HTML
 
-* [Методические указания](/tutorials/lab1-py/lab1_tutorial.md)
+* [Методические указания Django](/tutorials/lab1-py/lab1_tutorial.md)
+* [Методические указания Golang](/tutorials/lab1-go/golang/README.md)
 
 #### Лабораторная работа №2
 Создание базы данных `PostgreSQL`/`MySQL` (`SQLite` использовать нельзя), подключение к шаблонизатору. Создание админки.
