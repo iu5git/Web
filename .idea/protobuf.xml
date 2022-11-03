@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="BufFileManager">
+    <libraries>
+      <module>
+        <name>buf.build/envoyproxy/protoc-gen-validate</name>
+        <path>$USER_HOME$/.cache/buf/v1/module/data/buf.build/envoyproxy/protoc-gen-validate/dc09a417d27241f7b069feae2cd74a0e</path>
+        <reference>buf.build/envoyproxy/protoc-gen-validate:dc09a417d27241f7b069feae2cd74a0e</reference>
+        <yaml>$USER_HOME$/.cache/buf/v1/module/data/buf.build/envoyproxy/protoc-gen-validate/dc09a417d27241f7b069feae2cd74a0e/buf.yaml</yaml>
+      </module>
+      <module>
+        <name>buf.build/googleapis/googleapis</name>
+        <path>$USER_HOME$/.cache/buf/v1/module/data/buf.build/googleapis/googleapis/80720a488c9a414bb8d4a9f811084989</path>
+        <reference>buf.build/googleapis/googleapis:80720a488c9a414bb8d4a9f811084989</reference>
+        <yaml>$USER_HOME$/.cache/buf/v1/module/data/buf.build/googleapis/googleapis/80720a488c9a414bb8d4a9f811084989/buf.yaml</yaml>
+      </module>
+      <module>
+        <lockedDependencies>
+          <dependency>
+            <commit>8bb768d6ffdf4397a969703e17229c64</commit>
+            <owner>googleapis</owner>
+            <remote>buf.build</remote>
+            <repository>googleapis</repository>
+          </dependency>
+        </lockedDependencies>
+        <name>buf.build/grpc-ecosystem/grpc-gateway</name>
+        <path>$USER_HOME$/.cache/buf/v1/module/data/buf.build/grpc-ecosystem/grpc-gateway/00116f302b12478b85deb33b734e026c</path>
+        <reference>buf.build/grpc-ecosystem/grpc-gateway:00116f302b12478b85deb33b734e026c</reference>
+        <yaml>$USER_HOME$/.cache/buf/v1/module/data/buf.build/grpc-ecosystem/grpc-gateway/00116f302b12478b85deb33b734e026c/buf.yaml</yaml>
+      </module>
+    </libraries>
+  </component>
+</project>
