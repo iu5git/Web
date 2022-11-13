@@ -399,3 +399,5 @@ STATIC_URL = '/static/'
 ```html
 <div class="order-text">Информация о заказе №{{ data.id }}</div>
 ```
+
+## to-do Получение данных из запроса, input
