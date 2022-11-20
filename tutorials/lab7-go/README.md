@@ -373,7 +373,7 @@ CONTAINER ID   IMAGE              COMMAND                  CREATED          STAT
 1:M 20 Nov 2022 19:20:14.509 # Done loading RDB, keys loaded: 0, keys expired: 0.
 
 ```
-# 5. Разрабатываем ролевую модель. Разрабатываем регистрацию.
+# 5. Разрабатываем ролевую модель и регистрацию.
 # 6. Реализуем ролевую модель на основе JWT
 # 7. Refresh Token
 # 8. Полезные ссылки
