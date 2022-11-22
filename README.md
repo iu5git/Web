@@ -28,7 +28,7 @@
 
 [Лекция 11. Авторизация, куки, хранилище сессий](/lectures/Lecture_11_Authorization.pdf) 
 
-Лекция 12. JWT. SSO 
+[Лекция 12. JWT. SSO](/lectures/Lecture_12_jwt.pdf) 
 
 ### Мобильные приложения
 
