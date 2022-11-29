@@ -6,7 +6,7 @@ import { CoffeeCardProps } from "./TobaccoCard.types";
 export const TobaccoCard: React.FC<CoffeeCardProps> = ({ tobacco: coffee, ...props }) => {
     return (
         <TobaccoCardStyled {...props}>
-            <h2>{coffee.title}</h2>
+            <h2>{coffee.name}</h2>
             <p>${coffee.price}</p>
         </TobaccoCardStyled>
     );

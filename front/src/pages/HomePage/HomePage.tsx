@@ -1,5 +1,4 @@
 import { TobaccoCard } from "components/TobaccoCard";
-import { TOBACCO } from "constants/tobaccos";
 import {
     BannerStyled,
     TobaccosStyled,
@@ -7,10 +6,22 @@ import {
     MainPageStyled,
     TableStyled,
 } from "pages/HomePage/HomePage.style";
-import React, { useCallback } from "react";
+import React, { useCallback, useEffect } from "react";
 import { useNavigate } from "react-router";
+import { useAppDispatch, useAppSelector } from "store";
+import { getTobaccoListAction } from "store/tobaccos/tobaccos.action";
 
 export const HomePage: React.FC = () => {
+    const dispatch = useAppDispatch();
+    const { tobaccos } = useAppSelector((store) => store.tobacco);
+
+    useEffect(() => {
+        if (!tobaccos?.length) {
+            console.log("use effect");
+            dispatch(getTobaccoListAction());
+        }
+    }, [dispatch, tobaccos]);
+
     const navigate = useNavigate();
     const handleCardClick = useCallback(
         (id: number) => {
@@ -27,11 +38,11 @@ export const HomePage: React.FC = () => {
                     <BannerStyled>Купите снюс от абобы и получите чаппалах бесплатно!</BannerStyled>
 
                     <TobaccosStyled>
-                        {TOBACCO.map((tobacco) => (
+                        {tobaccos?.map((tobacco) => (
                             <TobaccoCard
                                 key={tobacco.id}
                                 tobacco={tobacco}
-                                onClick={() => handleCardClick(tobacco.id)}
+                                onClick={() => handleCardClick(Number(tobacco.id))}
                             />
                         ))}
                     </TobaccosStyled>

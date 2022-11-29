@@ -7,7 +7,7 @@ class ProductSerializer(serializers.ModelSerializer):
         # Модель, которую мы сериализуем
         model = Product
         # Поля, которые мы сериализуем
-        fields = ["name", "brand", "type", "price", "strength"]
+        fields = ["id", "name", "brand", "type", "price", "strength"]
 
 class CustomerSerializer(serializers.ModelSerializer):
     class Meta:
