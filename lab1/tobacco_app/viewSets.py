@@ -19,12 +19,12 @@ class ProductViewSet(viewsets.ModelViewSet):
     """
     # queryset всех пользователей для фильтрации по дате последнего изменения
     authentication_classes = [JWTAuthentication]
-    # permission_classes = (IsAuthenticatedOrReadOnly,)
+    permission_classes = (IsAuthenticated,)
     queryset = Product.objects.all().order_by('pk')
     serializer_class = ProductSerializer  # Сериализатор для модели
 
     def list(self, request):
-        print(authenticate(request=request))
+        # print(authenticate(request=request))
         # try:
         #     print(request.META)
         #     token = request.META.get("token")
@@ -221,7 +221,7 @@ class LoginAPIView(APIView):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         response = Response(serializer.data, status=status.HTTP_200_OK)
-        response.set_cookie("session_id", value=serializer.data.get('token'))
-        session_storage.set(serializer.data.get('token'), serializer.data.get('username'))
+        # response.set_cookie("session_id", value=serializer.data.get('token'))
+        # session_storage.set(serializer.data.get('token'), serializer.data.get('username'))
 
-        return Response({"token":serializer.data.get('token')}, status=status.HTTP_200_OK)
+        return response

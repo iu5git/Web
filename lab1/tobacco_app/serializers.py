@@ -70,8 +70,7 @@ class LoginSerializer(serializers.Serializer):
             )
 
         return {
-            'token': user.token,
-            'username': user.get_username
+            'token': user.token
         }
 
 

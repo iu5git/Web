@@ -76,8 +76,8 @@ class JWTAuthentication(authentication.BaseAuthentication):
         successful, return the user and token. If not, throw an error.
         """
         try:
-            payload = jwt.decode(token, settings.SECRET_KEY, algorithm='HS256')
-        except:
+            payload = jwt.decode(token, settings.SECRET_KEY, algorithms=['HS256'])
+        except Exception as e:
             msg = 'Invalid authentication. Could not decode token.'
             raise exceptions.AuthenticationFailed(msg)
 
