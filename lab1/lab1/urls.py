@@ -1,14 +1,15 @@
 from django.contrib import admin
-from django.urls import include, path
+from django.urls import include, path, re_path
 from rest_framework import routers
 from tobacco_app import views
-from tobacco_app.viewSets import ProductViewSet, CustomerViewSet, OrderViewSet
+from tobacco_app.viewSets import *
 
 
 
 router = routers.DefaultRouter()
 router.register(r'products', ProductViewSet)
-router.register(r'customer', CustomerViewSet)
+# router.register(r'login', LoginAPIView.as_view(), basename='user_login')
+# router.register(r'registration', RegistrationAPIView.as_view(), basename='user_registration')
 router.register(r'order', OrderViewSet)
 
 urlpatterns = [
@@ -19,4 +20,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     # path('tobacco-app', include('tobacco_app.urls')),
     path('', include(router.urls)),
+    re_path(r'^registration/?$', RegistrationAPIView.as_view(), name='user_registration'),
+    re_path(r'^login/?$', LoginAPIView.as_view(), name='user_login'),
     ]

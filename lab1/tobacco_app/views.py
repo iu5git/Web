@@ -6,6 +6,9 @@ from django.shortcuts import get_object_or_404
 from rest_framework import  status
 from rest_framework.response import Response
 # from rest_framework.decorators import api_view
+from django.conf import settings
+
+# Connect to our Redis instance
 
 
 from .models import *
@@ -33,7 +36,7 @@ def get_product(request, id):
         'current_date': date.today(),
         'product': Product.objects.filter(id=id)[0]
     }})
-    
+
 # nt = namedtuple("object", ["model", "serializers"])
 # pattern = {
 #     "product"  : nt(Product, ProductSerializer),
@@ -58,7 +61,7 @@ def get_product(request, id):
 #     if request.method == "POST":
 #         data = request.data
 #         serializers = object.serializers(data=data)
-        
+
 #         if not serializers.is_valid():
 #             return Response(
 #                 data   = serializers.error,
