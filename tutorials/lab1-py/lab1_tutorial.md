@@ -400,4 +400,26 @@ STATIC_URL = '/static/'
 <div class="order-text">Информация о заказе №{{ data.id }}</div>
 ```
 
-## to-do Получение данных из запроса, input
+## Получение данных из запроса, input
+
+Для передачи данных из браузера на сервер Django, необходимо добавить форму, кнопку и поле ввода в наш шаблон
+```html
+<form action="sendText" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <input name="text" type="text"><br><br>
+    <input type="submit" value="Submit" >
+</form>
+```
+
+Добавить в `urls.py` обработчик нашего POST-запроса `views.sendText` для url [/sendText]()
+```python
+path('sendText', views.sendText, name='sendText'),
+```
+
+А в обработчик `sendText` в `views.py` добавляем код получения значения передаваемого параметра из POST-запроса
+
+```python
+def sendText(request):
+    input_text = request.POST['text']
+    ...
+```
