@@ -1,8 +1,4 @@
-export type Tobacco = {
-    id: number;
-    title: string;
-    price: number;
-};
+import { Tobacco } from "types/tobacco";
 
 export type CoffeeCardProps = Omit<
     React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement>,
