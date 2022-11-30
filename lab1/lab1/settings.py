@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'tobacco_app',
     'rest_framework',
+    'authentication',
 ]
 
 MIDDLEWARE = [
@@ -130,15 +131,16 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-AUTH_USER_MODEL = 'tobacco_app.User'
+AUTH_USER_MODEL = 'authentication.User'
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
-        # 'rest_framework.permissions.AllowAny',
 
         ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'tobacco_app.backends.JWTAuthentication',
-        )
+        'authentication.backends.JWTAuthentication',
+        ),
+    'EXCEPTION_HANDLER': 'authentication.exceptions.core_exception_handler',
+    'NON_FIELD_ERRORS_KEY': 'error',
 }
