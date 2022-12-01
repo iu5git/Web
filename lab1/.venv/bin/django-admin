@@ -1,4 +1,4 @@
-#!/Users/puzzzik/Developer/web-2022/lab1/.venv/bin/python3
+#!/Users/puzzzik/Developer/web-2022/lab1/.venv/bin/python
 # -*- coding: utf-8 -*-
 import re
 import sys

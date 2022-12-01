@@ -1,12 +1,12 @@
 from rest_framework import status
+from rest_framework.generics import RetrieveUpdateAPIView
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.permissions import AllowAny
+
 from .renderers import UserJSONRenderer
-from rest_framework.generics import RetrieveUpdateAPIView
-
-
 from .serializers import *
+
 
 class RegistrationAPIView(APIView):
     """
@@ -46,10 +46,18 @@ class LoginAPIView(APIView):
         Email and password are required.
         Returns a JSON web token.
         """
+
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         response = Response(serializer.data, status=status.HTTP_200_OK)
-
+        user = User.objects.get(email=serializer.data.get('email'))
+        token = serializer.data.get('token')
+        response.set_cookie(key='uid', value=user.pk, httponly=True)
+        # json_user = s.serialize('json', [user, ])
+        # parted_token = serializer.data.get('token').split('.')
+        # halved_token = parted_token[0] + '.' + parted_token[1]
+        # redis_connect.set(halved_token, value=json_user)
+        redis_connect.set(user.pk, value=token)
         return response
 
 

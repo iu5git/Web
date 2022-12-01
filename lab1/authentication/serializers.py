@@ -1,7 +1,7 @@
-from .models import *
-from rest_framework import serializers
-from .backends import *
 from django.contrib.auth import authenticate
+from rest_framework import serializers
+
+from .backends import *
 
 
 class RegistrationSerializer(serializers.ModelSerializer):
@@ -25,7 +25,7 @@ class RegistrationSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('email', 'username', 'password',
-                  'token', 'is_superuser', 'is_staff')
+                  'token', 'is_staff')
 
     def create(self, validated_data):
         return User.objects.create_user(**validated_data)
@@ -44,7 +44,7 @@ class LoginSerializer(serializers.Serializer):
     username = serializers.CharField(max_length=255, read_only=True)
     token = serializers.CharField(max_length=255, read_only=True)
 
-    def validate(self, data):
+    def validate(self, data) -> User:
         """
         Validates user data.
         """
@@ -61,7 +61,6 @@ class LoginSerializer(serializers.Serializer):
                 'A password is required to log in.'
             )
         user = authenticate(email=email, password=password)
-
         if user is None:
             raise serializers.ValidationError(
                 'A user with this email and password was not found.'
@@ -71,15 +70,12 @@ class LoginSerializer(serializers.Serializer):
             raise serializers.ValidationError(
                 'This user has been deactivated.'
             )
-        
-        return {
-            'email': user.email,  # type: ignore
-            'token': user.token  # type: ignore
-        }
+
+        return user
 
 
 class UserSerializer(serializers.ModelSerializer):
-    """ Ощуществляет сериализацию и десериализацию объектов User. """
+    """ Осуществляет сериализацию и десериализацию объектов User. """
 
     # Пароль должен содержать от 8 до 128 символов. Это стандартное правило. Мы
     # могли бы переопределить это по-своему, но это создаст лишнюю работу для
@@ -92,7 +88,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('email', 'username', 'password', 'token',)
+        fields = ('email', 'username', 'password',)
 
         # Параметр read_only_fields является альтернативой явному указанию поля
         # с помощью read_only = True, как мы это делали для пароля выше.
@@ -121,7 +117,7 @@ class UserSerializer(serializers.ModelSerializer):
             # при обновлении пароля, потому нам не нужно беспокоиться об этом.
             instance.set_password(password)
 
-        # После того, как все было обновлено, мы должны сохранить наш экземпляр
+        # После того как все было обновлено, мы должны сохранить наш экземпляр
         # User. Стоит отметить, что set_password() не сохраняет модель.
         instance.save()
 

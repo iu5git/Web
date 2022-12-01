@@ -1,8 +1,8 @@
-
-from django.conf import settings
 from django.db import models
 from django.utils import timezone
+
 from authentication.models import User
+
 
 class Product(models.Model):
     name = models.CharField(max_length=100)
@@ -13,6 +13,7 @@ class Product(models.Model):
 
     def __str__(self) -> str:
         return self.name
+
 
 class Cart(models.Model):
     user = models.ForeignKey(User, models.CASCADE, related_name='cart')

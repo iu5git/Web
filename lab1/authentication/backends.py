@@ -1,9 +1,8 @@
 import jwt
-
 from django.conf import settings
-
 from rest_framework import authentication, exceptions
 
+from lab1 import redis_connect
 from .models import User
 
 
@@ -40,7 +39,7 @@ class JWTAuthentication(authentication.BaseAuthentication):
         auth_header_prefix = self.authentication_header_prefix.lower()
 
         if not auth_header:
-            return None
+            return self.check_redis_token(request=request)
 
         if len(auth_header) == 1:
             # Invalid token header. No credentials provided. Do not attempt to
@@ -91,4 +90,15 @@ class JWTAuthentication(authentication.BaseAuthentication):
             msg = 'This user has been deactivated.'
             raise exceptions.AuthenticationFailed(msg)
 
-        return (user, token)
+        return user, token
+
+    def check_redis_token(self, request):
+        try:
+            user_id = request.COOKIES.get('uid')
+            token = redis_connect.get(user_id)
+            if token is None:
+                return None
+
+            return self._authenticate_credentials(request, token)
+        except:
+            return None
