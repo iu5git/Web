@@ -102,8 +102,69 @@ const MusicCard = ({artworkUrl100, artistName, collectionCensoredName, trackView
 export default MusicCard;
 ```
 
-## to-do Доработка сервиса бэкенда
-Методы нашего сервиса на бэкенде должны предусматривать получение значений всех фильтров в качестве входных параметров 
+## POST запросы и Axios
+
+Для выполнения данной лабораторной работы вам понадобятся POST запросы для внесения новых данных о ваших покупках, а также запросы для удаления записей при обращении к вашему сервису
+
+Выполнение POST-запроса
+
+```js
+axios.post('/user', {
+        firstName: 'Fred',
+        lastName: 'Flintstone'
+    })
+    .then(function (response) {
+        console.log(response);
+    })
+    .catch(function (error) {
+        console.log(error);
+    });
+```
+
+Выполнение нескольких одновременных запросов
+
+```js
+function getUserAccount() {
+    return axios.get('/user/12345');
+}
+
+function getUserPermissions() {
+    return axios.get('/user/12345/permissions');
+}
+
+Promise.all([getUserAccount(), getUserPermissions()])
+    .then(function (results) {
+        const acct = results[0];
+        const perm = results[1];
+    });
+```
+
+## Доработка сервиса бэкенда
+Методы нашего сервиса на бэкенде должны предусматривать получение значений всех фильтров в качестве входных параметров
+
+#### filter()
+
+`filter(*args, **kwargs)`
+
+Возвращает новый `QuerySet`, содержащий объекты, которые соответствуют заданным параметрам поиска.
+
+Параметры поиска (`**kwargs`) должны быть в формате, описанном в Полевые поиски ниже. Несколько параметров объединяются через "И" в базовом операторе `SQL`.
+
+Если вам необходимо выполнить более сложные запросы (например, запросы с операторами OR), вы можете использовать `Q objects (*args)`.
+
+#### order_by()
+
+`order_by(*fields)`
+
+По умолчанию результаты, возвращаемые QuerySet, упорядочиваются с помощью кортежа, заданного параметром ordering в классе Meta модели. Вы можете переопределить это для каждого QuerySet, используя метод order_by.
+
+Пример:
+
+```python
+Entry.objects.filter(pub_date__year=2005).order_by('-pub_date', 'headline')
+```
+
+Приведенный выше результат будет упорядочен по убыванию `pub_date`, затем по возрастанию `headline`.
 
 ## to-do Swagger
 Подключение Swagger на бэкенде.

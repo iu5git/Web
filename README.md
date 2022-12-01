@@ -151,6 +151,7 @@ Activity диаграмма: описание основного алгорит�
 
 * [iOS (Swift)](https://github.com/iu5git/web-2022/blob/main/tutorials/ios_tutorial/ios_tutorial.md)
 * [Android (Java)](https://github.com/iu5git/web-2022/blob/main/tutorials/android_tutorial/android_tutorial.md)
+* [React Native + Redux Toolkit](/tutorials/react-native/react_native.md)
 * [Progressive Web App](/tutorials/pwa/PWA.md)
 
 ## Домашнее задание
