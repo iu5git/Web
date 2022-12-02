@@ -1,4 +1,6 @@
-# React Native
+# Методические указания для React Native
+
+### Команда курса благодарит Данилова Даниила Сергеевича за активное участие в подготовке данного руководства.
 
 Создаем проект командой
 
@@ -56,7 +58,7 @@ npm i
 
 `ShopScreen.jsx`
 
-```
+```js
 import { View, Text, Button } from 'react-native';
 import React from 'react';
 
@@ -72,7 +74,7 @@ export default function ShopScreen({ navigation }) {
 
 `DeviceScreen.jsx`
 
-```
+```js
 import { View, Text } from 'react-native';
 import React from 'react';
 
@@ -87,7 +89,7 @@ export default function DeviceScreen() {
 
 А также изменим `App.js`
 
-```
+```js
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import ShopScreen from './screens/ShopScreen';
@@ -113,13 +115,13 @@ export default function App() {
 
 Теперь займемся хранилищем, а после визуализируем все данные
 
-```
+```js
 npm i react-redux @reduxjs/toolkit axios
 ```
 
 создаем в папке `store` файл `index.js`
 
-```
+```js
 import { configureStore } from '@reduxjs/toolkit';
 
 export const store = configureStore({ reducer: {} });
@@ -127,7 +129,7 @@ export const store = configureStore({ reducer: {} });
 
 Оборачиваем наше приложение в `Provider`
 
-```
+```js
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import ShopScreen from './screens/ShopScreen';
@@ -153,7 +155,7 @@ export default function App() {
 
 Теперь в папке `store` создаем наш слайс - `deviceSlice.js`
 
-```
+```js
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
@@ -189,7 +191,7 @@ export const { setDevices, setDevice, resetDevice } = deviceSlice.actions;
 
 И добавляем его в `store`
 
-```
+```js
 import { configureStore } from '@reduxjs/toolkit';
 import { deviceReducer } from './deviceSlice';
 
@@ -198,7 +200,7 @@ export const store = configureStore({ reducer: { device: deviceReducer } });
 
 Создаем папку `API` и в ней `index.js`
 
-```
+```js
 import axios from 'axios';
 
 export const axiosInstance = axios.create({ baseURL: 'http://192.168.0.104:5000/api' });
@@ -208,7 +210,7 @@ export const axiosInstance = axios.create({ baseURL: 'http://192.168.0.104:5000/
 
 Создаем в папке components файл `DeviceCard.jsx`
 
-```
+```js
 import { View, Text } from 'react-native';
 import React from 'react';
 
@@ -223,7 +225,7 @@ export default function DeviceCard(props) {
 
 После этого на странице с помощью `useEffect` отправляем запрос и через `dispatch` записываем данные в хранилище
 
-```
+```js
 import { View } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import React, { useEffect } from 'react';
@@ -253,7 +255,7 @@ export default function ShopScreen({ navigation }) {
 
 Теперь наведем немного красоты и сделаем нормальную карточку товара, в моем случае телефона
 
-```
+```js
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import React, { useEffect } from 'react';
@@ -294,7 +296,7 @@ const styles = StyleSheet.create({
 
 ```
 
-```
+```js
 import { View, Text, StyleSheet, Image, Button } from 'react-native';
 import React from 'react';
 
@@ -348,7 +350,7 @@ const styles = StyleSheet.create({
 
 И посмотрим, что мы передали вместе с нажатием параметр – `id` товара (функция `handlePress`)
 
-```
+```js
 import { View, Text } from 'react-native';
 import React from 'react';
 
@@ -368,7 +370,7 @@ export default function DeviceScreen({ route }) {
 
 Теперь займемся вторым запросом на получение данных о конкретном товаре
 
-```
+```js
 import { View, Text } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import React, { useEffect } from 'react';
@@ -408,4 +410,3 @@ export default function DeviceScreen({ route }) {
 
 Если у вас всё работало, ответы с сервера приходили, но через время запросы начали падать, обновите `URL` бэкенда
 
-Автор - `github.com/douevenfeel`
