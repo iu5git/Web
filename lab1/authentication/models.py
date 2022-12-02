@@ -1,15 +1,14 @@
-import jwt
 from datetime import datetime
 from datetime import timedelta
 
+import jwt
 from django.conf import settings
-from django.db import models
-from django.core import validators
 from django.contrib.auth.models import AbstractBaseUser
 from django.contrib.auth.models import PermissionsMixin
-from django.utils import timezone
+from django.db import models
 
 from .managers import UserManager
+
 
 class User(AbstractBaseUser, PermissionsMixin):
     username = models.CharField(db_index=True, max_length=255, unique=True)
@@ -75,3 +74,9 @@ class User(AbstractBaseUser, PermissionsMixin):
         }, settings.SECRET_KEY, algorithm='HS256')
         return token
 
+    def get_cart(self):
+        try:
+            cart = self.cart
+        except:
+            return None
+        return self.cart

@@ -16,16 +16,18 @@ class Product(models.Model):
 
 
 class Cart(models.Model):
-    user = models.ForeignKey(User, models.CASCADE, related_name='cart')
-    products = models.ManyToManyField(Product, verbose_name="products")
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='cart',
+                                related_query_name='cart_query')
+    products = models.ManyToManyField(Product, verbose_name="products", blank=True)
 
     def __str__(self) -> str:
-        return self.user.get_short_name()
+        return self.user.get_short_name() + 'cart'
 
 
 class Order(models.Model):
-    cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
     date = models.DateField(default=timezone.now, blank=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='orders', related_query_name='orders_query')
+    products = models.ManyToManyField(Product, verbose_name="products")
 
     def __str__(self) -> str:
-        return self.cart.user.get_short_name()
+        return self.user.get_short_name() + 'order'

@@ -39,7 +39,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'authentication',
     'django_filters',
-    'drf_yasg',
+    # 'drf_yasg',
+    'drf_spectacular',
 ]
 
 MIDDLEWARE = [
@@ -142,6 +143,7 @@ REST_FRAMEWORK = {
         'rest_framework.filters.SearchFilter',
         'rest_framework.filters.OrderingFilter',
     ],
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 
 CACHES = {
@@ -155,3 +157,11 @@ CACHES = {
 }
 SESSION_ENGINE = "django.contrib.sessions.backends.cache"
 SESSION_CACHE_ALIAS = "default"
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Tobacco API',
+    'DESCRIPTION': 'Tobacco Shop',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    # OTHER SETTINGS
+}

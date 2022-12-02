@@ -4,7 +4,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .renderers import UserJSONRenderer
+# from .renderers import UserJSONRenderer
 from .serializers import *
 
 
@@ -14,7 +14,8 @@ class RegistrationAPIView(APIView):
     """
     permission_classes = [AllowAny]
     serializer_class = RegistrationSerializer
-    renderer_classes = (UserJSONRenderer,)
+
+    # renderer_classes = (UserJSONRenderer,)
 
     def post(self, request):
         """
@@ -38,7 +39,8 @@ class LoginAPIView(APIView):
     """
     permission_classes = [AllowAny]
     serializer_class = LoginSerializer
-    renderer_classes = (UserJSONRenderer,)
+
+    # renderer_classes = (UserJSONRenderer,)
 
     def post(self, request):
         """
@@ -49,6 +51,7 @@ class LoginAPIView(APIView):
 
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
+        print(serializer.data)
         response = Response(serializer.data, status=status.HTTP_200_OK)
         user = User.objects.get(email=serializer.data.get('email'))
         token = serializer.data.get('token')
@@ -62,7 +65,7 @@ class LoginAPIView(APIView):
 
 
 class UserRetrieveUpdateAPIView(RetrieveUpdateAPIView):
-    renderer_classes = (UserJSONRenderer,)
+    # renderer_classes = (UserJSONRenderer,)
     serializer_class = UserSerializer
 
     def retrieve(self, request, *args, **kwargs):

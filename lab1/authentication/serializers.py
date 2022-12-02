@@ -1,6 +1,7 @@
 from django.contrib.auth import authenticate
 from rest_framework import serializers
 
+from tobacco_app.models import Cart
 from .backends import *
 
 
@@ -24,11 +25,14 @@ class RegistrationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('email', 'username', 'password',
+        fields = ('id', 'email', 'username', 'password',
                   'token', 'is_staff')
 
     def create(self, validated_data):
-        return User.objects.create_user(**validated_data)
+        user = User.objects.create_user(**validated_data)
+        cart = Cart.objects.create(user=user)
+        cart.save()
+        return user
 
 
 class LoginSerializer(serializers.Serializer):
@@ -43,6 +47,7 @@ class LoginSerializer(serializers.Serializer):
     # Ignore these fields if they are included in the request.
     username = serializers.CharField(max_length=255, read_only=True)
     token = serializers.CharField(max_length=255, read_only=True)
+    id = serializers.IntegerField(read_only=True)
 
     def validate(self, data) -> User:
         """
@@ -88,7 +93,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('email', 'username', 'password',)
+        fields = ('id', 'email', 'username', 'password',)
 
         # Параметр read_only_fields является альтернативой явному указанию поля
         # с помощью read_only = True, как мы это делали для пароля выше.
@@ -96,7 +101,7 @@ class UserSerializer(serializers.ModelSerializer):
         # состоит в том, что нам не нужно ничего указывать о поле. В поле
         # пароля требуются свойства min_length и max_length,
         # но это не относится к полю токена.
-        read_only_fields = ('token',)
+        read_only_fields = ('token', 'id')
 
     def update(self, instance, validated_data):
         """ Выполняет обновление User. """
