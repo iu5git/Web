@@ -46,7 +46,11 @@ npm install @react-navigation/native @react-navigation/native-stack
 expo install react-native-screens react-native-safe-area-context
 ```
 
-Позднее может появиться ошибка, что `react-native-safe-area-context` есть как зависимость, но не установлена, тогда нужно просто написать `npm i`
+Позднее может появиться ошибка, что `react-native-safe-area-context` есть как зависимость, но не установлена, тогда нужно просто написать
+
+```
+npm i
+```
 
 Создаем папку `screens`, в ней создадим две страницы – главную страницу магазина(`ShopScreen.jsx`) и страницу товара(`DeviceScreen.jsx`)
 
