@@ -1,7 +1,7 @@
 from django.contrib.auth import authenticate
 from rest_framework import serializers
 
-from tobacco_app.models import Cart
+from app.models import Cart
 from .backends import *
 
 

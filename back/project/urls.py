@@ -3,7 +3,7 @@ from django.urls import include, path
 from rest_framework import routers
 
 import spectacular.urls
-from tobacco_app.views import *
+from app.views import *
 
 router = routers.DefaultRouter()
 router.register(r'products', ProductViewSet, basename='products')

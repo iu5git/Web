@@ -5,7 +5,7 @@ from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 
-from tobacco_app.serializers import *
+from app.serializers import *
 
 
 class ProductViewSet(viewsets.ModelViewSet):
