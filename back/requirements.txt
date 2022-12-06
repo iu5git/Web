@@ -5,3 +5,5 @@ PyJWT==2.6.0
 drf-spectacular==0.24.2
 django_redis==5.2.0
 psycopg2==2.9.5
+django-cors-headers==3.13.0
+
