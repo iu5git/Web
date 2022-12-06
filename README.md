@@ -139,7 +139,7 @@ Activity диаграмма: описание основного бизнес-п
 
 Контрольные вопросы: куки, сессия, redis, jwt, авторизация, аутентификация
 
-* [Настройка Redis через WSL](tutorials/redis_wsl/redis.md)
+* [Настройка Kafka через WSL](https://github.com/iu5git/Networking/tree/main/kafka_wsl)
 * [Методические указания DRF Redis](https://github.com/iu5git/web-2022/blob/main/tutorials/lab7-py/lab7_tutorial.md)
 * [Методические указания Golang JWT](https://github.com/iu5git/web-2022/tree/main/tutorials/lab7-go/README.md)
 
