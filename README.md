@@ -139,7 +139,7 @@ Activity диаграмма: описание основного алгорит�
 
 Контрольные вопросы: куки, сессия, redis, jwt, авторизация, аутентификация
 
-* [Настройка Redis через WSL](tutorials/redis_wsl/redis.md))
+* [Настройка Redis через WSL](tutorials/redis_wsl/redis.md)
 * [Методические указания DRF Redis](https://github.com/iu5git/web-2022/blob/main/tutorials/lab7-py/lab7_tutorial.md)
 * [Методические указания Golang JWT](https://github.com/iu5git/web-2022/tree/main/tutorials/lab7-go/README.md)
 
