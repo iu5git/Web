@@ -49,7 +49,7 @@ C:/kafka_2.12-3.2.0/bin/windows/kafka-server-start.bat C:/kafka_2.12-3.2.0/confi
 # С докером
 1. Скачайте [докер](https://www.docker.com/products/docker-desktop/) и WSL2 (В Docker desktop будет ссылка)
 2. Рекомендую ознакомиться с [документацией](https://learn.microsoft.com/ru-ru/windows/wsl/tutorials/wsl-containers)
-3. В корень проекта, в котором вы будете работать поместить конфигурационный файл
+3. В корень проекта, в котором вы будете работать поместить конфигурационный [файл](docker-compose.yml) 
 
 ![](assets/docker1.jpg)
 
@@ -60,4 +60,5 @@ C:/kafka_2.12-3.2.0/bin/windows/kafka-server-start.bat C:/kafka_2.12-3.2.0/confi
 ![](assets/docker2.jpg)
 
 также можно проверить через *docker ps*
-7. Готово. Успешной работы!
+
+#### Готово. Успешной работы!
