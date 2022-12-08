@@ -1,5 +1,7 @@
 # Разработка Интернет Приложений (РИП) 2022
 
+Отчеты по лабораторным работам и ДЗ отправлять на почту `aikanev@bmstu.ru`
+
 ## [Видеозаписи лекций в youtube](https://youtube.com/playlist?list=PLLELLTvDgUQ9cpB1XzSuZ0mNSBkbjVNJ_)
 #### Образ виртуальной машины Linux [Ubuntu 20.04](https://github.com/iu5git/Standards/blob/main/Linux/Linux.md) для выполнения заданий курса 
 
