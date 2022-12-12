@@ -207,6 +207,12 @@ export const axiosInstance = axios.create({ baseURL: 'http://192.168.0.104:5000/
 ```
 
 !!! обязательно `url` в таком виде, не `localhost`, иначе запросы будут падать
+Upd: что надо сделать, чтобы запустить сервер на подобном адресе
+
+1. Пишем в терминале ipconfig и ищем IPv4-адрес в разделе `Адаптер беспроводной локальной сети Беспроводная сеть` - в моем случае `192.168.125.34`
+2. Запускаем сервер командой `python manage.py runserver 192.168.125.34:8000`
+3. Если мы перейдем по этой ссылке, то в браузере будет ошибка, в которой сказано про `ALLOWED_HOSTS` - открываем `settings.py`, ищем `ALLOWED_HOSTS` и записываем в массив адрес - что-то вроде такого `ALLOWED_HOSTS = ['192.168.125.34']`
+   Важно, если вы пришли сдавать лабу, а у вас все упало, повторите все эти действия и не забудьте поменять `baseURL` в `axiosInstance`
 
 Создаем в папке components файл `DeviceCard.jsx`
 
@@ -246,7 +252,6 @@ export default function ShopScreen({ navigation }) {
 
     return <View>{!!devices && devices.map((device) => <DeviceCard key={device.id} {...device} />)}</View>;
 }
-
 ```
 
 И после сохранения видим в консоли заветное:
@@ -293,7 +298,6 @@ const styles = StyleSheet.create({
         backgroundColor: '#2a2a2a',
     },
 });
-
 ```
 
 ```js
@@ -343,7 +347,6 @@ const styles = StyleSheet.create({
     brandTitle: { color: '#4287f5', fontSize: 16 },
     text: { color: '#f0f0f0', fontSize: 16 },
 });
-
 ```
 
 ![](assets/8.png)
@@ -409,4 +412,3 @@ export default function DeviceScreen({ route }) {
 Теперь вам осталось только вывести всю информацию о товаре, аналогично компоненту `DeviceCard`
 
 Если у вас всё работало, ответы с сервера приходили, но через время запросы начали падать, обновите `URL` бэкенда
-
