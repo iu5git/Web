@@ -14,13 +14,21 @@
 
 ## Менеджер состояний
 
+Менеджер состояния может быть реализован через Redux Toolkit или через набор хуков `useContext` и `useReducer`
+
+### Redux Toolkit
+
+[Методические указания для использования Redux Toolkit](https://github.com/iu5git/web-2022/blob/main/tutorials/redux/redux_toolkit.md)
+
+### Хуки useContext и useReducer
+
 Для использования разными компонентами нашего приложения одних данных (одного состояния) нам потребуется использовать хук `useContext`, а для разделения различных источников и вариантов изменений этих состояний мы будем использовать хук `useReducer`
 
-## useContext
+#### useContext
 
 [Контекст](https://reactjs.org/docs/hooks-reference.html#usecontext) разработан для передачи данных, которые можно назвать «глобальными» для всего дерева React-компонентов
 
-## useReducer
+#### useReducer
 
 [Редюсер](https://reactjs.org/docs/hooks-reference.html#usereducer)
 
