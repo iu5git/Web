@@ -2,57 +2,15 @@
 
 ## План
 
-1. Добавление главного меню приложения
+1. Добавление развертывания приложения React в GitHub Pages
 2. Добавление компонентов для фильтрации в react
 3. Доработка веб-сервиса для реализации фильтрации 
 4. POST запросы. CORS
 5. POST запросы. Axios
 6. Добавление Swagger
 
-## 1. Главное меню приложения
 
-Для создания главного меню приложения будем использовать `Navbar` из `react-bootstrap`
-
-[Подробнее](https://react-bootstrap.github.io/components/navbar/)
-
-```jsx
-import Container from 'react-bootstrap/Container';
-import Nav from 'react-bootstrap/Nav';
-import Navbar from 'react-bootstrap/Navbar';
-import NavDropdown from 'react-bootstrap/NavDropdown';
-
-function BasicExample() {
-  return (
-    <Navbar bg="light" expand="lg">
-      <Container>
-        <Navbar.Brand href="#home">React-Bootstrap</Navbar.Brand>
-        <Navbar.Toggle aria-controls="basic-navbar-nav" />
-        <Navbar.Collapse id="basic-navbar-nav">
-          <Nav className="me-auto">
-            <Nav.Link href="#home">Home</Nav.Link>
-            <Nav.Link href="#link">Link</Nav.Link>
-            <NavDropdown title="Dropdown" id="basic-nav-dropdown">
-              <NavDropdown.Item href="#action/3.1">Action</NavDropdown.Item>
-              <NavDropdown.Item href="#action/3.2">
-                Another action
-              </NavDropdown.Item>
-              <NavDropdown.Item href="#action/3.3">Something</NavDropdown.Item>
-              <NavDropdown.Divider />
-              <NavDropdown.Item href="#action/3.4">
-                Separated link
-              </NavDropdown.Item>
-            </NavDropdown>
-          </Nav>
-        </Navbar.Collapse>
-      </Container>
-    </Navbar>
-  );
-}
-
-export default BasicExample;
-```
-
-## 2. Добавление фильтрации. Доработка фронтенда
+## 1. Добавление фильтрации. Доработка фронтенда
 
 Вернемся к нашему примеру с iTunes.
 
@@ -154,7 +112,7 @@ const MusicCard = ({artworkUrl100, artistName, collectionCensoredName, trackView
 export default MusicCard;
 ```
 
-## 3. Добавление фильтрации. Доработка веб-сервиса
+## 2. Добавление фильтрации. Доработка веб-сервиса
 Методы нашего сервиса на бэкенде должны предусматривать получение значений всех фильтров в качестве входных параметров
 
 #### filter()
@@ -181,7 +139,7 @@ Entry.objects.filter(pub_date__year=2005).order_by('-pub_date', 'headline')
 
 Приведенный выше результат будет упорядочен по убыванию `pub_date`, затем по возрастанию `headline`.
 
-## 4. POST запросы. CORS
+## 3. POST запросы. CORS
 
 Вы уже столкнулись с CORS политиками ранее при выполнении GET запроса к вашему сервису. Но расширение браузера не лучшее решение данной проблемы. Поэтому рассмотрим проксирование запросов к бэкенду на фронтенде. 
 
@@ -189,7 +147,7 @@ Entry.objects.filter(pub_date__year=2005).order_by('-pub_date', 'headline')
 
 [Пример проксирования](https://medium.com/bb-tutorials-and-thoughts/react-how-to-proxy-to-backend-server-5588a9e0347)
 
-## 5. POST запросы. Axios
+## 4. POST запросы. Axios
 
 Для выполнения данной лабораторной работы вам понадобятся POST запросы для внесения новых данных о ваших покупках, а также запросы для удаления записей при обращении к вашему сервису
 
@@ -209,7 +167,7 @@ axios.post('/user', {
 ```
 
 
-## 6. Добавление Swagger
+## 5. Добавление Swagger
 
 Подключение swagger к Django Rest Framework делается очень просто. Для начала необходимо скачать зависимость:
 

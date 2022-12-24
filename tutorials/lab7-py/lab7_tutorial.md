@@ -111,6 +111,32 @@ class ExampleView(APIView):
         return Response(content)
 ```
 
+## Использование авторизации Django на фронтенде
+
+Для использование стандартной авторизации Django требуется дополнительно добавить в запросы работу с `CSRFToken`
+
+```js
+const options = {
+   method: 'PATCH',
+   credentials: 'include',
+   headers: {
+       'Content-Type': 'application/json',
+       "X-CSRFToken": document.cookie
+           .split('; ')
+           .filter(row => row.startsWith('csrftoken='))
+           .map(c => c.split('=')[1])[0]
+   },
+       body: JSON.stringify({
+           order_statusid: 8,
+            order_date: new Date().toISOString()
+       })
+};
+fetch(`http://${api_socket}/orders/${user_cart[user_cart.length - 1].order_id}/`, options)
+   .then(response => response.json())
+   .then(response => console.log(response))
+   .catch(err => console.error(err));
+```
+
 ## СУБД для хранения сессий
 
 Выше мы использовали встроенные механизмы аутентификации в Django. Но для достаточно нагруженных приложений, это не всегда может быть выгодно по производительности,

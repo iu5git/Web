@@ -2,25 +2,65 @@
 
 ## План
 
-1. Добавление взаимодействия с API
-2. Решение проблем с CORS политикой при обращении к собственному API
-3. Добавление менеджера состояний 
+1. Развертывание приложения React в GitHub Pages
+2. Добавление главного меню приложения
+3. Добавление менеджера состояний
+    1. Redux Toolkit
+    2. React Context
 
-    3.1 Redux Toolkit
-    
-    3.2 React Context
+## 1. Развертывание приложения React в GitHub Pages
 
-## 1. Обращение к `API`
-Вернемся к нашему примеру с iTunes. Теперь нам требуется заменить наши запросы `fetch` к сервису iTunes на обращение к нашему сервису `Django` или `Golang`
+С помощью `GitHub Pages` возможно развернуть статическое приложение, например наш React проект. Но развернуть наш бекенд здесь не получится.
 
-## 2. Важный момент. CORS
-Скорее всего у вас возникнет проблема с отображением либо всего проекта React, либо с частью, связанной с json'ом. 
+[Пример развертывания React](https://github.com/gitname/react-gh-pages)
 
-Как понять, что пустой экран связан с этой ошибкой?
+#### Обратите внимание
+
+При развертывании приложения `React` через `GitHub Pages`, ваши `AJAX` запросы будут идти по `http`, в то время как приложение будет доступно по `https`. Работать это будет только при использовании адреса `localhost` в `AJAX` запросах.
+
+## 2. Главное меню приложения
+
+Для создания главного меню приложения будем использовать `Navbar` из `react-bootstrap`
+
+[Подробнее](https://react-bootstrap.github.io/components/navbar/)
 
 
-Нажимаем правой кнопкой мыши на любое место на странице, после чего нажимаем на кнопку __Посмотреть код__. После чего переходим во вкладку __Console__, где и ищем ошибку связанную с `CORS`-политикой. Если она есть, то просто отключаем CORS. Есть разные способы, как это сделать, но я предложу очень полезное [расширение для Googl'a](https://chrome.google.com/webstore/detail/cors-unblock/lfhmikememgdcahcdlaciloancbhjino) 
+```jsx
+import Container from 'react-bootstrap/Container';
+import Nav from 'react-bootstrap/Nav';
+import Navbar from 'react-bootstrap/Navbar';
+import NavDropdown from 'react-bootstrap/NavDropdown';
 
+function BasicExample() {
+  return (
+    <Navbar bg="light" expand="lg">
+      <Container>
+        <Navbar.Brand href="#home">React-Bootstrap</Navbar.Brand>
+        <Navbar.Toggle aria-controls="basic-navbar-nav" />
+        <Navbar.Collapse id="basic-navbar-nav">
+          <Nav className="me-auto">
+            <Nav.Link href="#home">Home</Nav.Link>
+            <Nav.Link href="#link">Link</Nav.Link>
+            <NavDropdown title="Dropdown" id="basic-nav-dropdown">
+              <NavDropdown.Item href="#action/3.1">Action</NavDropdown.Item>
+              <NavDropdown.Item href="#action/3.2">
+                Another action
+              </NavDropdown.Item>
+              <NavDropdown.Item href="#action/3.3">Something</NavDropdown.Item>
+              <NavDropdown.Divider />
+              <NavDropdown.Item href="#action/3.4">
+                Separated link
+              </NavDropdown.Item>
+            </NavDropdown>
+          </Nav>
+        </Navbar.Collapse>
+      </Container>
+    </Navbar>
+  );
+}
+
+export default BasicExample;
+```
 
 ## 3. Менеджер состояний
 
@@ -28,7 +68,7 @@
 
 ### 3.1. Redux Toolkit
 
-[Методические указания для использования Redux Toolkit](https://github.com/iu5git/web-2022/blob/main/tutorials/redux/redux_toolkit.md)
+[Методические указания для Redux Toolkit](https://github.com/iu5git/web-2022/blob/main/tutorials/redux/redux_toolkit.md)
 
 ### 3.2. Хуки useContext и useReducer
 
