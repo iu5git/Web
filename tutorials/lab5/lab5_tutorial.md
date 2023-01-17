@@ -4,9 +4,7 @@
 
 1. Развертывание приложения React в GitHub Pages
 2. Добавление главного меню приложения
-3. Добавление менеджера состояний
-    1. Redux Toolkit
-    2. React Context
+3. Добавление менеджера состояний Redux Toolkit
 
 ## 1. Развертывание приложения React в GitHub Pages
 
@@ -64,22 +62,6 @@ export default BasicExample;
 
 ## 3. Менеджер состояний
 
-Менеджер состояния может быть реализован через Redux Toolkit или через набор хуков `useContext` и `useReducer`
-
-### 3.1. Redux Toolkit
+Менеджер состояния может быть реализован через Redux Toolkit
 
 [Методические указания для Redux Toolkit](https://github.com/iu5git/web-2022/blob/main/tutorials/redux/redux_toolkit.md)
-
-### 3.2. Хуки useContext и useReducer
-
-Для использования разными компонентами нашего приложения одних данных (одного состояния) нам потребуется использовать хук `useContext`, а для разделения различных источников и вариантов изменений этих состояний мы будем использовать хук `useReducer`
-
-#### useContext
-
-[Контекст](https://reactjs.org/docs/hooks-reference.html#usecontext) разработан для передачи данных, которые можно назвать «глобальными» для всего дерева React-компонентов
-
-#### useReducer
-
-[Редюсер](https://reactjs.org/docs/hooks-reference.html#usereducer)
-
-
