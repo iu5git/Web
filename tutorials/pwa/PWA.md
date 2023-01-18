@@ -221,4 +221,267 @@ self.addEventListener('fetch',() => console.log("fetch"));
 
 ![](./assets/9.png)
 
-[//]: # (Базово в css объявляем `@media &#40;max-width: 480px`. И внутри фигурных скобок пишем стили, они будут применяться, когда разрешение устройства меньше 480px. Обычно телефоны примерно таких размером, можно отдельно сделать для совсем маленьких телефонов 320px &#40;iPhone SE&#41;. Или для планшетов 768px.)
+2. Создание адаптивной панели навигации
+
+Панель навигации является важнейшим элементом в веб-приложении, ведь пользователь на протяжении всего серфинга по сайту его видит, поэтому следует уделить особое внимание адаптивности данного компонента.
+
+Пример макета компонента `Navbar`:
+```jsx
+import React from 'react'
+import {NavLink} from "react-router-dom";
+import './Navbar.css'
+
+export const Navbar = () => {
+  return (
+      <nav className='nav'>
+        <div className='nav__wrapper'>
+          <div className='nav__links'>
+            <NavLink to='/' className='nav__link'>Главная</NavLink>
+            <NavLink to='/items' className='nav__link'>Товары</NavLink>
+            <NavLink to='/orders' className='nav__link'>Заказы</NavLink>
+            <NavLink to='/about' className='nav__link'>О магазине</NavLink>
+          </div>
+          <div className='nav__cart'>
+            <NavLink to='/cart' className='nav__link nav__link--cart'>Корзина</NavLink>
+          </div>
+        </div>
+      </nav>
+  )
+}
+```
+
+`Navbar.css`
+```css
+.nav {
+    width: calc(100% - 70px);
+    max-width: 1200px;
+    height: 40px;
+    background-color: #387ef6;
+    box-shadow: 0 0 15px rgb(0 0 0 / 10%);
+    padding: 10px 20px;
+    border-radius: 15px;
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+}
+
+.nav__wrapper {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.nav__links {
+    width: 90%;
+    display: flex;
+    align-items: center;
+    gap: 0 35px
+}
+
+.nav__link {
+    text-decoration: none;
+    color: #fff;
+    position: relative;
+}
+
+.nav__link--cart {
+    color: #387ef6;
+    padding: 5px 10px;
+    background-color: #fff;
+    border-radius: 5px;
+    font-weight: 700;
+}
+
+.nav__link.active::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 3px;
+    left: 0;
+    bottom: -7px;
+    background-color: #fff;
+}
+```
+
+В итоге мы получаем такую навигацию:
+
+![](./assets/10.png)
+
+Можно заметить, что при ширине экрана меньше `545px` наш компонент выглядит очень не презентабильно:
+
+![](./assets/11.png)
+
+Что же нам делать в такой ситуации? На помощь приходит компонент, в народе называемый бургер меню (если присмотреться, то действительно похоже на бургер - 2 булочки и котлета посередине).
+
+![](./assets/14.png)
+
+Встроим его в наш компонент `Navbar.jsx`
+```jsx
+import React from 'react'
+import {NavLink} from "react-router-dom"
+import './Navbar.css'
+
+export const Navbar = () => {
+  return (
+      <nav className='nav'>
+        <div className='nav__wrapper'>
+          <div className='nav__links'>
+            <NavLink to='/' className='nav__link'>Главная</NavLink>
+            <NavLink to='/items' className='nav__link'>Товары</NavLink>
+            <NavLink to='/orders' className='nav__link'>Заказы</NavLink>
+            <NavLink to='/about' className='nav__link'>О магазине</NavLink>
+          </div>
+          <div className='nav__cart'>
+            <NavLink to='/cart' className='nav__link nav__link--card'>Корзина</NavLink>
+          </div>
+          <div className='nav__mobile-wrapper'>
+            <div className='nav__mobile-target' />
+            <div className='nav__mobile-menu'>
+              <NavLink to='/' className='nav__link'>Главная</NavLink>
+              <NavLink to='/items' className='nav__link'>Товары</NavLink>
+              <NavLink to='/orders' className='nav__link'>Заказы</NavLink>
+              <NavLink to='/about' className='nav__link'>О магазине</NavLink>
+            </div>
+          </div>
+        </div>
+      </nav>
+  )
+}
+```
+
+Бургер меню имеет всего два состояния:
+1. активное - показывается меню со ссылками на другие страницы, сам бургер превращается в крестик
+2. не активное - меню c навигационными ссылками скрыта, бургер принимает знакомое всем форму
+
+Чтобы отслеживать состояние бургер меню, сделаем простой обработчик события `onClick` при клике на элемент с классом `nav__mobile-wrapper`:
+```jsx
+ <div className='nav__mobile-wrapper'
+      onClick={(event) => event.currentTarget.classList.toggle('active')}
+  >
+    <div className='nav__mobile-target' />
+    <div className='nav__mobile-menu'>
+      <NavLink to='/' className='nav__link'>Главная</NavLink>
+      <NavLink to='/items' className='nav__link'>Товары</NavLink>
+      <NavLink to='/orders' className='nav__link'>Заказы</NavLink>
+      <NavLink to='/about' className='nav__link'>О магазине</NavLink>
+    </div>
+</div>
+```
+
+Что он делает? Всего лишь "переключает" класс `active` у элемента `nav__mobile-wrapper`, то есть добавляет, если `active` отсутствует, и наоборот.
+
+Осталось лишь добавить стили для нашего бургер меню и обработать ситуацию, когда `nav__mobile-wrapper` имеет класс `acitve`.
+```css
+.nav__mobile-wrapper {
+    display: none;
+    height: 30px;
+    width: 30px;
+    transition: all .4s linear;
+    cursor: pointer;
+    position: relative;
+}
+
+.nav__mobile-target {
+    height: 2px;
+    width: 100%;
+    background-color: black;
+    position: relative;
+    transition: all .2s linear;
+}
+
+.nav__mobile-wrapper.active .nav__mobile-target {
+    transform: rotate(45deg)
+}
+
+.nav__mobile-target::after, .nav__mobile-target::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    height: 2px;
+    width: 100%;
+    background-color: black;
+}
+
+.nav__mobile-target::after {
+    top: -7px;
+}
+
+.nav__mobile-target::before {
+    bottom: -7px;
+}
+
+.nav__mobile-wrapper.active .nav__mobile-target::after {
+    display: none;
+}
+
+.nav__mobile-wrapper.active .nav__mobile-target::before {
+    top: 0;
+    transform: rotate(90deg);
+}
+
+.nav__mobile-menu {
+    position: absolute;
+    top: 30px;
+    left: 0;
+    flex-direction: column;
+    gap: 15px 0;
+    background-color: #387ef6;
+    padding: 20px;
+    min-width: 150px;
+    border-radius: 10px;
+    display: none;
+}
+
+.nav__mobile-wrapper.active .nav__mobile-menu {
+    display: flex;
+}
+
+@media (max-width: 545px) {
+    .nav__wrapper {
+        flex-direction: row-reverse;
+    }
+
+    .nav__links {
+        display: none;
+    }
+
+    .nav__mobile-wrapper {
+        display: flex;
+        align-items: center;
+
+    }
+}
+```
+
+Как можно заметить, на брейкпоинте `545px` мы скрываем ссылки, которые расположены в строчку, и отображаем меню. Следует обратить внимание на псевдоэлементы `::after, ::before`, которые позволяют стилизовать элемент, не добавляя дополнительные теги в DOM-дерево. Подробнее про псевдоэлемты и их практическое использование можно почитать [здесь](https://doka.guide/css/pseudoelements/).
+
+В конце можно столкнуться с такой `проблемой`, при нажатии на ссылку в нашем бургер меню, элемент сразу же закрывается. Это связано со `всплытием события`. Если кратко, то при нажатии на дочерний элемент, событие `click` передастся всем родительским, в том числе и `nav__mobile-wrapper`, что приведет к исключению класса `active` из списка классов этого элемента. Подробнее про всплытие можно почитать [здесь](https://learn.javascript.ru/bubbling-and-capturing)
+
+Чтобы этого избежать, надо перехватить событие, например в элементе `nav__mobile-menu`, и вызвать у `event` метод, останавливающий всплытие - `stopPropagation()`
+
+```jsx
+<div className='nav__mobile-wrapper'
+     onClick={(event) => event.currentTarget.classList.toggle('active')}
+>
+    <div className='nav__mobile-target' />
+    <div className='nav__mobile-menu' onClick={(event) => event.stopPropagation()}>
+        <NavLink to='/' className='nav__link'>Главная</NavLink>
+        <NavLink to='/items' className='nav__link'>Товары</NavLink>
+        <NavLink to='/orders' className='nav__link'>Заказы</NavLink>
+        <NavLink to='/about' className='nav__link'>О магазине</NavLink>
+    </div>
+</div>
+```
+
+Итого, наше меню имеет следующий вид:
+- в не активном состоянии
+
+![](./assets/12.png)
+
+- в активном состоянии
+
+![](./assets/13.png)
