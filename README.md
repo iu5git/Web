@@ -123,10 +123,10 @@
 
 Создание нативного простого приложения с подключением API: мобильное или Tauri, Qt для интерфейса гостя без авторизации.
 
-* [iOS (Swift)](https://github.com/iu5git/web-2022/blob/main/tutorials/ios_tutorial/ios_tutorial.md)
-* [Android (Java)](https://github.com/iu5git/web-2022/blob/main/tutorials/android_tutorial/android_tutorial.md)
-* [React Native + Redux Toolkit](/tutorials/react-native/react_native.md)
-* Tauri
+* [Методические указания iOS (Swift)](https://github.com/iu5git/web-2022/blob/main/tutorials/ios_tutorial/ios_tutorial.md)
+* [Методические указания Android (Java)](https://github.com/iu5git/web-2022/blob/main/tutorials/android_tutorial/android_tutorial.md)
+* [Методические указания React Native + Redux Toolkit](/tutorials/react-native/react_native.md)
+* [Методические указания Tauri](/tutorials/tauri/)
 * Qt
 
 **Activity диаграмма/BPMN** для итогового бизнес-процесса для ДЗ: описание бизнес-процесса, разделение на дорожки по ролям пользователей, действия соответствуют операциям пользователей в вашей системе.
