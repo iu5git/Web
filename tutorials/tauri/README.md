@@ -1,5 +1,25 @@
 # Tauri методические инструкции
 
+## План
+- [Создание простого Back-End'а](#создание-простого-back-endа)
+    * [Шаг 1: Установка необходимых инструментов](#шаг-1-установка-необходимых-инструментов)
+    * [Шаг 2: Инициализация проекта](#шаг-2-инициализация-проекта)
+    * [Шаг 3: Инициализация проекта и установка Express](#шаг-3-инициализация-проекта-и-установка-express)
+    * [Шаг 4: Создание сервера с Express](#шаг-4-создание-сервера-с-express)
+    * [Шаг 5: Запуск сервера](#шаг-5-запуск-сервера)
+- [Разработка Tauri приложения](#разработка-tauri-приложения)
+    * [Шаг 1: Создание нового Tauri приложения](#шаг-1-создание-нового-tauri-приложения)
+    * [Шаг 2: Конфигурация Tauri приложения](#шаг-2-конфигурация-tauri-приложения)
+    * [Шаг 3: Запуск Tauri приложения](#шаг-3-запуск-tauri-приложения)
+    * [Шаг 4: Разработка frontend'а](#шаг-4-разработка-frontendа)
+    * [Шаг 5: Работа с Tauri API](#шаг-5-работа-с-tauri-api)
+    * [Шаг 6: Сборка Tauri приложения](#шаг-6-сборка-tauri-приложения)
+- [Дополнительно: Добавление Middleware для сервера](#дополнительно-добавление-middleware-для-сервера)
+    * [Шаг 1: Логирование запросов](#шаг-1-логирование-запросов)
+    * [Шаг 2: Установка логгера](#шаг-2-установка-логгера)
+    * [Шаг 3: Добавление валидации задач](#шаг-3-добавление-валидации-задач)
+    * [Шаг 4: Добавляем валидацию на POST-запрос](#шаг-4-добавляем-валидацию-на-post-запрос)
+
 ## Создание простого Back-End'а
 
 ### Шаг 1: Установка необходимых инструментов
@@ -7,9 +27,13 @@
 Перед тем, как начать разрабатывать, убедитесь, что у вас установлены следующие инструменты:
 
 1. Node.js - платформа для выполнения JavaScript кода вне браузера.
-2. npm (Node Package Manager) - менеджер пакетов для Node.js (поставляется вместе с Node.js)
+2. npm (Node Package Manager) - менеджер пакетов для Node.js (поставляется вместе с Node.js).
+3. Rust - язык программирования общего назначения, который будет ядром нашего приложения.
+4. Cargo - это инструмент, который позволяет указывать необходимые зависимости для проектов на языке Rust
 
-[Скачать](https://nodejs.dev)
+[Скачать Node.js и npm](https://nodejs.dev)
+
+[Скачать Rust и Cargo](https://doc.rust-lang.org/cargo/getting-started/installation.html)
 
 ### Шаг 2: Инициализация проекта
 
@@ -43,39 +67,41 @@ const port = 3000; // Вы можете использовать любой др
 app.use(express.json());
 
 // Простой массив для хранения заметок
-let notes = [];
+let todos = [];
 
 // Роут для получения всех заметок
-app.get('/notes', (req, res) => {
-  res.json(notes);
+app.get('/todos', (req, res) => {
+  res.json(todos);
+  console.log(todos);
 });
 
 // Роут для создания новой заметки
-app.post('/notes', (req, res) => {
-  const { title, content } = req.body;
-  const newNote = { title, content };
-  notes.push(newNote);
-  res.status(201).json(newNote);
+app.post('/todos', (req, res) => {
+  const { id, title, content } = req.body;
+  const newTodo = { id, title, content };
+  todos.push(newTodo);
+  res.status(201).json(newTodo);
+  console.log(todos);
 });
 
 // Роут для обновления существующей заметки
-app.put('/notes/:id', (req, res) => {
+app.put('/todos/:id', (req, res) => {
   const id = parseInt(req.params.id);
   const { title, content } = req.body;
-  const noteIndex = notes.findIndex((note) => note.id === id);
+  const todoIndex = todos.findIndex((todo) => todo.id === id);
 
-  if (noteIndex !== -1) {
-    notes[noteIndex] = { id, title, content };
-    res.json(notes[noteIndex]);
+  if (todoIndex !== -1) {
+    todos[todoIndex] = { id, title, content };
+    res.json(todos[todoIndex]);
   } else {
     res.status(404).json({ error: 'Заметка не найдена' });
   }
 });
 
 // Роут для удаления заметки
-app.delete('/notes/:id', (req, res) => {
+app.delete('/todos/:id', (req, res) => {
   const id = parseInt(req.params.id);
-  notes = notes.filter((note) => note.id !== id);
+  todos = todos.filter((todo) => todo.id !== id);
   res.status(204).end();
 });
 
@@ -99,14 +125,7 @@ node index.js
 
 ## Разработка Tauri приложения
 
-### Шаг 1: Установка Tauri
-Установите Tauri CLI с помощью следующей команды:
-
-```bash
-npm install -g tauri
-```
-
-### Шаг 2: Создание нового Tauri приложения
+### Шаг 1: Создание нового Tauri приложения
 
 Для создания нового Tauri приложения используйте:
 
@@ -117,15 +136,11 @@ npm create tauri@latest
 
 ![Untitled](assets/settings.png)
 
-При желании, можно выбрать другое имя проекта, Rust для разработки интерфейса, или другие инструменты, например Vue. 
+### Шаг 2: Конфигурация Tauri приложения
 
-Мы же покажем далее, как использовать выбранные инструменты.
+Нужно настроить Tauri приложение в файле `src-tauri/tauri.conf.json`. Этот файл находится в папке src-tauri вашего проекта и позволяет управлять различными настройками такими, как иконки, заголовок окна, настройки безопасности и т.д.
 
-### Шаг 3: Конфигурация Tauri приложения
-
-Нужно настроить Tauri приложение в файле `tauri.conf.js`. Этот файл находится в папке src-tauri вашего проекта и позволяет управлять различными настройками такими, как иконки, заголовок окна, настройки безопасности и т.д.
-
-Для того, чтобы разрешить приложению обращаться к серверу, добавьте конфигурацию в `allowlist` так, чтобы он выглядел следующим образом:
+Для того чтобы разрешить приложению обращаться к серверу, добавьте конфигурацию в `allowlist` так, чтобы он выглядел следующим образом:
 
 ```json
 "allowlist": {
@@ -145,7 +160,7 @@ npm create tauri@latest
 
 Убедитесь, что в массиве scope присутствует адрес вашего Backend'а.
 
-### Шаг 4: Запуск Tauri приложения
+### Шаг 3: Запуск Tauri приложения
 
 Перейдите в папку вашего Tauri приложения и запустите его, используя команды:
 
@@ -158,19 +173,19 @@ npm run tauri dev
 
 ![Untitled](assets/startapp.png)
 
-### Шаг 5: Разработка frontend
+### Шаг 4: Разработка frontend'а
 
 В папке `src` вы найдёте JSX файлы - файлы React компонентов. 
 Сейчас в файле `App.jsx` сгенерированный код. Изменим его так, чтобы в нём остался только наш будущий компонент:
 
 ```jsx
 import React from 'react';
-import TodoListPage from './pages/TodoList';
+import { TodoListPage } from './pages/TodoListPage';
 import './styles.css';
 
 function App() {
     return (
-        <div className="App">
+        <div className='App'>
             <TodoListPage />
         </div>
     );
@@ -179,7 +194,7 @@ function App() {
 export default App;
 ```
 
-Создадим папку `pages`, в которой будут размещены страницы нашего приложения. Добавим в папку компонент первой страницы `TodoList.jsx` - он будет отвечать за вывод списка задач и взаимодействие с ними. `TodoListPage` должен возвращать JSX-код, который [компилируется](https://ru.legacy.reactjs.org/docs/introducing-jsx.html) в вызовы `React.createElement()`, после чего полученные React-элементы [рендерятся](https://ru.legacy.reactjs.org/docs/rendering-elements.html) в DOM. Добавим в исходную функцию `TodoListPage` рендеринг, и сделаем её экспортируемой:
+Создадим папку `pages`, в которой будут размещены страницы нашего приложения. Добавим в папку компонент первой страницы `TodoListPage.jsx` - он будет отвечать за вывод списка задач и взаимодействие с ними:
 
 ```jsx
 import React, { useState } from 'react';
@@ -194,31 +209,35 @@ export function TodoListPage() {
     return (
         <div>
             <h1>Планирование задач</h1>
-            <div className="container">
+            <div className='container'>
                 <input
-                    className="input-title"
-                    type="text"
-                    placeholder="Название"
+                    className='input-title'
+                    type='text'
+                    placeholder='Название'
                     value={newTodo.title}
                 />
                 <textarea
-                    className="input-content"
-                    placeholder="Содержание"
+                    className='input-content'
+                    placeholder='Содержание'
                     value={newTodo.content}
                 />
-                <button className="button-add button-lg">Добавить</button>
+                <button className='button button-success text-lg'>
+                  Добавить
+                </button>
             </div>
             <hr />
-            <div className="container">
-                {todos.map((todo) => ( // Для каждой задачи из списка 
-                    <div className="todo" key={todo.id}>
+            <div className='container'>
+                {todos.map((todo) => (
+                    <div className='todo' key={todo.id}>
                         <h3 className='todo-title'>
                             {todo.title}
                         </h3>
-                        <p className="todo-content">
+                        <p className='todo-content'>
                             {todo.content}
                         </p>
-                        <button className='button-delete'>Удалить</button>
+                        <button className='button button-danger text-md'>
+                            Удалить
+                        </button>
                     </div>
                 ))}
             </div>
@@ -227,11 +246,13 @@ export function TodoListPage() {
 }
 ```
 
+`TodoListPage` должен возвращать JSX-код, который [компилируется](https://ru.legacy.reactjs.org/docs/introducing-jsx.html) в вызовы `React.createElement()`, после чего полученные React-элементы [рендерятся](https://ru.legacy.reactjs.org/docs/rendering-elements.html) в DOM. Мы добавили рендеринг в `TodoListPage` и сделали её экспортируемой.
+
 Теперь, если у нас запущено приложение в режиме разработки, должна быть следующая картина:
 
 ![Untitled](assets/5.1.png)
 
-Так как приложение использует стили по-умолчанию для своего шаблона, мы отредактируем `src/styles.css` так, чтобы сначала [сбросить](https://medium.com/@stasonmars/%D1%81%D0%BE%D0%B2%D1%80%D0%B5%D0%BC%D0%B5%D0%BD%D0%BD%D1%8B%D0%B8%CC%86-%D1%81%D0%B1%D1%80%D0%BE%D1%81-css-f5816963c82b) старые стили, а затем установить новые для приложения:
+Можно удалить `src/App.css`. Так как приложение использует стили по-умолчанию для своего шаблона, мы отредактируем `src/styles.css` так, чтобы сначала сбросить старые стили, а затем установить новые для приложения:
 
 <details>
 <summary>Новые стили `src/styles.css`</summary>
@@ -435,6 +456,7 @@ h1 {
 ```
 </details>
 
+
 Теперь приложение должно выглядеть следующим образом:
 
 ![Untitled](assets/5.2.png)
@@ -443,23 +465,21 @@ h1 {
 
 ![Untitled](assets/5.3.png)
 
-Дело в том, что мы отображаем состояние компонента, но никак его не меняем. Для того, чтобы изменить состояние, нужно повесить триггер на событие изменения `OnChange`, в котором будет вызываться функция изменения состояния:
+Дело в том, что мы отображаем состояние компонента, но никак его не меняем. Для того чтобы изменить состояние, нужно повесить триггер на событие изменения `OnChange`, в котором будет вызываться функция изменения состояния:
 
 ```jsx
-<div className="container">
+<div className='container'>
   <input
-      className="input-title"
-      type="text"
-      placeholder="Название"
+      className='input-title'
+      type='text'
+      placeholder='Название'
       value={newTodo.title}
-
       onChange={(e) => setNewTodo({ ...newTodo, title: e.target.value })}
   />
   <textarea
-      className="input-content"
-      placeholder="Содержание"
+      className='input-content'
+      placeholder='Содержание'
       value={newTodo.content}
-
       onChange={(e) => setNewTodo({ ...newTodo, content: e.target.value })}
   />
   {/* Код кнопки */}
@@ -485,7 +505,7 @@ const TodoListPage = () => {
     // добавление новой задачи
     const handleAddTodo = () => {
         if (!newTodo.title || !newTodo.content) {
-            console.error("Поля не должны быть пустыми");
+            console.error('Поля не должны быть пустыми');
             return;
         };
         const newTodoWithId = { ...newTodo, id: Date.now() };
@@ -505,10 +525,20 @@ const TodoListPage = () => {
 
 Мы добавили две функции, изменяющие состояния при добавлении и при удалении заметки. Повесим их на события нажатия кнопок:
 ```jsx
-<button className="button-add button-lg" onClick={handleAddTodo}>Добавить</button>
+<button
+    className='button button-success text-lg'
+    onClick={handleAddTodo}
+>
+    Добавить
+</button>
 ```
 ```jsx
-<button className='button-delete' onClick={() => handleDeleteTodo(todo.id)}>Удалить</button>
+<button
+    className='button button-danger text-md'
+    onClick={() => handleDeleteTodo(todo.id)}
+>
+    Удалить
+</button>
 ```
 
 Обратите внимание на то, как передаются аргументы функций. 
@@ -517,74 +547,86 @@ const TodoListPage = () => {
 
 Теперь заметки добавляются и удаляются, настало время связаться с нашим сервером!
 
-Для начала создадим файл `src/api/index.js` и добавим в него класс `TodosApi`, который будет отвечать за взаимодействие с сервером:
+На данном этапе структура проекта должна выглядеть следующим образом:
+
+```
+src
+│   main.jsx
+│   styles.css
+│
+├───app
+│       App.jsx
+│
+└───pages
+        TodoListPage.jsx
+```
+
+Для начала создадим файл `src/api/index.js` и добавим в него все функции нашего сервера:
 ```javascript
-import { fetch, Body } from '@tauri-apps/api/http';
+const URL = 'http://localhost:3000/todos';
 
-export class TodosApi {
-    constructor() {
-        this.url = 'http://localhost:3000/todos';
+async function getTodos() {
+    const response = await fetch(URL, {
+        method: 'GET',
+        timeout: 30
+    });
+
+    if (response.ok) {
+        return response.data;
+    } else {
+        throw new Error(response.status);
     }
+}
 
-    async getTodos() {
-        const response = await fetch(this.url, {
-            method: 'GET',
-            timeout: 30
-        });
+async function postTodos(todo) {
+    const response = await fetch(URL, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: Body.json(todo)
+    });
 
-        if (response.ok) {
-            return response.data;
-        } else {
-            throw new Error(response.status);
+    if (response.ok) {
+        return response.data;
+    } else {
+        throw new Error(response.status);
+    }
+}
+
+async function putTodos(todo) {
+    const response = await fetch(`${URL}/${todo.id}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: Body.json(todo)
+    });
+
+    if (response.ok) {
+        return response;
+    } else {
+        throw new Error(response.status);
+    }
+}
+
+async function deleteTodos(id) {
+    const response = await fetch(`${URL}/${id}`, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json'
         }
+    });
+
+    if (response.ok) {
+        return response;
+    } else {
+        throw new Error(response.status);
     }
+}
 
-    async postTodos(todo) {
-        const response = await fetch(this.url, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: Body.json(todo)
-        });
-
-        if (response.ok) {
-            return response.data;
-        } else {
-            throw new Error(response.status);
-        }
-    }
-
-    async putTodos(todo) {
-        const response = await fetch(`${this.url}/${todo.id}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: Body.json(todo)
-        });
-
-        if (response.ok) {
-            return response;
-        } else {
-            throw new Error(response.status);
-        }
-    }
-
-    async deleteTodos(id) {
-        const response = await fetch(`${this.url}/${id}`, {
-            method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        });
-
-        if (response.ok) {
-            return response;
-        } else {
-            throw new Error(response.status);
-        }
-    }
+export {
+    getTodos, deleteTodos, putTodos, postTodos
 }
 ```
 
@@ -594,15 +636,12 @@ export class TodosApi {
 
 Благодаря этому мы можем быть уверены в том, что наше приложение не сможет отправлять запросы на вредоносные сайты.
 
-Теперь перепишем наш компонент `TodoListPage` с использованием `TodosApi`:
+Теперь перепишем наш компонент `TodoListPage` с использованием API:
 ```jsx
 import React, { useEffect, useState } from 'react';
-import { TodosApi } from '../api';
-import { message, confirm } from '@tauri-apps/api/dialog';
+import { deleteTodos, postTodos, getTodos } from '../api';
 
 export function TodoListPage() {
-    // экземпляр класса TodosApi
-    const todosApi = new TodosApi();
 
     const [todos, setTodos] = useState([]);
     const [newTodo, setNewTodo] = useState({ title: '', content: '' });
@@ -615,28 +654,24 @@ export function TodoListPage() {
         setTodos([...todos, newTodoWithId]);
         setNewTodo({ title: '', content: '' });
 
-        todosApi.postTodos(newTodoWithId);
+        postTodos(newTodoWithId);
     }
 
     const handleDeleteTodo = (id) => {
         const updatedTodos = todos.filter((todo) => todo.id !== id);
         setTodos(updatedTodos);
 
-        todosApi.deleteTodos(id);
+        deleteTodos(id);
     }
 
     // получение списка задач при загрузке страницы
     useEffect(() => {
-        todosApi.getTodos().then(data => {
+        getTodos().then(data => {
             setTodos(data);
         });
-    }, []);
+    }, [getTodos]);
 
-    return (
-        <div>
-            {/*...*/}
-        </div>
-    );
+    {/*return ( ... )*/}
 }
 ```
 
@@ -650,54 +685,53 @@ export function TodoListPage() {
 npm install react-router-dom
 ```
 
-Теперь улучшим файловую структуру нашего проекта. Создадим папку `src/app`, `App.jsx` переименуем в `index.jsx` (отредактируйте импорт в `src/main.jsx`) и перенесём в папку `src/app`. Здесь же создадим `RouterProvider.jsx` со следующим содержимым:
+Теперь улучшим файловую структуру нашего проекта. Создадим папку `src/app`,  `App.jsx` переименуем в `index.jsx` (не забудте обновить импорт в `src/main.jsx`) и перенесём в папку `src/app`. Здесь же создадим `Router.jsx` со следующим содержимым:
 ```jsx
-import { Route, Routes } from 'react-router-dom';
+import {createBrowserRouter, createRoutesFromElements, Route} from 'react-router-dom';
 import { TodoListPage, TodoPage } from '../pages';
 
-export function Router() {
-    return (
-        <Routes>
-            <Route path="/" exact element={<TodoListPage />} />
-            <Route path="/:id" element={<TodoPage />} />
-        </Routes>
-    );
-}
+export const router = createBrowserRouter(
+    createRoutesFromElements(
+        <>
+            <Route path="/" index exact element={<TodoListPage />}/>
+            <Route path=":id" element={<TodoPage />} />
+        </>
+    )
+)
 ```
 
-Отредактируем `src/app/index.jsx`, пока добавив компонент `Router` в качестве корневого элемента, в дальнейшем мы создадим собственный провайдер, который будет оборачивать `Router`:
+Отредактируем `src/app/index.jsx`, добавив `RouterProvider` в качестве корневого элемента, в дальнейшем мы создадим собственный провайдер:
+
 ```jsx
 import React from 'react';
-import { BrowserRouter } from 'react-router-dom';
-import { Router } from './RouterProvider';
+import {RouterProvider} from 'react-router-dom';
+import { router } from './Router.jsx';
+import { ListenerProvider } from './ListenerProvider';
 
 function App() {
     return (
-        <BrowserRouter>
-            <Router />
-        </BrowserRouter>
+        <RouterProvider router={router}>
+        </RouterProvider>
     );
 }
 
 export default App;
 ```
 
-Создадим компонент `TodoPage`, который будет отображать отдельную задачу по её `id`, переданному в адресной строке:
+Создадим страницу `src/pages/TodoPage.jsx`, которая будет отображать отдельную задачу по её `id`, переданному в адресной строке:
 
 ```jsx
 import { useEffect, useState } from 'react';
-import { TodosApi } from '../api';
+import { useParams, Link } from 'react-router-dom';
+import {getTodos} from "../api/index.js";
 
 export function TodoPage() {
-    const todosApi = new TodosApi();
 
-    // получение id из адресной строки
     const { id } = useParams();
-
     const [todo, setTodo] = useState();
 
     useEffect(() => {
-        todosApi.getTodos().then(todos => {
+        getTodos().then(todos => {
             const todo = todos.find(todo => todo.id == id);
             setTodo(todo);
         })
@@ -705,7 +739,7 @@ export function TodoPage() {
 
     return (
         <div className='container'>
-            <Link to="/">
+            <Link to='/'>
                 <button className='button button-light text-lg'>
                     🔙 Вернуться
                 </button>
@@ -736,13 +770,13 @@ export function TodoListPage() {
 
   return (
     // ...
-      <div className="container">
+      <div className='container'>
         {todos.map((todo) => (
-              <div className="todo" key={todo.id}>
+              <div className='todo' key={todo.id}>
                   <h3 className='todo-title'>
                       {todo.title}
                   </h3>
-                  <p className="todo-content">
+                  <p className='todo-content'>
                       {todo.content}
                   </p>
                   <button
@@ -771,13 +805,33 @@ export { TodoListPage } from './TodoListPage';
 export { TodoPage } from './TodoPage';
 ```
 
-После проделанной работы результат следующий:
+После проделанной работы `todo-app/src` имеет следующую структуру:
+
+```
+src
+│   main.jsx
+│   styles.css
+│
+├───api
+│       index.js
+│
+├───app
+│       index.jsx
+│       Router.jsx
+│
+└───pages
+        index.js
+        TodoListPage.jsx
+        TodoPage.jsx
+```
+
+А приложение получилось двустраничным:
 
 ![Untitled](assets/5.7.gif)
 
-### Шаг 6: Работа с Tauri API
+### Шаг 5: Работа с Tauri API
 
-Tauri API - это набор методов, которые позволяют взаимодействовать с операционной системой, на которой запущено приложение. Например, с помощью Tauri API можно получить список файлов в папке, в которой запущено приложение, или провести системный вызов.
+Tauri API - это набор методов, который позволяет взаимодействовать с операционной системой. Например, с помощью Tauri API можно получить список файлов в папке, в которой запущено приложение, или провести системный вызов.
 До этого мы использовали Tauri API для отправки безопасных запросов на сервер, теперь же мы попробуем использовать системные диалоговые окна для отображения ошибок.
 
 В конфигурацию `tauri.conf.json` добавим часть [диалогого API](https://tauri.app/v1/api/js/dialog) в `allowlist`:
@@ -788,7 +842,12 @@ Tauri API - это набор методов, которые позволяют 
 }
 ```
 
-Отредактируем хендлеры в `src/pages/TodoList.jsx`:
+Импортируем необходимые функции из API:
+```jsx
+import { message, confirm } from '@tauri-apps/api/dialog';
+```
+
+Отредактируем хендлеры в `src/pages/TodoListPage.jsx`:
 ```jsx
 const handleAddTodo = () => {
     if (!newTodo.title || !newTodo.content) {
@@ -801,7 +860,7 @@ const handleAddTodo = () => {
     setTodos([...todos, newTodoWithId]);
     setNewTodo({ title: '', content: '' });
 
-    todosApi.postTodos(newTodoWithId);
+    postTodos(newTodoWithId);
 }
 
 const handleDeleteTodo = (id) => {
@@ -811,7 +870,7 @@ const handleDeleteTodo = (id) => {
             const updatedTodos = todos.filter((todo) => todo.id !== id);
             setTodos(updatedTodos);
 
-            todosApi.deleteTodos(id);
+            deleteTodos(id);
         });
 }
 ```
@@ -874,52 +933,54 @@ export function Listener({ children }) {
 }
 ```
 
-Здесь мы слушаем событие `new-todo` и переходим на главную страницу с параметром `new-todo`. С помощью [аргумента](https://react.dev/reference/react/Children) `children` мы можем передавать в провайдер любые компоненты, которые будут обернуты в `ListenerProvider`. Давайте обернем в провайдер роутер в `src/app/index.jsx`:
+Здесь мы слушаем событие `new-todo` и переходим на главную страницу с параметром `new-todo`. С помощью [аргумента](https://react.dev/reference/react/Children) `children` мы можем передавать в провайдер любые компоненты, которые будут обернуты в `ListenerProvider`, на случай если мы добавим еще провайдеры. Давайте обернем провайдер в роутер в `src/app/index.jsx`:
 ```jsx
-import { Listener } from './ListenerProvider';
+// ...импорты
+import { ListenerProvider } from './ListenerProvider';
 
 function App() {
     return (
-        <BrowserRouter>
-            <Listener>
-                <Router />
-            </Listener>
-        </BrowserRouter>
+        <RouterProvider router={router}>
+            <ListenerProvider/>
+        </RouterProvider>
     );
 }
+
+export default App;
 ```
 
-Остаётся научиться читать параметры, переданные в адресной строке. Для этого воспользуемся [хуком](https://reactrouter.com/en/main/hooks/use-search-params) `useSearchParams` из библиотеки `react-router-dom`. Отредактируем `src/pages/TodoList.jsx`:
+Остаётся научиться читать параметры, переданные в адресной строке. Для этого воспользуемся [хуком](https://reactrouter.com/en/main/hooks/use-search-params) `useSearchParams` из библиотеки `react-router-dom`. Отредактируем `src/pages/TodoListPage.jsx`:
 ```jsx
-// импорты
+// ...импорты
+import React, { useState, useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
 export function TodoListPage() {
-  // хуки и хендлеры
+    // хуки и хендлеры
 
-  // обработка параметров в адресной строке
-  const [searchParams] = useSearchParams();
-  // ссылаемся на инпут
-  const newTodoRef = useRef();
+    // обработка параметров в адресной строке
+    const [searchParams] = useSearchParams();
+    // ссылаемся на инпут
+    const newTodoRef = useRef();
 
-  useEffect(() => {
-      if (searchParams.has('new-todo')) {
-          newTodoRef.current.focus();
-      }
-  }, [searchParams]);
+    useEffect(() => {
+        if (searchParams.has('new-todo')) {
+            newTodoRef.current.focus();
+        }
+    }, [searchParams]);
 
-  return (
-      // разметка
-          <input
-              className="input-title"
-              type="text"
-              placeholder="Название"
-              value={newTodo.title}
-              ref={newTodoRef}
-              onChange={(e) => setNewTodo({ ...newTodo, title: e.target.value })}
-          />
-      // разметка
-  );
+    return (
+        // разметка
+            <input
+                className='input-title'
+                type='text'
+                placeholder='Название'
+                value={newTodo.title}
+                ref={newTodoRef}
+                onChange={(e) => setNewTodo({ ...newTodo, title: e.target.value })}
+            />
+        // разметка
+    );
 }
 ```
 
@@ -927,9 +988,28 @@ export function TodoListPage() {
 
 ![Untitled](assets/6.2.gif)
 
+```
+src
+│   main.jsx
+│   styles.css
+│   
+├───api
+│       index.js
+│       
+├───app
+│       index.jsx
+│       ListenerProvider.jsx
+│       Router.jsx
+│
+└───pages
+        index.js
+        TodoListPage.jsx
+        TodoPage.jsx
+```
+
 Ну что ж, наша задача выполнена! Мы создали приложение, которое может работать с диалоговыми окнами, отправлять запросы на сервер и использовать нативное меню. Поздравляю!
 
-### Шаг 7: Сборка Tauri приложения
+### Шаг 6: Сборка Tauri приложения
 
 Когда вы готовы опубликовать ваше Tauri приложение, вы можете выполнить команду:
 
@@ -1006,11 +1086,15 @@ const validateTodo = (req, res, next) => {
     const body = req.body;
 
     // Проверка наличия поля "id" и "title"
+    let error = {};
     if (!body.id) {
-        return res.status(400).json({ error: 'Id is required' });
+        error.id = "ID is required"
     }
     if (!body.title) {
-        return res.status(400).json({ error: 'Title is required' });
+        error.title = "Title is required"
+    }
+    if (error.id || error.title) {
+        return res.status(400).json({ error })
     }
 
     // Задаем значения по умолчанию для "content" и "completed"
@@ -1073,10 +1157,12 @@ curl -X POST -H "Content-Type: application/json" -d '{"content":"Buy fruits"}' h
 ```
 
 Получаем на выходе ошибку:
-```bash
+```json
 {
-  "error": "Title is required"
+  "error": {
+    "title": "Title is required"
+  }
 }
 ```
 
-Теперь у вас есть простое CRUD-backend с использованием Express и Tauri приложение, которое может взаимодействовать с этим Backend'ом. Вы можете использовать Tauri для создания кросс-платформенных desktop-приложений, интегрирующих ваш CRUD-backend для заметок.
+Теперь у вас есть простой CRUD-backend с использованием Express и Tauri приложение, которое может взаимодействовать с этим Backend'ом. Вы можете использовать Tauri для создания кросс-платформенных desktop-приложений, а в будущем и мобильных приложений, обещают авторы Tauri
