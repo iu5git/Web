@@ -3,44 +3,44 @@
 Отчеты по лабораторным работам и ДЗ отправлять на почту `aikanev@bmstu.ru`
 
 ## [Видеозаписи лекций в youtube](https://youtube.com/playlist?list=PLLELLTvDgUQ9cpB1XzSuZ0mNSBkbjVNJ_)
-#### Образ виртуальной машины Linux [Ubuntu 20.04](https://github.com/iu5git/Standards/blob/main/Linux/Linux.md) для выполнения заданий курса 
+#### Образ виртуальной машины Linux [Ubuntu 22.04](https://github.com/iu5git/Standards/blob/main/Linux/Linux.md) для выполнения заданий курса 
 
 ## Лекции
 ### Бекенд
-[Лекция 1. История Web, трехуровневая модель приложений, MVC](https://github.com/iu5git/web-2022/blob/main/lectures/web_intro.pdf) 
+[Лекция 1. История Web, MVC, Django](lectures/Lecture_1_Web.pdf) 
 
-[Лекция 2. Методология Agile, состав команды. Диаграммы UML](https://github.com/iu5git/web-2022/blob/main/lectures/Lecture_2_Agile_UML.pdf)
+[Лекция 2*. Методология Agile, состав команды. Диаграммы UML](lectures/Lecture_2_Agile_UML.pdf)
 
-[Лекция 3. Основы Web, шаблонизация, Django](https://github.com/iu5git/web-2022/blob/main/lectures/Lecture_3_Web_Django.pdf)
+[Лекция 3*. Основы Web, шаблонизация, Django](lectures/Lecture_3_Web_Django.pdf)
 
-[Лекция 4. Базы данных, ER, PostgreSQL. ORM. Админка Django. Курсоры](https://github.com/iu5git/web-2022/blob/main/lectures/Lecture_4_Databases_Django_ORM.pdf)
+[Лекция 4*. Базы данных, ER, PostgreSQL. ORM. Админка Django. Курсоры](lectures/Lecture_4_Databases_Django_ORM.pdf)
 
-[Лекция 5. Веб-сервис. Swagger. Микросервисы](https://github.com/iu5git/web-2022/blob/main/lectures/Lecture_5_Web_Service.pdf)
+[Лекция 5*. Веб-сервис. Swagger. Микросервисы](lectures/Lecture_5_Web_Service.pdf)
 
-[Лекция 6. Работа в git. Примеры специализированных сервисов - S3, уведомления, очереди](https://github.com/iu5git/web-2022/blob/main/lectures/Lecture_6_Special_Services.pdf)
+[Лекция 6*. Работа в git. Примеры специализированных сервисов - S3, уведомления, очереди](lectures/Lecture_6_Special_Services.pdf)
 
 ### Фронтенд
-[Лекция 7. Введение в фронтенд и React](https://github.com/iu5git/web-2022/blob/main/lectures/Lecture_7_React_Introduction.pdf)
+[Лекция 7*. Введение в фронтенд и React](lectures/Lecture_7_React_Introduction.pdf)
 
-[Лекция 8. React, сборка, компоненты](/lectures/Lecture_8_React.pdf)
+[Лекция 8*. React, сборка, компоненты](lectures/Lecture_8_React.pdf)
 
-[Лекция 9. Redux, hooks](/lectures/Lecture_9_Redux.pdf)
+[Лекция 9*. Redux, hooks](lectures/Lecture_9_Redux.pdf)
 
-[Лекция 10. Ajax, запросы на React. WebSocket](/lectures/Lecture_10_Ajax.pdf)
+[Лекция 10*. Ajax, запросы на React. WebSocket](lectures/Lecture_10_Ajax.pdf)
 
-[Лекция 11. Авторизация, куки, хранилище сессий](/lectures/Lecture_11_Authorization.pdf) 
+[Лекция 11*. Авторизация, куки, хранилище сессий](lectures/Lecture_11_Authorization.pdf) 
 
-[Лекция 12. JWT. SSO](/lectures/Lecture_12_jwt.pdf) 
+[Лекция 12*. JWT. SSO](lectures/Lecture_12_jwt.pdf) 
 
 ### Мобильные приложения
 
-[Лекция 13. Общая лекция про мобильные приложения. PWA](/lectures/Lecture_13_PWA.pdf) 
+[Лекция 13*. Общая лекция про мобильные приложения. PWA](lectures/Lecture_13_PWA.pdf) 
 
-[Лекция 14. Плюсы и минусы React Native. Сетевое взаимодействие на Swift](/lectures/Lecture_14_Swift.pdf) 
+[Лекция 14*. Плюсы и минусы React Native. Сетевое взаимодействие на Swift](lectures/Lecture_14_Swift.pdf) 
 
 ### Инфраструктура
 
-[Лекция 15. Резюме, Tauri, Agile, DevOps](/lectures/Lecture_15_Deploy.pdf)
+[Лекция 15*. Резюме, Tauri, Agile, DevOps](lectures/Lecture_15_Deploy.pdf)
 
 ## Лабораторные работы
 В рамках практических работ по курсу необходимо каждому разработать заявочную систему на услуги по своей предметной области. Система состоит из веб-сервиса, фронтенд приложения, нативного приложения и второго асинхронного сервиса.
