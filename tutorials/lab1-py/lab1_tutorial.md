@@ -156,12 +156,27 @@ urlpatterns = [
 </body>
 </html>
 ```
+
+Чтобы указать Django на то, где искать наши шаблоны проверьте файл `settings.py`. В нем в переменной `TEMPLATES` в поле `DIRS` должен быть указан путь к вашим шаблонам 
+
+```python
+TEMPLATES = [
+    {
+        # ...
+        "DIRS": [BASE_DIR / "bmstu_lab/templates"],
+        # ...
+    },
+]
+```
+
 Чтобы вернуть пользователю созданный файл, используйте метод render.
 Например данный код возвращает страницу `index.html`, которая была создана в
 папке templates.
 
 `views.py`
 ```python
+from django.shortcuts import render
+
 def hello(request):
     return render(request, 'index.html')
 ```
@@ -433,7 +448,7 @@ def GetOrder(request, id):
 
 В `settings.py` указан путь до статических файлов
 ```python
-STATIC_URL = '/static/'
+STATIC_URL = '/bmstu_lab/static/'
 ```
 
 В приложении создаем папку и кладем туда файлы:
