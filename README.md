@@ -9,7 +9,7 @@
 ### Бекенд
 * [Лекция 1. История Web, MVC, Django](lectures/Lecture_1_Web.pdf) 
 
-* Лекция 2. Базы данных, ER, PostgreSQL. ORM. Админка Django. Курсоры
+* [Лекция 2. Базы данных, ER, миграции, ORM](lectures/Lecture_2_Databases_ORM.pdf) 
 
 * Лекция 3. Методология Agile, состав команды. Диаграммы UML. Работа в git. 
 
