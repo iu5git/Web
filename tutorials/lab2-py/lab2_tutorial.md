@@ -1,56 +1,38 @@
 # Методические указания по выполнению лабораторной работы №2  
 
-## Установка MySQL и простые операции
+## Работа с PostgreSQL
 
-MySQL - одна из самых популярных классических реляционных СУБД,
-используемых в современном вебе.
+На вирутальной машине уже установлен PostgreSQL, чтобы начать с ним взаимодействовать непосредственно на ВМ необходимо активировать терминальный клиент **psql** одноименной командой
 
-Для работы вам потребуется установить MySQL на компьютер. Если у вас
-Windows, потребуется скачать дистрибутив с сайта
-http://dev.mysql.com/downloads/windows/. Также вам потребуется коннектор для Python,
-чтобы выполнять запросы из кода. В большинстве случаев для проектирования баз
-данных бывает полезна программа MySQL Workbench, где можно визуализировать
-схему базы в виде ER-диаграм. 
+![Активация терминального клиента](assets/8.PNG)
 
-После того, как вы установили MySQL, необходимо запустить сервер. В случае с
-Windows можно воспользоваться этим мануалом:
-https://dev.mysql.com/doc/refman/8.0/en/windows-start-command-line.html
+Если вы устанавливаете PostgreSQL на свою машину самостоятельно, вам в помощь хорошая статья - [How To Install PostgreSQL on Ubuntu 20.04](https://www.digitalocean.com/community/tutorials/how-to-install-postgresql-on-ubuntu-20-04-quickstart)
 
-Чтобы начать работать с сервером MySQL, нужно подсоединиться к нему из
-клиента. Для этого можно открыть Workbench или использовать командную строку
-("C:\Program Files\MySQL\MySQL Server 8.0\bin\mysql" в случае с windows)
 
-![Создание проекта](assets/2.png)
+Некоторые стандартные команды терминального клиента:
+- **\l** - показать доступные базы данных
+- **\с <имя базы>** - выбрать базу данных
+- **\dt** - показать таблицы в выбранной базе данных
+- **\d+ <имя таблицы>** - вывести схему таблицы
 
-Некоторые стандартные необходимые команды:
-- **show databases** - показать доступные базы данных
-- **use <имя базы>** - выбрать базу данных
-- **show tables** - показать таблицы в выбранной базе данных
-- **describe <имя таблицы>** - вывести схему таблицы
-
-Для начала необходимо создать пользователя базы данных. У него будет
-доступ к этой БД.
+Для начала необходимо создать пользователя базы данных. На вирутальной машине он уже создан, его имя также - student
 
 ```sql
-CREATE USER dbuser@'localhost' IDENTIFIED BY '123';
+create user user_name with password 'mypassword';
 ```
 
-После этого нужно создать базу данных.
+После этого нужно создать базу данных. Этот шаг можно также сделать в дайльнейшем через IDE. Дефолтная база данных называется postgres.
 
 
 ```sql
-CREATE DATABASE `first_db` CHARACTER SET utf8 COLLATE utf8_general_ci;
+createdb `student`;
 ```
 
 И выдать права новому пользователю на эту базу данных.
 
 ```sql
-GRANT ALL PRIVILEGES ON first_db.* TO dbuser@'localhost';
+grant all privileges on database student to user_name;;
 ```
-
-Если эта команда не срабатывает, то права доступа можно выдать через Workbench.
-
-![Создание проекта](assets/1.png)
 
 Теперь можно создавать таблицу в этой базе данных, но сначала нужно в
 нее перейти:
@@ -62,11 +44,10 @@ GRANT ALL PRIVILEGES ON first_db.* TO dbuser@'localhost';
 название книги и ее описание:
 
 ```sql
-CREATE TABLE `books` (
-    `id` INT(11) NOT NULL AUTO_INCREMENT,
-    `name` CHAR(30) NOT NULL,
-    `dicription` CHAR(255) NOT NULL,
-    PRIMARY KEY (`id`)
+CREATE TABLE books (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(30) NOT NULL,
+    description VARCHAR(255) NOT NULL
 );
 ```
 
@@ -75,25 +56,39 @@ CREATE TABLE `books` (
 рассмотрены в курсе баз данных.
 
 ```sql
-INSERT INTO books VALUES(1, 'Мастер и Маргарита', 'Крутая книга');
+INSERT INTO books (id, name, description) VALUES(1, 'Мастер и Маргарита', 'Крутая книга');
 
 SELECT * FROM books;
 ```
 
-![Создание проекта](assets/4.png)
+## Подключение к БД через IDE
+В данном случае пример показан на DBeaver, но вы можете использовать то IDE, которое для вас удобнее, например PG Admin или же DtaGrip
+
+Открываем окно для создания соединения и выбираем PostgreSQL
+
+![Соединение для postgresql](assets/9.png)
+
+Далее открывается окно, где необходимо прописать креды
+Хост: vm_ip (в данном случае 192.168.0.189)
+База данных: по умолчанию postgresql, но можно выбрать и свою: если вы создали его через psql
+Пользователь: student
+Пароль: root
+
+![Креды](assets/10.png)
+
+После этого у вас должно установиться соединение с БД
+
+![Успешное подключени](assets/11.png)
 
 ## Обращение к БД из Python
 
 В этой части лабораторной работы необходимо создать подключение из
-Python к MySQL, занести и выбрать несколько записей с помощью кода.
+Python к PostgreSQL, занести и выбрать несколько записей с помощью кода.
 
-Для начала требуется установить пакет mysqlclient из pip. Это необходимый
-набор классов и функций для работы с mysql из вашего кода.
+Для начала требуется установить пакет psycopg2-binary из pip. Это необходимый
+набор классов и функций для работы с postgresql из вашего кода.
 
-Ссылка на репозиторий на github:
-https://github.com/PyMySQL/mysqlclient-python
-
-Команда для установки: `pip install mysqlclient`
+Команда для установки: `pip install psycopg2-binary`
 
 В этой части вашей задачей является написание простого скрипта, который
 подключается к базе данных, добавляет одну запись, затем получает и выводит
@@ -102,25 +97,23 @@ https://github.com/PyMySQL/mysqlclient-python
 `Пример`
 
 ```python
-import MySQLdb
+import psycopg2
 
-db = MySQLdb.connect(
-    host="localhost",
-    user="dbuser",
-    passwd="123",
-    db="first_db"
-)
+conn = psycopg2.connect(dbname="postgres", host="192.168.0.189", user="student", password="root", port="5432")
 
-c=db.cursor()
-c.execute("INSERT INTO books (name, description) VALUES (%s, %s);", ('Book', 'Description'))
-db.commit()
-c.close()
-db.close()
+cursor = conn.cursor()
+ 
+cursor.execute("INSERT INTO public.books (id, name, description) VALUES(1, 'Мастер и Маргарита', 'Крутая книга')")
+ 
+conn.commit()   # реальное выполнение команд sql1
+ 
+cursor.close()
+conn.close()
 ```
 
 `Итог`
 
-![Создание проекта](assets/5.png)
+![Создание проекта](assets/12.png)
 
 ## Django ORM
 
@@ -143,12 +136,12 @@ https://django.fun/docs/django/ru/3.2/topics/db/models/
 ```python
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
+        'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'first_db',
         'USER': 'dbuser',
         'PASSWORD': '123',
         'HOST': 'localhost',
-        'PORT': 3306, # Стандартный порт MySQL
+        'PORT': 5432, # Стандартный порт PostgreSQL
         'OPTIONS': {'charset': 'utf8'},
         'TEST_CHARSET': 'utf8',
     }
