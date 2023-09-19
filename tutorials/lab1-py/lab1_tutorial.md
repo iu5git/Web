@@ -1,10 +1,9 @@
 # Методические указания по выполнению лабораторной работы №1  
 
-**Для выполнения лабораторной работы потребуется [PyCharm Professional](https://www.jetbrains.com/pycharm/download/)\
-Лицензию можно получить через сайт JetBrains, указав бауманскую почту.**
-Также django-проект можно создать руками по этому [тьюториалу](https://docs.djangoproject.com/en/1.10/intro/tutorial01/)
+Для выполнения лабораторной работы потребуется [VS Code](https://code.visualstudio.com) или [PyCharm Professional](https://www.jetbrains.com/pycharm/download/)
 
 ## Создание проекта локально
+Пример для PyCharm\
 `File -> New Project...`\
 В меню **New Project...** выбираем **Django**, задаем путь к проекту в **Location** и задаем имя нашему приложению в **Application name**
 
@@ -449,6 +448,12 @@ def GetOrder(request, id):
 В `settings.py` указан путь до статических файлов
 ```python
 STATIC_URL = '/bmstu_lab/static/'
+```
+
+```python
+STATICFILES_DIRS = [
+    BASE_DIR / "static",
+]
 ```
 
 В приложении создаем папку и кладем туда файлы:
