@@ -104,6 +104,8 @@
 
 * [Методические указания DRF](/tutorials/lab3-py/lab3_tutorial.md). Переделать на `API view`
 * [Методические указания Golang](/tutorials/lab3-go/README.md)
+* [Пример подключения S3-хранилища](https://github.com/iu5git/Networking/tree/main/S3)
+* [Пример использования Minio в Python](https://github.com/iu5git/Networking/tree/main/Minio_Python)
 
 #### Лабораторная 4
 
