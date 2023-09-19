@@ -545,6 +545,8 @@ npm i react-bootstrap
 * [Typescript][typescript]
 * [Vite][vite]
 
+<!-- TODO: тут еще не менял -->
+
 # Практика, которая похожа на настоящую практику
 
 ```tsx
