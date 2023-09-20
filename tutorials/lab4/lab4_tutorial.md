@@ -16,7 +16,7 @@
 
 До этого мы использовали Django шаблоны, чтобы показать пользователю интерфейс и отобразить данные, но сейчас так сделать не получится. Когда мы использовали Django шаблоны, то у нас сервер выступал в роли бекенда и фронтенда сразу, то есть в нем была реализовано бизнес логика по работе с данными (бекенд) и шаблонизатор для отдачи html (фронтенд).
 
-Сейчас же нас сервер выступает в роли бекенда, который нам просто отдает данные, нам нужно написать приложение, которое будет уметь получать эти данные и выводить пользователю. У нас будет 2 независимых приложения. Бекенд на Django REST и фронтенд на JS.
+Сейчас же нас сервер выступает в роли бекенда, который нам просто отдает данные, нам нужно написать приложение, которое будет уметь получать эти данные и выводить пользователю. У нас будет 2 независимых приложения. Бекенд на Django REST и фронтенд на JavaScript.
 
 ### Что такое TypeScript
 
@@ -39,8 +39,8 @@ React-компоненты — это повторно используемые
 ```tsx
 import { FC } from 'react'
 
-const Welcome: FC = (props) => {
-  return <h1>Привет, {props.name}</h1>;
+const Welcome: FC = () => {
+  return <h1>Привет, Мир</h1>;
 }
 ```
 
@@ -51,12 +51,12 @@ import React from 'react'
 
 class Welcome extends React.Component {
   render() {
-    return <h1>Привет, {this.props.name}</h1>;
+    return <h1>Привет, Мир</h1>;
   }
 }
 ```
 
-На данный момент в разработке предпочитают использовать функциональные компоненты. Подробнее о том, как они работают и чем отличаются от классовых можно узнать в [этой статье][habr-react-diff-class-function-component].
+На данный момент в разработке предпочитают использовать функциональные компоненты. Подробнее о том, как они работают и чем отличаются от классовых можно узнать в [этой статье][habr-react-diff-class-function-component]. В данной лабораторной работе мы будем рассматривать **только функциональные компоненты**.
 
 Компоненты могут состоять из других компонентов, так что по сути целая страница может считаться компонентом.
 
@@ -74,6 +74,30 @@ React-элементы — это составляющие блоки React-п�
 
 `props` (пропсы) — это входные данные React-компонентов, передаваемые от родительского компонента дочернему компоненту.
 
+Пример простого компонента `Text` с пропсом.
+
+```tsx
+import { FC } from 'react'
+
+interface Props {
+  name: string
+}
+
+const Text: FC<Props> = (props) => {
+    return <h1>Привет, {props.name}</h1>;
+}
+```
+
+Этот компонент используется на главной странице, куда передаем название текста.
+
+```tsx
+import { FC } from 'react'
+
+const MainPage: FC = () => {
+  return <Text name='Мир'/>
+}
+```
+
 Пропсы предназначены для чтения. Если требуется изменять данные, то необходимо использовать state (состояние приложения).
 
 В любом компоненте доступны `props.children`. Это контент между открывающим и закрывающим тегом компонента. Например:
@@ -88,7 +112,17 @@ React-элементы — это составляющие блоки React-п�
 
 ### State
 
-Компонент нуждается в `state`, когда данные в нём со временем изменяются. Например, компоненту `Checkbox` может понадобиться состояние `isChecked`.
+Компонент нуждается в `state`, когда данные в нём со временем изменяются. Например, компоненту `Checkbox` может понадобиться состояние `isChecked`. Рассмотрим пример такого компонента.
+
+```tsx
+import { FC, useState } from 'react'
+
+const Checkbox: FC = () => {
+    const [isChecked, setIsChecked] = useState<boolean>(false)
+
+    return <h1 onClick={() => setIsChecked((state) => !state)}>Состояние: ${isChecked}</h1>;
+}
+```
 
 Разница между пропсами и состоянием заключается в основном в том, что состояние нужно для управления компонентом, а пропсы для получения информации.
 
@@ -110,7 +144,7 @@ npm install
 
 После выполнения этих команд у нас будет готовое приложение. "Под капотом" нашего приложения используется язык [Typescript][typescript], библиотека [React][react] и сборщик [Vite][vite].
 
-Для удобства разработки внесем изменения в `vite.config.ts`, чтобы у нас всегда локальный сервер запускался на 3000 порту.
+Для удобства разработки внесем изменения в `vite.config.ts`, чтобы у нас всегда локальный сервер запускался на **3000 порту**.
 
 ```ts
 import { defineConfig } from 'vite'
@@ -128,7 +162,7 @@ export default defineConfig({
 * `npm run dev` - запуск локального сервера для разработки
 * `npm run build` - создание оптимизированной сборки приложения
 
-Запустим команду `npm run dev`, чтобы запустить локальный сервер для разработки. Страница автоматически перезагрузиться, если вы внесете изменения в код. Вы сможете увидеть ошибки сборки и предупреждения в консоли.
+Выполним команду `npm run dev`, чтобы запустить локальный сервер для разработки. Страница автоматически перезагрузиться, если вы внесете изменения в код. Вы сможете увидеть ошибки сборки и предупреждения в консоли.
 
 ![Фото 1](./assets/1.png)
 
@@ -323,39 +357,29 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
 
 Теперь вы знакомы с роутингом в приложении. Если потребуется обрабатывать какую-то информацию из адресной строки или использовать какой-то **особый роутер**, то подробнее о типах и работе роутеров можно ознакомиться в документации React или же на сайте [React Router][react-router] с готовыми примерами.
 
-## Жизненный цикл React приложения
+## Жизненный цикл
 
-Давайте рассмотрим каждый жизненный этап, включая методы, с ними связанные.
+Давайте рассмотрим каждый жизненный этап, включая методы, с ними связанные. В примере будут рассмотрены методы классового компонента, потому что в функциональных компонентах используется концепция хуков, о которых будет рассказано позднее.
 
 ### Монтирование
 
-Классовые компоненты тоже являются классами,  так что в первую очередь будет вызван constructor(). В нем мы выполняем инициализацию состояния компонента.
+Классовые компоненты тоже являются классами,  так что в первую очередь будет вызван `constructor()`. В нем мы выполняем инициализацию состояния компонента.
 
-Далее компонент запускает getDerivedStateFromProps(), потом запускается render(), возвращающий JSX. React «монтируется» в DOM.
+Далее компонент запускает `getDerivedStateFromProps()`, потом запускается `render()`, возвращающий JSX. React «монтируется» в DOM.
 
-Затем происходит запуск метода componentDidMount(), в котором выполняются все асинхронные процессы, описанные разработчиком. После этого компонент можно считать успешно "рожденным"
+Затем происходит запуск метода `componentDidMount()`, в котором выполняются все асинхронные процессы, описанные разработчиком. После этого компонент можно считать успешно "рожденным".
 
 ### Обновление
 
-Данный этап запускается во время каждого изменения состояния либо свойств. Как и в случае с монтированием, происходит вызов метода getDerivedStateFromProps(), однако в этот раз уже без конструктора.
+Данный этап запускается во время каждого изменения состояния либо свойств. Как и в случае с монтированием, происходит вызов метода `getDerivedStateFromProps()`, однако в этот раз уже без конструктора. Потом происходит запуск `shouldComponentUpdate()`.
 
-Потом происходит запуск shouldComponentUpdate().
+В `shouldComponentUpdate()` можно сравнить состояния **до** и **после**, чтобы лишний раз не перерисовывать компонент.
 
-В shouldComponentUpdate() можно сравнить состояния **до** и **после** , чтобы лишний раз не перерисовывать компонент.
-
-Потом React запустит componentDidUpdate(). Как и в случае с componentDidMount(), его можно применять для асинхронных вызовов либо управления DOM.
+Потом React запустит `componentDidUpdate()`. Как и в случае с `componentDidMount()`, его можно применять для асинхронных вызовов либо управления DOM.
 
 ### Размонтирование
 
-Когда компонент прожил свою жизнь, наступает размонтирование — последний жизненный этап. React выполняет запуск componentWillUnmount() непосредственно перед удалением из DOM. Данный метод применяется при закрытии всех открытых соединений типа web-сокетов либо тайм-аутов.
-
-В этой лабораторной работе мы будем работать с функциональными компонентами.
-
-## Функциональные компоненты
-
-1. Описание компонентов с помощью чистых функций создает меньше кода, а значит его легче поддерживать.
-2. Чистые функции намного проще тестировать. Вы просто передаете props на вход и ожидаете какую то разметку.
-3. В будущем чистые функции будут выигрывать по скорости работы в сравнении с классами из-за отсутствия методов жизненного цикла
+Когда компонент прожил свою жизнь, наступает размонтирование — последний жизненный этап. React выполняет запуск `componentWillUnmount()` непосредственно перед удалением из DOM. Данный метод применяется при закрытии всех открытых соединений типа web-сокетов либо тайм-аутов.
 
 ## Хуки
 
@@ -371,8 +395,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
 import React from 'react'
 
 class Example extends React.Component {
-    constructor(props: Props) {
-        super(props);
+    constructor() {
         this.state = {
             count: 0
         };
@@ -441,7 +464,6 @@ const data: string[] = [
 ]
 
 const StartPage: FC = () => {
-
     // В функциональных компонентах для работы с состоянием можно использовать хук useState()
     // Он возвращает кортеж из двух элементов:
     // 1 элемент - объект состояния
@@ -454,19 +476,19 @@ const StartPage: FC = () => {
     const [showNames, setShowNames] = useState(false)
 
     // В данном хендлере мы изменяем состояние на какое-то конкретное
-    const handleShowNames = () =>{
+    const handleShowNames = () => {
         setShowNames(true)
     }
 
     // В данном хендлере мы изменяем состояние на какое-то конкретное
-    const handleHideNames = () =>{
+    const handleHideNames = () => {
         setShowNames(false)
     }
 
     useEffect(()=>{
         console.log('Этот код выполняется только на первом рендере компонента')
         // В данном примере можно наблюдать Spread syntax (Троеточие перед массивом)
-        setNames(names=>[...names, 'Бедный студент'])
+        setNames((names) => [...names, 'Бедный студент'])
 
         return () => {
             console.log('Этот код выполняется, когда компонент будет размонтирован')
@@ -509,15 +531,311 @@ export default StartPage
 
 Предположим, у нас уже есть рабочий API (В примере используется API ITunes). Мы можем получить список сущностей, отфильтровать их и вывести в понятном виде пользователю.
 
-Для этого нам необходимо установить библиотеку `react-bootstrap`.
+Для этого нам необходимо установить библиотеку `react-bootstrap` и `bootstrap`.
 
 ```shell
-npm i react-bootstrap
+npm i react-bootstrap bootstrap
 ```
 
 Создадим страницу для отрисовки треков из ITunes.
 
-<!-- TODO: дописать -->
+### ITunesPage
+
+#### ITunesPage.css
+
+```css
+.container {
+    display: flex;
+    flex-direction: column;
+    padding: 20px 40px;
+    min-width: 800px;
+}
+.containerLoading {
+    filter: blur(8px);
+}
+
+@media (max-width: 600px) {
+    .container{
+        min-width: auto;
+    }
+}
+```
+
+#### ITunesPage.tsx
+
+```tsx
+import { FC, useState} from 'react'
+import { Card, Col, Row, Button, Spinner } from 'react-bootstrap'
+import './ITunesPage.css'
+
+interface ITunesMusic {
+    wrapperType: string
+    artworkUrl100: string
+    artistName: string
+    collectionCensoredName: string
+    trackViewUrl: string
+}
+
+interface ITunesResult {
+    resultCount: number
+    results: ITunesMusic[]
+}
+
+const getMusicByName = async (name = ''): Promise<ITunesResult> =>{
+    return fetch(`https://itunes.apple.com/search?term=${name}`)
+        .then((response) => response.json())
+        .catch(()=> ({ resultCount:0, results:[] }))
+}
+
+const ITunesPage: FC = () => {
+    const [searchValue, setSearchValue] = useState('')
+
+    const [loading, setLoading] = useState(false)
+
+    const [music, setMusic] = useState<ITunesMusic[]>([])
+
+    const handleSearch = async () =>{
+        await setLoading(true)
+        const { results } = await getMusicByName(searchValue)
+        await setMusic(results.filter(item => item.wrapperType === "track"))
+        await setLoading(false)
+    }
+
+    return (
+        <div className={`container ${loading && 'containerLoading'}`}>
+            {loading && <div className="loadingBg"><Spinner animation="border"/></div>}
+
+            <div className="inputField">
+                <input value={searchValue} onChange={(event => setSearchValue(event.target.value))}/>
+                <Button disabled={loading} onClick={handleSearch}>Искать</Button>
+            </div>
+
+            {!music.length && <div>
+                <h1>К сожалению, пока ничего не найдено :(</h1>
+            </div>}
+
+            <Row xs={4} md={4} className="g-4">
+                {music.map((item, index)=> (
+                    <Col >
+                        <Card key={index} className="card">
+                            <Card.Img className="cardImage" variant="top" src={item.artworkUrl100} height={100} width={100}  />
+                            <Card.Body>
+                            
+                            <div className="textStyle">
+                                <Card.Title>{item.artistName}</Card.Title>
+                            </div>
+
+                            <div className="textStyle">
+                                <Card.Text>
+                                    {item.collectionCensoredName}
+                                </Card.Text>
+                            </div>
+
+                            <Button className="cardButton" href={item.trackViewUrl} target="_blank" variant="primary">Открыть в ITunes</Button>
+                            </Card.Body>
+                        </Card>
+                    </Col>
+                ))}
+            </Row>
+        </div>
+    )
+}
+
+export default ITunesPage
+```
+
+![Gif 3](assets/3.gif)
+
+Для того, чтобы в будущем было куда удобнее разрабатывать, стоит разделять страницу на компоненты, и разделять логику в разных файлах.
+
+На данном этапе у нас есть тонна кода в одном файле. Вынесем в директорию `components` карточку и поле ввода. Работу с сетью вынесем в директорию `modules`.
+
+### components/InputField
+
+#### InputField.css
+
+```css
+.inputField {
+    display: flex;
+    padding: 12px 0;
+}
+.inputField > input {
+    width: 200px;
+    margin-right: 12px;
+    border: 2px solid black;
+    border-radius: 4px;
+    outline: none;
+}
+```
+
+#### InputField.tsx
+
+```tsx
+import { FC } from 'react'
+import { Button } from 'react-bootstrap'
+import './InputField.css'
+
+interface Props {
+    value: string
+    setValue: (value: string) => void
+    onSubmit: () => void
+    loading?: boolean
+    placeholder?: string
+    buttonTitle?: string
+}
+
+const InputField: FC<Props> = ({ value, setValue, onSubmit, loading, placeholder, buttonTitle = 'Искать' }) => (
+    <div className="inputField">
+        <input value={value} placeholder={placeholder} onChange={(event => setValue(event.target.value))}/>
+        <Button disabled={loading} onClick={onSubmit}>{buttonTitle}</Button>
+    </div>
+)
+
+export default InputField
+```
+
+### components/MusicCard
+
+#### MusicCard.css
+
+```css
+.card {
+    padding: 8px;
+}
+.loadingBg {
+    z-index: 999;
+    position: fixed;
+    height: 100%;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.textStyle {
+    height:48px;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    margin-bottom:12px;
+}
+.cardImage {
+    object-fit: contain;
+}
+.cardButton {
+    width: 100%;
+}
+```
+
+#### MusicCard.tsx
+
+```tsx
+import { FC } from 'react'
+import { Button, Card } from 'react-bootstrap'
+import './MusicCard.css'
+
+interface Props {
+    artworkUrl100: string
+    artistName: string
+    collectionCensoredName: string
+    trackViewUrl: string
+}
+
+const MusicCard: FC<Props> = ({ artworkUrl100, artistName, collectionCensoredName, trackViewUrl }) => (
+    <Card className="card">
+        <Card.Img className="cardImage" variant="top" src={artworkUrl100} height={100} width={100}  />
+        <Card.Body>                
+            <div className="textStyle">
+                <Card.Title>{artistName}</Card.Title>
+            </div>
+            <div className="textStyle">
+                <Card.Text>
+                    {collectionCensoredName}
+                </Card.Text>
+            </div>
+            <Button className="cardButton" href={trackViewUrl} target="_blank" variant="primary">Открыть в ITunes</Button>
+        </Card.Body>
+    </Card>
+)
+
+export default MusicCard;
+```
+
+### modules/get-music-by-name.ts
+
+```ts
+export interface ITunesMusic {
+    wrapperType: string
+    artworkUrl100: string
+    artistName: string
+    collectionCensoredName: string
+    trackViewUrl: string
+}
+
+export interface ITunesResult {
+    resultCount: number
+    results: ITunesMusic[]
+}
+
+export const getMusicByName = async (name = ''): Promise<ITunesResult> =>{
+    return fetch(`https://itunes.apple.com/search?term=${name}`)
+        .then((response) => response.json())
+        .catch(()=> ({ resultCount:0, results:[] }))
+}
+```
+
+### ITunesPage.tsx
+
+```tsx
+import { FC, useState} from 'react'
+import { Col, Row, Spinner } from 'react-bootstrap'
+import { ITunesMusic, getMusicByName } from './modules/get-music-by-name'
+import { InputField } from './components/InputField'
+import { MusicCard } from './components/MusicCard'
+import './ITunesPage.css'
+
+const ITunesPage: FC = () => {
+    const [searchValue, setSearchValue] = useState('')
+
+    const [loading, setLoading] = useState(false)
+
+    const [music, setMusic] = useState<ITunesMusic[]>([])
+
+    const handleSearch = async () =>{
+        await setLoading(true)
+        const { results } = await getMusicByName(searchValue)
+        await setMusic(results.filter(item => item.wrapperType === "track"))
+        await setLoading(false)
+    }
+
+    return (
+        <div className={`container ${loading && 'containerLoading'}`}>
+            {loading && <div className="loadingBg"><Spinner animation="border"/></div>}
+
+            <InputField
+                value={searchValue}
+                setValue={(value) => setSearchValue(value)}
+                loading={loading}
+                onSubmit={handleSearch}
+            />
+
+            {!music.length && <div>
+                <h1>К сожалению, пока ничего не найдено :(</h1>
+            </div>}
+
+            <Row xs={4} md={4} className="g-4">
+                {music.map((item, index)=> (
+                    <Col key={index}>
+                        <MusicCard {...item} />
+                    </Col>
+                ))}
+            </Row>
+        </div>
+    )
+}
+
+export default ITunesPage
+```
+
+В итоге у нас получилось приложение для поиска музыки в ITunes. В этом приложении мы использовали функциональные компоненты, хуки жизненного цикла и стейт приложения.
 
 ## Доработка React приложения по варианту
 
@@ -549,279 +867,6 @@ npm i react-bootstrap
 * [React Router][react-router]
 * [Typescript][typescript]
 * [Vite][vite]
-
-<!-- TODO: тут еще не менял -->
-
-# Практика, которая похожа на настоящую практику
-
-```tsx
-import React, {useEffect, useState} from 'react';
-import {Card, Col, Row, Button, Spinner} from "react-bootstrap";
-import './ITunesPage.css';
-
-const DEFAULT_SEARCH_VALUE = 'radiohead';
-
-const getMusicByName = async (name = DEFAULT_SEARCH_VALUE) =>{
-    const res = await fetch(`https://itunes.apple.com/search?term=${name}`)
-        .then((response) => {
-            return response.json();
-        }).catch(()=>{
-            return {resultCount:0, results:[]}
-        })
-    return res
-}
-
-function ITunesPage() {
-
-    const [searchValue, setSearchValue] = useState('radiohead');
-
-    const [loading, setLoading] = useState(false)
-
-    const [music, setMusic] = useState([])
-
-    const handleSearch = async () =>{
-        await setLoading(true);
-        const { results } = await getMusicByName(searchValue);
-        await setMusic(results.filter(item => item.wrapperType === "track"));
-        await setLoading(false)
-    }
-
-    return (
-        <div className={`container ${loading && 'containerLoading'}`}>
-            {loading && <div className="loadingBg"><Spinner animation="border"/></div>}
-            <div className="inputField">
-                <input value={searchValue} onChange={(event => setSearchValue(event.target.value))}/>
-                <Button disabled={loading} onClick={handleSearch}>Искать</Button>
-            </div>
-            {!music.length && <div>
-                <h1>К сожалению, пока ничего не найдено :(</h1>
-            </div>}
-
-            <Row xs={4} md={4} className="g-4">
-                {music.map((item, index)=>{
-                return<Col >
-                <Card key={index} className="card">
-                    <Card.Img className="cardImage" variant="top" src={item.artworkUrl100} height={100} width={100}  />
-                    <Card.Body>
-                        <div className="textStyle">
-                            <Card.Title>{item.artistName}</Card.Title>
-                        </div>
-                        <div  className="textStyle">
-                            <Card.Text>
-                                {item.collectionCensoredName}
-                            </Card.Text>
-                        </div>
-                        <Button className="cardButton" href={item.trackViewUrl} target="_blank" variant="primary">Открыть в ITunes</Button>
-                    </Card.Body>
-                </Card>
-                </Col>
-            })}
-            </Row>
-    </div>
-    );
-}
-
-export default ITunesPage;
-```
-
-![Untitled](assets/Untitled%202.gif)
-
-Для того, чтобы в будущем было куда удобнее разрабатывать, стоит разделять страницу на компоненты, и разделять логику в разных файлах.
-
-На данном этапе у нас есть тонна кода в одном файле.
-
-Вынесем в директорию components  карточку и поле ввода .
-
-Работу с сетью вынесем в директорию modules
-
-```tsx
-import React, {useState} from 'react';
-import { Col, Row, Spinner} from "react-bootstrap";
-import MusicCard from "../../components/MusicCard";
-import InputField from "../../components/InputField";
-import { getMusicByName } from '../../modules'
-import './ITunesPage.css';
-
-function ITunesPage() {
-
-    const [searchValue, setSearchValue] = useState('radiohead');
-
-    const [loading, setLoading] = useState(false)
-
-    const [music, setMusic] = useState([])
-
-    const handleSearch = async () => {
-        await setLoading(true);
-        const { results } = await getMusicByName(searchValue);
-        await setMusic(results.filter(item => item.wrapperType === "track"));
-        await setLoading(false)
-    }
-
-    return (
-        <div className={`container ${loading && 'containerLoading'}`}>
-            {loading && <div className="loadingBg"><Spinner animation="border"/></div>}
-            <InputField value={searchValue} setValue={setSearchValue} loading={loading} onSubmit={handleSearch} buttonTitle="Искать"/>
-            {!music.length ? <h1>К сожалению, пока ничего не найдено :(</h1>:
-                <Row xs={4} md={4} className="g-4">
-                {music.map((item, index)=>{
-                    return(
-                        <Col key={index}>
-                            <MusicCard {...item}/>
-                        </Col>
-                    )
-                })}
-            </Row>
-            }
-    </div>
-    );
-}
-
-export default ITunesPage;
-```
-
-```tsx
-import {Button} from "react-bootstrap";
-import React from "react";
-import './InputField.css';
-
-const InputField = ({ value, setValue, onSubmit, loading, placeholder, buttonTitle = 'Поиск'}) => {
-    return <div className="inputField">
-        <input value={value} placeholder={placeholder} onChange={(event => setValue(event.target.value))}/>
-        <Button disabled={loading} onClick={onSubmit}>{buttonTitle}</Button>
-    </div>
-}
-
-export default InputField
-```
-
-```tsx
-import {Button, Card} from "react-bootstrap";
-import React from "react";
-import './MusicCard.css';
-
-const MusicCard = ({artworkUrl100, artistName, collectionCensoredName, trackViewUrl}) => {
-
-    return <Card className="card">
-        <Card.Img className="cardImage" variant="top" src={artworkUrl100} height={100} width={100}  />
-        <Card.Body>
-            <div className="textStyle">
-                <Card.Title>{artistName}</Card.Title>
-            </div>
-            <div  className="textStyle">
-                <Card.Text>
-                    {collectionCensoredName}
-                </Card.Text>
-            </div>
-            <Button className="cardButton" href={trackViewUrl} target="_blank" variant="primary">Открыть в ITunes</Button>
-        </Card.Body>
-    </Card>
-}
-
-export default MusicCard;
-```
-
-Теперь, когда мы разделили код, можно приступать к совершенствованию функционала.
-
-Внезапно, у нас появилась необходимость добавить поиск по названию для уже загруженного списка.
-
-Добавим на страницу еще один компонент InputField, который будет отвечать за поиск по автору в загруженном списке
-
-```tsx
-import React, {useState} from 'react';
-import { Col, Row, Spinner} from "react-bootstrap";
-import MusicCard from "../../components/MusicCard";
-import InputField from "../../components/InputField";
-import { getMusicByName } from '../../modules'
-import './ITunesPage.css';
-
-function ITunesPage() {
-
-    const [searchValue, setSearchValue] = useState('radiohead');
-
-    const [filter, setFilter] = useState('');
-
-    const [loading, setLoading] = useState(false)
-
-    const [music, setMusic] = useState([])
-
-    const handleSearch = async () => {
-        // Сбрасываем фильтр
-        await setFilter('');
-        // Ставим загрузку
-        await setLoading(true);
-        const { results } = await getMusicByName(searchValue);
-        // Добавляем в состояние только треки
-        await setMusic(results.filter(item => item.wrapperType === "track"));
-        // Убираем загрузку
-        await setLoading(false)
-    }
-
-    const handleFilter = ()=> {
-        setMusic(music => music.filter(item=>item.artistName && item.artistName.includes(filter)));
-    }
-
-    return (
-        <div className={`container ${loading && 'containerLoading'}`}>
-            {loading && <div className="loadingBg"><Spinner animation="border"/></div>}
-            <InputField value={searchValue} setValue={setSearchValue} placeholder="поиск" loading={loading} onSubmit={handleSearch} buttonTitle="Искать"/>
-            <InputField value={filter} setValue={setFilter} placeholder="Автор" loading={loading} onSubmit={handleFilter} buttonTitle="Отфильтровать"/>
-            {!music.length ? <h1>К сожалению, пока ничего не найдено :(</h1>:
-                <Row xs={1} md={4} className="g-4">
-                {music.map((item, index)=>{
-                    return(
-                        <Col key={index}>
-                            <MusicCard {...item}/>
-                        </Col>
-                    )
-                })}
-            </Row>
-            }
-    </div>
-    );
-}
-
-export default ITunesPage;
-```
-
-Для осуществления нашей цели нам потребовалось добавить еще одно состояние и функцию для фильтрации. После добавления нового инпута с фильтрацией, можем видеть результат:
-
-![Untitled](assets/Untitled%203.gif)
-
-В данном примере используется библиотека компонентов react-bootstrap.
-
-К сожалению, на странице отсутствует адаптивная верстка. Учитывая факт, что мы уже ознакомились с пользовательскими хуками, предлагаю экспресс решение для добавления адаптивной верстки на эту страницу.
-
-Компонент Row может принимать пропс md, от которого зависит количество колонок.
-
-Если в момент рендера мы будем знать ширину экрана, то мы сможем регулировать количество колонок в компоненте.
-
-Добавим на страницу наш ранее описанный пользовательский хук `useWindowSize()`
-
-```tsx
-  const { width } = useWindowSize();
-    const isMobile = width && width <= 600;
-
-    return (
-        <div className={`container ${loading && 'containerLoading'}`}>
-            {loading && <div className="loadingBg"><Spinner animation="border"/></div>}
-            <InputField value={searchValue} setValue={setSearchValue} placeholder="поиск" loading={loading} onSubmit={handleSearch} buttonTitle="Искать"/>
-            <InputField value={filter} setValue={setFilter} placeholder="Автор" loading={loading} onSubmit={handleFilter} buttonTitle="Отфильтровать"/>
-            {!music.length ? <h1>К сожалению, пока ничего не найдено :(</h1>:
-                <Row xs={1} md={isMobile ? 1 : 4} className="g-4">
-                {music.map((item, index)=>{
-                    return isMobile ? <MusicCard {...item} key={index}/> :(
-                        <Col key={index}>
-                            <MusicCard {...item}/>
-                        </Col>
-                    )
-                })}
-            </Row>
-            }
-    </div>
-    );
-```
-
-Для устройств с шириной экрана меньше 600 мы будем изменять количество колонок на странице.
 
 [iu5-javascript]: https://github.com/iu5git/JavaScript
 [react]: https://react.dev
