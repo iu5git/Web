@@ -310,11 +310,11 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
 )
 ```
 
-**Главная страница**
+### Главная страница
 
 ![Фото 3](./assets/3.png)
 
-**Страница `/new`**
+### Страница `/new`
 
 ![Фото 4](./assets/4.png)
 
@@ -352,6 +352,8 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
   </React.StrictMode>,
 )
 ```
+
+### Финальный результат
 
 ![Gif 1](./assets/1.gif)
 
