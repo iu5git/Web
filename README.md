@@ -13,7 +13,7 @@
 
 * [Лекция 3. Методология Agile, состав команды. Диаграммы UML. Работа в git](lectures/Lecture_3_Agile_UML_Git.pdf)
 
-* Лекция 4. OSI, HTTP. Стандарты интернета
+* [Лекция 4. OSI, HTTP. Стандарты интернета](lectures/Lecture_4_HTTP.pdf)
 
 * Лекция 5. Веб-сервис. REST. Swagger. Микросервисы
 
