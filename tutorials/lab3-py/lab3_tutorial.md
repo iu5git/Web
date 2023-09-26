@@ -82,22 +82,16 @@
 
 Писать сервер с API мы будем на Django Rest Framework (DRF). Это надстройка над Django, которая позволяет нам писать REST приложения. 
 
-Стеап DRF проекта очень похож на сетап обычного Django проекта, но с небольшим исключением: нам понадобиться еще библиотека  `djangorestframework`
+Сетап DRF проекта очень похож на сетап обычного Django проекта, но с небольшим исключением: нам понадобиться еще библиотека  `djangorestframework`
 
-1. Заходим в меню создания проекта: **File -> New Project...**
-2. В открывшемся меню выбираем **Django**
-3. Задаем путь к проекту в **Location**
-4. Задаем имя нашему приложению в **Application name**
+В [1 лабораторной](https://github.com/iu5git/Web/blob/main/tutorials/lab1-py/lab1_tutorial.md) описано, как создать проект на виртуальной машине (удалённо).Согласно инструкциям оттуда подключаемся к ВМ через VS Code и оттуда во вкладке Terminaд:
+1. Создаём и активируем виртуальную среду. Устанавливаем зависимости командами `pip install Django==4.2.4` и `pip install djangorestframework` 
+2. Cоздаём проект lab3 с помощью команды `django-admin startproject lab3`. В файл settings.py в ALLOWED_HOSTS добавляем звездочку '*'.
+3. Создадим приложение stocks с помощью команды `django-admin startapp stocks`
+![Screen Shot 2023-09-26 at 4.11.48 pm.png](assets/1.png)
 
-![Screen Shot 2021-10-24 at 4.11.48 pm.png](assets/Screen_Shot_2021-10-24_at_4.11.48_pm.png)
-
-1. После этого во вкладке Terminal выполняем команду `pip install djangorestframework` (это нужно для установки библиотеки DRF)
-   
-    ![Screen Shot 2021-10-24 at 4.15.42 pm.png](assets/Screen_Shot_2021-10-24_at_4.15.42_pm.png)
-    
-2. Создадим приложение stocks с помощью команды `django-admin startapp stocks`
-3. Применим все миграции проекта: `python manage.py migrate`
-4. В файле lab3/lab3/settings.py в листе `INSTALLED_APPS` добавим название нашего приложения и название модуля DRF:
+4. Применим все миграции проекта: `python manage.py migrate`
+5. В файле lab3/lab3/settings.py в листе `INSTALLED_APPS` добавим название нашего приложения и название модуля DRF:
    
     ```python
     INSTALLED_APPS = [
@@ -173,44 +167,90 @@ class StockSerializer(serializers.ModelSerializer):
 
 ## 7. Написание View
 
-View — это точка входа в приложение, именно view отправит запрос в базу данных и сериализует его, чтобы отдать клиенту.
+View — это точка входа в приложение, именно view отправит запрос в базу данных и сериализует его, чтобы отдать клиенту. StockList реализует методы для работы со списком акций: get (GET /stocks/) и post (POST /stocks/). StockDetail реализует методы для работы с отдельными акциями с pk, указанным в запросе: get (GET /stocks/1/), put (PUT /stocks/1/), delete (DELETE /stocks/1/)
 
 Напишем view в файле lab3/stocks/views.py
 
 ```python
-from rest_framework import viewsets
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from django.shortcuts import get_object_or_404
+from rest_framework import status
 from stocks.serializers import StockSerializer
 from stocks.models import Stock
 
+class StockList(APIView):
+    model_class = Stock
+    serializer_class = StockSerializer
+    
+    def get(self, request, format=None):
+        """
+        Возвращает список акций
+        """
+        stocks = self.model_class.objects.all()
+        serializer = self.serializer_class(stocks, many=True)
+        return Response(serializer.data)
+    
+    def post(self, request, format=None):
+        """
+        Добавляет новую акцию
+        """
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-class StockViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint, который позволяет просматривать и редактировать акции компаний
-    """
-    # queryset всех пользователей для фильтрации по дате последнего изменения
-    queryset = Stock.objects.all().order_by('date_modified')
-    serializer_class = StockSerializer  # Сериализатор для модели
+class StockDetail(APIView):
+    model_class = Stock
+    serializer_class = StockSerializer
+
+    def get(self, request, pk, format=None):
+        """
+        Возвращает информацию об акции
+        """
+        stock = get_object_or_404(self.model_class, pk=pk)
+        serializer = self.serializer_class(stock)
+        return Response(serializer.data)
+    
+    def put(self, request, pk, format=None):
+        """
+        Обновляет информацию об акции
+        """
+        stock = get_object_or_404(self.model_class, pk=pk)
+        serializer = self.serializer_class(stock, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, pk, format=None):
+        """
+        Удаляет информацию об акции
+        """
+        stock = get_object_or_404(self.model_class, pk=pk)
+        stock.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 ```
 
 ## 8. Добавление View в URL'ы нашего приложения
 
-Добавим роутер нашего view в URL'ы приложения. 
+Добавим пути для наших view в URL'ы приложения. 
 
 Для этого в файле lab3/lab3/urls.py напишем:
 
 ```python
 from django.contrib import admin
-from stocks import views as stock_views
+from stocks import views
 from django.urls import include, path
 from rest_framework import routers
 
 router = routers.DefaultRouter()
-router.register(r'stocks', stock_views.StockViewSet)
 
-# Wire up our API using automatic URL routing.
-# Additionally, we include login URLs for the browsable API.
 urlpatterns = [
     path('', include(router.urls)),
+    path(r'stocks/', views.StockList.as_view()),
+    path(r'stocks/<int:pk>/', views.StockDetail.as_view()),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
 
     path('admin/', admin.site.urls),
@@ -268,3 +308,4 @@ urlpatterns = [
 1. Статья про API: [https://habr.com/ru/post/464261/](https://habr.com/ru/post/464261/)
 2. Статья про REST: [https://habr.com/ru/post/483202/](https://habr.com/ru/post/483202/)
 3. Статья про JSON: [https://habr.com/ru/post/554274/](https://habr.com/ru/post/554274/)
+4. Документация для APIView: [https://www.django-rest-framework.org/tutorial/3-class-based-views/]
