@@ -167,70 +167,71 @@ class StockSerializer(serializers.ModelSerializer):
 
 ## 7. Написание View
 
-View — это точка входа в приложение, именно view отправит запрос в базу данных и сериализует его, чтобы отдать клиенту. StockList реализует методы для работы со списком акций: get (GET /stocks/) и post (POST /stocks/). StockDetail реализует методы для работы с отдельными акциями с pk, указанным в запросе: get (GET /stocks/1/), put (PUT /stocks/1/), delete (DELETE /stocks/1/)
+View — это точка входа в приложение, именно view отправит запрос в базу данных и сериализует его, чтобы отдать клиенту. 
+Cуществует четыре способа написания rest view:
+- Представления на основе функций
+- Класс APIView
+- Классы-примеси (ViewSet)
+В данной работе реализуем view на основе функций. Декоратор api_view принимает список методов HTTP, на которые представление должно реагировать.
+stocks_list реализует работу со списком акций: get (GET /stocks/) и post (POST /stocks/). stocks_detail реализует методы для работы с отдельными акциями с pk, указанным в запросе: get (GET /stocks/1/), put (PUT /stocks/1/), delete (DELETE /stocks/1/).
 
 Напишем view в файле lab3/stocks/views.py
 
 ```python
-from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 from rest_framework import status
 from stocks.serializers import StockSerializer
 from stocks.models import Stock
+from rest_framework.decorators import api_view
 
-class StockList(APIView):
-    model_class = Stock
-    serializer_class = StockSerializer
-    
-    def get(self, request, format=None):
+@api_view(['Get','Post'])
+def stocks_list(request, format=None):
+    if request.method == 'GET':
         """
         Возвращает список акций
         """
-        stocks = self.model_class.objects.all()
-        serializer = self.serializer_class(stocks, many=True)
+        stocks = Stock.objects.all()
+        serializer = StockSerializer(stocks, many=True)
         return Response(serializer.data)
-    
-    def post(self, request, format=None):
+    elif request.method == 'POST':
         """
         Добавляет новую акцию
         """
-        serializer = self.serializer_class(data=request.data)
+        serializer = StockSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    else:
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST) 
 
-class StockDetail(APIView):
-    model_class = Stock
-    serializer_class = StockSerializer
-
-    def get(self, request, pk, format=None):
+@api_view(['Get','Put','Delete'])
+def stocks_detail(request, pk, format=None):
+    stock = get_object_or_404(Stock, pk=pk)
+    if request.method == 'GET':
         """
         Возвращает информацию об акции
         """
-        stock = get_object_or_404(self.model_class, pk=pk)
-        serializer = self.serializer_class(stock)
+        serializer = StockSerializer(stock)
         return Response(serializer.data)
-    
-    def put(self, request, pk, format=None):
+    elif request.method == 'PUT':
         """
         Обновляет информацию об акции
         """
-        stock = get_object_or_404(self.model_class, pk=pk)
-        serializer = self.serializer_class(stock, data=request.data)
+        serializer = StockSerializer(stock, data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def delete(self, request, pk, format=None):
+    elif request.method == 'DELETE':
         """
         Удаляет информацию об акции
         """
-        stock = get_object_or_404(self.model_class, pk=pk)
         stock.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+    else:
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST) 
 ```
 
 ## 8. Добавление View в URL'ы нашего приложения
@@ -249,8 +250,8 @@ router = routers.DefaultRouter()
 
 urlpatterns = [
     path('', include(router.urls)),
-    path(r'stocks/', views.StockList.as_view()),
-    path(r'stocks/<int:pk>/', views.StockDetail.as_view()),
+    path(r'stocks/', views.stocks_list),
+    path(r'stocks/<int:pk>/', views.stocks_detail),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
 
     path('admin/', admin.site.urls),
@@ -308,4 +309,3 @@ urlpatterns = [
 1. Статья про API: [https://habr.com/ru/post/464261/](https://habr.com/ru/post/464261/)
 2. Статья про REST: [https://habr.com/ru/post/483202/](https://habr.com/ru/post/483202/)
 3. Статья про JSON: [https://habr.com/ru/post/554274/](https://habr.com/ru/post/554274/)
-4. Документация для APIView: [https://www.django-rest-framework.org/tutorial/3-class-based-views/]
