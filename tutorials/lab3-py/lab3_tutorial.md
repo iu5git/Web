@@ -82,22 +82,16 @@
 
 Писать сервер с API мы будем на Django Rest Framework (DRF). Это надстройка над Django, которая позволяет нам писать REST приложения. 
 
-Стеап DRF проекта очень похож на сетап обычного Django проекта, но с небольшим исключением: нам понадобиться еще библиотека  `djangorestframework`
+Сетап DRF проекта очень похож на сетап обычного Django проекта, но с небольшим исключением: нам понадобиться еще библиотека  `djangorestframework`
 
-1. Заходим в меню создания проекта: **File -> New Project...**
-2. В открывшемся меню выбираем **Django**
-3. Задаем путь к проекту в **Location**
-4. Задаем имя нашему приложению в **Application name**
+В [1 лабораторной](https://github.com/iu5git/Web/blob/main/tutorials/lab1-py/lab1_tutorial.md) описано, как создать проект на виртуальной машине (удалённо).Согласно инструкциям оттуда подключаемся к ВМ через VS Code и оттуда во вкладке Terminaд:
+1. Создаём и активируем виртуальную среду. Устанавливаем зависимости командами `pip install Django==4.2.4` и `pip install djangorestframework` 
+2. Cоздаём проект lab3 с помощью команды `django-admin startproject lab3`. В файл settings.py в ALLOWED_HOSTS добавляем звездочку '*'.
+3. Создадим приложение stocks с помощью команды `django-admin startapp stocks`
+![Screen Shot 2023-09-26 at 4.11.48 pm.png](assets/1.png)
 
-![Screen Shot 2021-10-24 at 4.11.48 pm.png](assets/Screen_Shot_2021-10-24_at_4.11.48_pm.png)
-
-1. После этого во вкладке Terminal выполняем команду `pip install djangorestframework` (это нужно для установки библиотеки DRF)
-   
-    ![Screen Shot 2021-10-24 at 4.15.42 pm.png](assets/Screen_Shot_2021-10-24_at_4.15.42_pm.png)
-    
-2. Создадим приложение stocks с помощью команды `django-admin startapp stocks`
-3. Применим все миграции проекта: `python manage.py migrate`
-4. В файле lab3/lab3/settings.py в листе `INSTALLED_APPS` добавим название нашего приложения и название модуля DRF:
+4. Применим все миграции проекта: `python manage.py migrate`
+5. В файле lab3/lab3/settings.py в листе `INSTALLED_APPS` добавим название нашего приложения и название модуля DRF:
    
     ```python
     INSTALLED_APPS = [
@@ -173,44 +167,99 @@ class StockSerializer(serializers.ModelSerializer):
 
 ## 7. Написание View
 
-View — это точка входа в приложение, именно view отправит запрос в базу данных и сериализует его, чтобы отдать клиенту.
+View — это точка входа в приложение, именно view отправит запрос в базу данных и сериализует его, чтобы отдать клиенту. 
+Cуществует четыре способа написания rest view:
+- Представления на основе функций
+- Класс APIView
+- Классы-примеси (ViewSet)
+В данной работе реализуем view на основе функций. Декоратор api_view принимает список методов HTTP, на которые представление должно реагировать.
+stocks_list реализует работу со списком акций: get (GET /stocks/) и post (POST /stocks/). stocks_detail реализует методы для работы с отдельными акциями с pk, указанным в запросе: get (GET /stocks/1/), put (PUT /stocks/1/), delete (DELETE /stocks/1/).
 
 Напишем view в файле lab3/stocks/views.py
 
 ```python
-from rest_framework import viewsets
+from rest_framework.response import Response
+from django.shortcuts import get_object_or_404
+from rest_framework import status
 from stocks.serializers import StockSerializer
 from stocks.models import Stock
+from rest_framework.decorators import api_view
 
+@api_view(['Get'])
+def get_list(request, format=None):
+    """
+    Возвращает список акций
+    """
+    print('get')
+    stocks = Stock.objects.all()
+    serializer = StockSerializer(stocks, many=True)
+    return Response(serializer.data)
 
-class StockViewSet(viewsets.ModelViewSet):
+@api_view(['Post'])
+def post_list(request, format=None):    
     """
-    API endpoint, который позволяет просматривать и редактировать акции компаний
+    Добавляет новую акцию
     """
-    # queryset всех пользователей для фильтрации по дате последнего изменения
-    queryset = Stock.objects.all().order_by('date_modified')
-    serializer_class = StockSerializer  # Сериализатор для модели
+    print('post')
+    serializer = StockSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['Get'])
+def get_detail(request, pk, format=None):
+    stock = get_object_or_404(Stock, pk=pk)
+    if request.method == 'GET':
+        """
+        Возвращает информацию об акции
+        """
+        serializer = StockSerializer(stock)
+        return Response(serializer.data)
+
+@api_view(['Put'])
+def put_detail(request, pk, format=None):
+    """
+    Обновляет информацию об акции
+    """
+    stock = get_object_or_404(Stock, pk=pk)
+    serializer = StockSerializer(stock, data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['Delete'])
+def delete_detail(request, pk, format=None):    
+    """
+    Удаляет информацию об акции
+    """
+    stock = get_object_or_404(Stock, pk=pk)
+    stock.delete()
+    return Response(status=status.HTTP_204_NO_CONTENT)
 ```
 
 ## 8. Добавление View в URL'ы нашего приложения
 
-Добавим роутер нашего view в URL'ы приложения. 
+Добавим пути для наших view в URL'ы приложения. 
 
 Для этого в файле lab3/lab3/urls.py напишем:
 
 ```python
 from django.contrib import admin
-from stocks import views as stock_views
+from stocks import views
 from django.urls import include, path
 from rest_framework import routers
 
 router = routers.DefaultRouter()
-router.register(r'stocks', stock_views.StockViewSet)
 
-# Wire up our API using automatic URL routing.
-# Additionally, we include login URLs for the browsable API.
 urlpatterns = [
     path('', include(router.urls)),
+    path(r'stocks/', views.get_list, name='stocks-list'),
+    path(r'stocks/post/', views.post_list, name='stocks-post'),
+    path(r'stocks/<int:pk>/', views.get_detail, name='stocks-detail'),
+    path(r'stocks/<int:pk>/put/', views.put_detail, name='stocks-put'),
+    path(r'stocks/<int:pk>/delete/', views.delete_detail, name='stocks-delete'),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
 
     path('admin/', admin.site.urls),
@@ -219,50 +268,51 @@ urlpatterns = [
 
 ## 9. Проверяем правильность работы API
 
+Запустим приложение, введя в терминале: python manage.py runserver 0.0.0.0:8000
+
 Чтобы проверить правильность работы API и отослать запросы можно использовать [Insomnia](https://insomnia.rest/download) или [Postman](https://www.postman.com/), а можно использовать прямо отладочный интерфейс DRF.
 
 Чтобы использовать стандартный отладчик DRF достаточно перейти по ссылке, которую Django показал при запуске сервера. И написать что-то вроде: [http://127.0.0.1:8000/stocks/](http://127.0.0.1:8000/stocks/).
 
-Но мы будем использовать Insomnia, которую можно скачать по [этой ссылке](https://insomnia.rest/download). 
+Я буду использовать Postman, который можно скачать [здесь](https://www.postman.com/downloads/)
 
 Первый запрос, который мы будем тестировать — это добавление новой акции. Для выполнения запроса:
 
-1. Нажмем на плюсик и во всплывающем меню выберем **New Request**:
+1. Нажмем на New и во всплывающем меню выберем **HTTP**:
    
-    ![Screen Shot 2021-10-24 at 7.50.28 pm.png](assets/Screen_Shot_2021-10-24_at_7.50.28_pm.png)
+    ![2.png](assets/2.png)
+    ![3.png](assets/3.png)
     
-2. Во всплывшем окне напишем название запроса для удобства(оно будет отображаться в колонке слева), в качестве примера используем название *create new stock*
-3. После этого мы сможем редактировать наш запрос: выбрать HTTP метод(GET/POST/...), попробуем запросить список всех акций
+2. Попробуем запросить список всех акций. Для этого выберем HTTP метод GET и введём соответствующий путь.
    
-    ![Screen Shot 2021-10-25 at 9.15.00 pm.png](assets/Screen_Shot_2021-10-25_at_9.15.00_pm.png)
+    ![4.png](assets/4.png)
     
-4. Как можно увидеть, нам пришел пустой список `[]`, чтобы добавить акции новой компании воспользуемся методом POST. Выбрав метод POST, нам также необходимо передать данные в теле запроса в виде JSON структуры, а затем отправить запрос(сделать это можно несколько раз, чтобы данных было больше).
+3. Как можно увидеть, нам пришел пустой список `[]`. Для добавления новой акции воспользуемся методом POST. Выберем метод POST, введём нужный путь, а также добавим в тело запроса JSON структуру, описывающую новый объект. Повторим это несколько раз, чтобы данных было больше.
    
-    ![Screen Shot 2021-10-25 at 9.19.40 pm.png](assets/Screen_Shot_2021-10-25_at_9.19.40_pm.png)
+    ![5.png](assets/5.png)
     
-5. Нам пришел статус 201 и вернулся объект, который мы создали, попробуем еще раз запросить список всех объектов с помощью GET запроса.
+4. Нам пришел статус 201 и вернулся объект, который мы создали. Ещё раз запросим список всех объектов с помощью GET запроса.
    
-    ![Screen Shot 2021-10-25 at 9.32.33 pm.png](assets/Screen_Shot_2021-10-25_at_9.32.33_pm.png)
+    ![6.png](assets/6.png)
     
-6. Можно заметить, что нам вернулись все объекты, которые мы создали, также им присвоились номера, которые написаны в поле pk(Primary Key), давайте попробуем изменить объект с pk=2 и поменять название компании, а также курс ее акций. Для этого поменяем метод на PUT(нужен для обновления объекта), в конце ссылки напишем id и передадим новый объект (переименуем [Mail.Ru](http://Mail.Ru) в VK).
+5. Можно заметить, что нам вернулись все объекты, которые мы создали, также им присвоились номера, которые написаны в поле pk (Primary Key). Давайте попробуем изменить у объекта с pk=8 название компании, а также курс акций. Для этого поменяем метод на PUT (нужен для обновления объекта), в конце ссылки напишем id и передадим новый объект в body запроса (переименуем VK в Zarathustra).
    
-    ![Screen Shot 2021-10-25 at 9.38.34 pm.png](assets/Screen_Shot_2021-10-25_at_9.38.34_pm.png)
+    ![7.png](assets/7.png)
     
-7. В нашей базе данных мы сделали ребрендинг [Mail.Ru](http://Mail.Ru), теперь можно для наглядности и надежности посмотреть список объектов еще раз:
+6. Проверим общий список. 
    
-    ![Screen Shot 2021-10-25 at 9.40.10 pm.png](assets/Screen_Shot_2021-10-25_at_9.40.10_pm.png)
+    ![8.png](assets/8.png)
     
-8. Мы успешно переименовали [Mail.Ru](http://Mail.Ru) в VK в объекте с pk=2(третий по счету) и изменили стоимость акций у этой компании.
+7. Мы успешно переименовали VK в Zarathustra в объекте с pk=8 (первый по счету) и изменили стоимость акций у этой компании.
 
-9. Далее необходимо удалить все объекты с названием Mail.Ru. Можно заметить, что это записи с pk=3 и pk=1, чтобы удалить эти записи достаточно изменить HTTP метод на DELETE и в конце строки аргументом указать pk. Все почти также, как в методе PUT, только тело запроса здесь не нужно.
+8. Далее удалим объект с pk=9. Для этого изменим HTTP метод на DELETE и в конце строки аргументом укажем pk. Все почти также, как в методе PUT, только тело запроса здесь не нужно.
    
-    ![Screen Shot 2021-10-25 at 9.45.19 pm.png](assets/Screen_Shot_2021-10-25_at_9.45.19_pm.png)
+    ![9.png](assets/9.png)
     
-10. Успешно удалив два объекта Mail.Ru, давайте проверим, что в списке остался один объект с pk=2:
+9. Просмотрим обновлённый список.
     
-    ![Screen Shot 2021-10-25 at 9.46.38 pm.png](assets/Screen_Shot_2021-10-25_at_9.46.38_pm.png)
+    ![10.png](assets/10.png)
     
-11. В итоге остался только объект с названием VK, мы считаем наше задание выполненным.
 
 ## 10. Полезные ссылки
 1. Статья про API: [https://habr.com/ru/post/464261/](https://habr.com/ru/post/464261/)
