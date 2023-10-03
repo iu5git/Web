@@ -863,6 +863,60 @@ export default ITunesPage
 
 Нажимаем правой кнопкой мыши на любое место на странице, после чего нажимаем на кнопку **Посмотреть код**. После чего переходим во вкладку **Console**, где и ищем ошибку связанную с `CORS`-политикой. Если она есть, то просто отключаем CORS. Есть разные способы, как это сделать, но я предложу очень полезное [расширение для Googl'a][chrome-cors-unblock].
 
+## Развертывание приложения React в GitHub Pages
+
+С помощью `GitHub Pages` возможно развернуть статическое приложение, например наш React проект. Но развернуть наш бекенд здесь не получится.
+
+[Пример развертывания React](https://github.com/gitname/react-gh-pages)
+
+#### Обратите внимание
+
+При развертывании приложения `React` через `GitHub Pages`, ваши `AJAX` запросы будут идти по `http`, в то время как приложение будет доступно по `https`. Работать это будет только при использовании адреса `localhost` в `AJAX` запросах.
+
+## Главное меню приложения
+
+Для создания главного меню приложения будем использовать `Navbar` из `react-bootstrap`
+
+[Подробнее](https://react-bootstrap.github.io/components/navbar/)
+
+
+```jsx
+import Container from 'react-bootstrap/Container';
+import Nav from 'react-bootstrap/Nav';
+import Navbar from 'react-bootstrap/Navbar';
+import NavDropdown from 'react-bootstrap/NavDropdown';
+
+function BasicExample() {
+  return (
+    <Navbar bg="light" expand="lg">
+      <Container>
+        <Navbar.Brand href="#home">React-Bootstrap</Navbar.Brand>
+        <Navbar.Toggle aria-controls="basic-navbar-nav" />
+        <Navbar.Collapse id="basic-navbar-nav">
+          <Nav className="me-auto">
+            <Nav.Link href="#home">Home</Nav.Link>
+            <Nav.Link href="#link">Link</Nav.Link>
+            <NavDropdown title="Dropdown" id="basic-nav-dropdown">
+              <NavDropdown.Item href="#action/3.1">Action</NavDropdown.Item>
+              <NavDropdown.Item href="#action/3.2">
+                Another action
+              </NavDropdown.Item>
+              <NavDropdown.Item href="#action/3.3">Something</NavDropdown.Item>
+              <NavDropdown.Divider />
+              <NavDropdown.Item href="#action/3.4">
+                Separated link
+              </NavDropdown.Item>
+            </NavDropdown>
+          </Nav>
+        </Navbar.Collapse>
+      </Container>
+    </Navbar>
+  );
+}
+
+export default BasicExample;
+```
+
 ## Полезные ссылки
 
 * [React][react]
