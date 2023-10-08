@@ -861,15 +861,31 @@ export default ITunesPage
 
 Как понять, что пустой экран связан с этой ошибкой?
 
-Нажимаем правой кнопкой мыши на любое место на странице, после чего нажимаем на кнопку **Посмотреть код**. После чего переходим во вкладку **Console**, где и ищем ошибку связанную с `CORS`-политикой. Если она есть, то просто отключаем CORS. Есть разные способы, как это сделать, но я предложу очень полезное [расширение для Googl'a][chrome-cors-unblock].
+Нажимаем правой кнопкой мыши на любое место на странице, после чего нажимаем на кнопку **Посмотреть код**. После чего переходим во вкладку **Console**, где и ищем ошибку связанную с `CORS`-политикой. Если она есть, то просто отключаем CORS.
+
+Я предложу 3 способа решения этой проблемы.
+
+### CORS. Настройка на бекенде
+
+Необходимо на бекенде настроить отдачу `CORS` заголовков. Как это сделать можно почитать [тут][habr-cors1] или [тут][habr-cors2].
+
+### CORS. Отключение на фронтенде
+
+С помощью специальных расширений мы можем отключить работу `CORS` политик на фронтенде. К пример, вот полезное расширение для [Google Chrome][chrome-cors-unblock].
+
+### CORS. Проксирование на фронтенде
+
+Мы можем проксировать запросы через наш dev сервер. В таком случае у нас не будет проблем с `CORS` запросами. Для настройки необходимо в файле `vite.config.ts` указать поле [proxy][vite-proxy]. К примеру, если мы будем делать запрос на `/api`, то наш dev сервер будет проксировать его на `http://;localhost:8080`.
+
+Важно момент, что такое решение работает только при локальной разработке. Если мы будем разворачивать приложение в prod окружении, то нам нужно будет настраивать `proxy` другим способом.
 
 ## Развертывание приложения React в GitHub Pages
 
 С помощью `GitHub Pages` возможно развернуть статическое приложение, например наш React проект. Но развернуть наш бекенд здесь не получится.
 
-[Пример развертывания React](https://github.com/gitname/react-gh-pages)
+[Пример развертывания React + Vite][vite-gh-pages]
 
-#### Обратите внимание
+### Обратите внимание
 
 При развертывании приложения `React` через `GitHub Pages`, ваши `AJAX` запросы будут идти по `http`, в то время как приложение будет доступно по `https`. Работать это будет только при использовании адреса `localhost` в `AJAX` запросах.
 
@@ -878,7 +894,6 @@ export default ITunesPage
 Для создания главного меню приложения будем использовать `Navbar` из `react-bootstrap`
 
 [Подробнее](https://react-bootstrap.github.io/components/navbar/)
-
 
 ```jsx
 import Container from 'react-bootstrap/Container';
@@ -929,10 +944,14 @@ export default BasicExample;
 [react-hooks]: https://react.dev/reference/react
 [react-router]: https://reactrouter.com
 [vite]: https://vitejs.dev
+[vite-proxy]: https://vitejs.dev/config/server-options.html#server-proxy
 [vite-template-project]: https://vitejs.dev/guide/#scaffolding-your-first-vite-project
+[vite-gh-pages]: https://rashidshamloo.hashnode.dev/deploying-vite-react-app-to-github-pages
 [typescript]: https://www.typescriptlang.org/
 [habr-react-diff-class-function-component]: https://habr.com/ru/company/ruvds/blog/444348
 [habr-react-hooks]: https://habr.com/ru/company/ruvds/blog/554280
 [habr-react-jsx]: https://habr.com/ru/articles/319270
 [habr-typescript]: https://habr.com/ru/articles/663964
+[habr-cors1]: https://habr.com/ru/companies/macloud/articles/553826
+[habr-cors2]: https://habr.com/ru/articles/514684
 [chrome-cors-unblock]: https://chrome.google.com/webstore/detail/cors-unblock/lfhmikememgdcahcdlaciloancbhjino
