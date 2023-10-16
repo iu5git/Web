@@ -863,7 +863,13 @@ export default ITunesPage
 
 Нажимаем правой кнопкой мыши на любое место на странице, после чего нажимаем на кнопку **Посмотреть код**. После чего переходим во вкладку **Console**, где и ищем ошибку связанную с `CORS`-политикой. Если она есть, то просто отключаем CORS.
 
-Я предложу 3 способа решения этой проблемы.
+Мы предлагаем 3 способа решения этой проблемы.
+
+### CORS. Проксирование на фронтенде
+
+Мы можем проксировать запросы через наш dev сервер. Схема проксирования такая: фронт -> прокси -> бек. В таком случае у нас не будет проблем с `CORS` запросами. Для настройки необходимо в файле `vite.config.ts` указать поле [proxy][vite-proxy]. К примеру, если мы будем делать запрос на `/api`, то наш dev сервер будет проксировать его на `http://;localhost:8080`.
+
+Важно момент, что такое решение работает только при локальной разработке. Если мы будем разворачивать приложение в prod окружении, то нам нужно будет настраивать `proxy` другим способом.
 
 ### CORS. Настройка на бекенде
 
@@ -871,13 +877,7 @@ export default ITunesPage
 
 ### CORS. Отключение на фронтенде
 
-С помощью специальных расширений мы можем отключить работу `CORS` политик на фронтенде. К пример, вот полезное расширение для [Google Chrome][chrome-cors-unblock].
-
-### CORS. Проксирование на фронтенде
-
-Мы можем проксировать запросы через наш dev сервер. В таком случае у нас не будет проблем с `CORS` запросами. Для настройки необходимо в файле `vite.config.ts` указать поле [proxy][vite-proxy]. К примеру, если мы будем делать запрос на `/api`, то наш dev сервер будет проксировать его на `http://;localhost:8080`.
-
-Важно момент, что такое решение работает только при локальной разработке. Если мы будем разворачивать приложение в prod окружении, то нам нужно будет настраивать `proxy` другим способом.
+С помощью специальных расширений мы можем отключить работу `CORS` политик на фронтенде. К пример, вот полезное расширение для [Google Chrome][chrome-cors-unblock]. Но расширение браузера не лучшее решение данной проблемы, это небезопасно при использовании в сторонних сайтах.
 
 ## Развертывание приложения React в GitHub Pages
 
@@ -939,19 +939,19 @@ export default BasicExample;
 * [Typescript][typescript]
 * [Vite][vite]
 
-[iu5-javascript]: https://github.com/iu5git/JavaScript
-[react]: https://react.dev
-[react-hooks]: https://react.dev/reference/react
-[react-router]: https://reactrouter.com
-[vite]: https://vitejs.dev
-[vite-proxy]: https://vitejs.dev/config/server-options.html#server-proxy
-[vite-template-project]: https://vitejs.dev/guide/#scaffolding-your-first-vite-project
-[vite-gh-pages]: https://rashidshamloo.hashnode.dev/deploying-vite-react-app-to-github-pages
-[typescript]: https://www.typescriptlang.org/
-[habr-react-diff-class-function-component]: https://habr.com/ru/company/ruvds/blog/444348
-[habr-react-hooks]: https://habr.com/ru/company/ruvds/blog/554280
-[habr-react-jsx]: https://habr.com/ru/articles/319270
-[habr-typescript]: https://habr.com/ru/articles/663964
-[habr-cors1]: https://habr.com/ru/companies/macloud/articles/553826
-[habr-cors2]: https://habr.com/ru/articles/514684
-[chrome-cors-unblock]: https://chrome.google.com/webstore/detail/cors-unblock/lfhmikememgdcahcdlaciloancbhjino
+* [iu5-javascript]: https://github.com/iu5git/JavaScript
+* [react]: https://react.dev
+* [react-hooks]: https://react.dev/reference/react
+* [react-router]: https://reactrouter.com
+* [vite]: https://vitejs.dev
+* [vite-proxy]: https://vitejs.dev/config/server-options.html#server-proxy
+* [vite-template-project]: https://vitejs.dev/guide/#scaffolding-your-first-vite-project
+* [vite-gh-pages]: https://rashidshamloo.hashnode.dev/deploying-vite-react-app-to-github-pages
+* [typescript]: https://www.typescriptlang.org/
+* [habr-react-diff-class-function-component]: https://habr.com/ru/company/ruvds/blog/444348
+* [habr-react-hooks]: https://habr.com/ru/company/ruvds/blog/554280
+* [habr-react-jsx]: https://habr.com/ru/articles/319270
+* [habr-typescript]: https://habr.com/ru/articles/663964
+* [habr-cors1]: https://habr.com/ru/companies/macloud/articles/553826
+* [habr-cors2]: https://habr.com/ru/articles/514684
+* [chrome-cors-unblock]: https://chrome.google.com/webstore/detail/cors-unblock/lfhmikememgdcahcdlaciloancbhjino

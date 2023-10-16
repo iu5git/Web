@@ -8,6 +8,7 @@
 
 ## План
 
+0. Swagger. Написание документация и генерация документации.
 1. Чем отличается авторизация от аутентификации?
 2. Вводная часть: по какому принципу работает авторизация JWT
 3. Пишем простейшую авторизацию на JWT. Middlewares.
@@ -16,6 +17,136 @@
 6. Реализуем ролевую модель на основе JWT
 7. Refresh Token
 8. Полезные ссылки
+
+## 0. Swagger. Написание документация и генерация документации.
+Swagger — это инструментарий, использующий спецификацию OpenAPI.
+Например, OpenAPIGenerator и SwaggerUI.
+Спецификация OpenAPI (openapi.json).
+Спецификация OpenAPI — это документ, описывающий возможности API.
+
+Как выглядит свагер описание? Откройте файл merged.swagger.json и вы можете наглядно посмотреть.
+Большинство IDE отлично интерпретируют свагер. Например Goland дает нам возможность параллельно смотреть исходники документации 
+и видеть визуальный результат. Сваггер можно описывать в json формате, а так же в yaml формате.
+В проекте как правило такую документацию помещают в корень проекта в папку ```/docs```.
+Сваггер можно написать вручную, однако когда над вашим проектом работают 5 разработчиков,
+то кто-то обязательно забудет его дополнить, дополнив при этом еще один запрос новым параметром,
+передав эту документацию вашим клиентам она уже станет не валидной. 
+
+Решить эту проблему можно несколькими путями:
+1. Фреймворк, который генерирует вам код на которым вы пишите сервер из swagger.
+2. Описание контракта для протоколов protobuf(.proto файлы), которые сгенерируют вам фрагмент сервера. А так же параллельно swagger документацию.(Более популярно в профессиональных коллективах)
+3. Генерировать сваггер из комментариев. (Мы будем использовтаь этот вариант)
+
+Изучите документацию библиотеки для генерации сваггера и установите утилиту swag согласно документации: https://github.com/swaggo/swag
+
+Создадим свою первую swagger документацию:
+
+Добавим комментарии в файл main.go 
+```go
+package main
+
+import (
+	"context"
+	"log"
+	"os"
+
+	"awesomeProject/internal/pkg/app"
+)
+
+// @title BITOP
+// @version 1.0
+// @description Bmstu Open IT Platform
+
+// @contact.name API Support
+// @contact.url https://vk.com/bmstu_schedule
+// @contact.email bitop@spatecon.ru
+
+// @license.name AS IS (NO WARRANTY)
+
+// @host 127.0.0.1
+// @schemes https http
+// @BasePath /
+
+func main() {
+	ctx := context.Background()
+
+	log.Println("Initializing server")
+	application, err := app.New(ctx)
+	if err != nil {
+		log.Println("cant create application")
+		os.Exit(2)
+	}
+
+	log.Println("Application start!")
+	application.Run()
+	log.Println("Application terminated!")
+}
+
+```
+
+Добавим описание эндпоинта и вынесем его вне анонимной функции:
+`server.go`
+```go
+package app
+
+import (
+   "github.com/gin-gonic/gin"
+   "log"
+   "net/http"
+)
+
+func (a *Application) StartServer() {
+   log.Println("Server start up")
+
+   r := gin.Default()
+
+   r.GET("/ping/:name", a.Ping)
+
+   r.Run() // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
+
+   log.Println("Server down")
+}
+
+type pingReq struct{}
+type pingResp struct {
+   Status string `json:"status"`
+}
+
+// Ping godoc
+// @Summary      Show hello text
+// @Description  very very friendly response
+// @Tags         Tests
+// @Produce      json
+// @Success      200  {object}  pingResp
+// @Router       /ping/{name} [get]
+func (a *Application) Ping(gCtx *gin.Context) {
+   name := gCtx.Param("name")
+   gCtx.String(http.StatusOK, "Hello %s", name)
+}
+
+```
+
+Сгенерируем сваггер документацию:
+```shell
+$ swag init -g cmd/awesomeProject/main.go
+2022/10/02 23:16:10 Generate swagger docs....
+2022/10/02 23:16:10 Generate general API Info, search dir:./
+2022/10/02 23:16:10 warning: failed to get package name in dir: ./, error: execute go list command, exit status 1, stdout:, stderr:no Go files in /Users/maxim-konovalov/VK/Cloud/awesomeProject
+2022/10/02 23:16:10 Generating app.pingResp
+2022/10/02 23:16:10 create docs.go at docs/docs.go
+2022/10/02 23:16:10 create swagger.json at docs/swagger.json
+2022/10/02 23:16:10 create swagger.yaml at docs/swagger.yaml
+```
+Как видим документация сгенерировалась успешно:
+```shell
+$ ls -l ./docs
+total 24
+-rw-r--r--  1 maxim-konovalov  staff  2801 Oct  2 23:16 docs.go
+-rw-r--r--  1 maxim-konovalov  staff  1334 Oct  2 23:16 swagger.json
+-rw-r--r--  1 maxim-konovalov  staff   682 Oct  2 23:16 swagger.yaml
+```
+Откроем и посмотрим результат, убедимся что все сгенерировалось согласно нашим комментариям:
+![Untitled Diagram.drawio (2).png](docs/swagger.png)
 
 ## 1. Чем отличается авторизация от аутентификации?
 
