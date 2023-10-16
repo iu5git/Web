@@ -939,19 +939,19 @@ export default BasicExample;
 * [Typescript][typescript]
 * [Vite][vite]
 
-* [iu5-javascript]: https://github.com/iu5git/JavaScript
-* [react]: https://react.dev
-* [react-hooks]: https://react.dev/reference/react
-* [react-router]: https://reactrouter.com
-* [vite]: https://vitejs.dev
-* [vite-proxy]: https://vitejs.dev/config/server-options.html#server-proxy
-* [vite-template-project]: https://vitejs.dev/guide/#scaffolding-your-first-vite-project
-* [vite-gh-pages]: https://rashidshamloo.hashnode.dev/deploying-vite-react-app-to-github-pages
-* [typescript]: https://www.typescriptlang.org/
-* [habr-react-diff-class-function-component]: https://habr.com/ru/company/ruvds/blog/444348
-* [habr-react-hooks]: https://habr.com/ru/company/ruvds/blog/554280
-* [habr-react-jsx]: https://habr.com/ru/articles/319270
-* [habr-typescript]: https://habr.com/ru/articles/663964
-* [habr-cors1]: https://habr.com/ru/companies/macloud/articles/553826
-* [habr-cors2]: https://habr.com/ru/articles/514684
-* [chrome-cors-unblock]: https://chrome.google.com/webstore/detail/cors-unblock/lfhmikememgdcahcdlaciloancbhjino
+[iu5-javascript]: https://github.com/iu5git/JavaScript
+[react]: https://react.dev
+[react-hooks]: https://react.dev/reference/react
+[react-router]: https://reactrouter.com
+[vite]: https://vitejs.dev
+[vite-proxy]: https://vitejs.dev/config/server-options.html#server-proxy
+[vite-template-project]: https://vitejs.dev/guide/#scaffolding-your-first-vite-project
+[vite-gh-pages]: https://rashidshamloo.hashnode.dev/deploying-vite-react-app-to-github-pages
+[typescript]: https://www.typescriptlang.org/
+[habr-react-diff-class-function-component]: https://habr.com/ru/company/ruvds/blog/444348
+[habr-react-hooks]: https://habr.com/ru/company/ruvds/blog/554280
+[habr-react-jsx]: https://habr.com/ru/articles/319270
+[habr-typescript]: https://habr.com/ru/articles/663964
+[habr-cors1]: https://habr.com/ru/companies/macloud/articles/553826
+[habr-cors2]: https://habr.com/ru/articles/514684
+[chrome-cors-unblock]: https://chrome.google.com/webstore/detail/cors-unblock/lfhmikememgdcahcdlaciloancbhjino
