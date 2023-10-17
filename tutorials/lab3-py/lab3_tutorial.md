@@ -223,7 +223,7 @@ def put_detail(request, pk, format=None):
     Обновляет информацию об акции
     """
     stock = get_object_or_404(Stock, pk=pk)
-    serializer = StockSerializer(stock, data=request.data)
+    serializer = StockSerializer(stock, data=request.data, partial=True)
     if serializer.is_valid():
         serializer.save()
         return Response(serializer.data)
