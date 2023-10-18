@@ -172,8 +172,7 @@ Cуществует четыре способа написания rest view:
 - Представления на основе функций
 - Класс APIView
 - Классы-примеси (ViewSet)
-В данной работе реализуем view на основе функций. Декоратор api_view принимает список методов HTTP, на которые представление должно реагировать.
-stocks_list реализует работу со списком акций: get (GET /stocks/) и post (POST /stocks/). stocks_detail реализует методы для работы с отдельными акциями с pk, указанным в запросе: get (GET /stocks/1/), put (PUT /stocks/1/), delete (DELETE /stocks/1/).
+В данной работе реализуем view на основе классов. Платформа REST предоставляет класс APIView, который является подклассом класса View Django. 
 
 Напишем view в файле lab3/stocks/views.py
 
@@ -183,44 +182,66 @@ from django.shortcuts import get_object_or_404
 from rest_framework import status
 from stocks.serializers import StockSerializer
 from stocks.models import Stock
+from rest_framework.views import APIView
 from rest_framework.decorators import api_view
 
-@api_view(['Get'])
-def get_list(request, format=None):
-    """
-    Возвращает список акций
-    """
-    print('get')
-    stocks = Stock.objects.all()
-    serializer = StockSerializer(stocks, many=True)
-    return Response(serializer.data)
+class StockList(APIView):
+    model_class = Stock
+    serializer_class = StockSerializer
+    
+    def get(self, request, format=None):
+        """
+        Возвращает список акций
+        """
+        stocks = self.model_class.objects.all()
+        serializer = self.serializer_class(stocks, many=True)
+        return Response(serializer.data)
+    
+    def post(self, request, format=None):
+        """
+        Добавляет новую акцию
+        """
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-@api_view(['Post'])
-def post_list(request, format=None):    
-    """
-    Добавляет новую акцию
-    """
-    print('post')
-    serializer = StockSerializer(data=request.data)
-    if serializer.is_valid():
-        serializer.save()
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+class StockDetail(APIView):
+    model_class = Stock
+    serializer_class = StockSerializer
 
-@api_view(['Get'])
-def get_detail(request, pk, format=None):
-    stock = get_object_or_404(Stock, pk=pk)
-    if request.method == 'GET':
+    def get(self, request, pk, format=None):
         """
         Возвращает информацию об акции
         """
-        serializer = StockSerializer(stock)
+        stock = get_object_or_404(self.model_class, pk=pk)
+        serializer = self.serializer_class(stock)
         return Response(serializer.data)
+    
+    def put(self, request, pk, format=None):
+        """
+        Обновляет информацию об акции (для модератора)
+        """
+        stock = get_object_or_404(self.model_class, pk=pk)
+        serializer = self.serializer_class(stock, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    def delete(self, request, pk, format=None):
+        """
+        Удаляет информацию об акции
+        """
+        stock = get_object_or_404(self.model_class, pk=pk)
+        stock.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    
 @api_view(['Put'])
 def put_detail(request, pk, format=None):
     """
-    Обновляет информацию об акции
+    Обновляет информацию об акции (для пользователя)
     """
     stock = get_object_or_404(Stock, pk=pk)
     serializer = StockSerializer(stock, data=request.data, partial=True)
@@ -228,15 +249,6 @@ def put_detail(request, pk, format=None):
         serializer.save()
         return Response(serializer.data)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-@api_view(['Delete'])
-def delete_detail(request, pk, format=None):    
-    """
-    Удаляет информацию об акции
-    """
-    stock = get_object_or_404(Stock, pk=pk)
-    stock.delete()
-    return Response(status=status.HTTP_204_NO_CONTENT)
 ```
 
 ## 8. Добавление View в URL'ы нашего приложения
@@ -255,13 +267,10 @@ router = routers.DefaultRouter()
 
 urlpatterns = [
     path('', include(router.urls)),
-    path(r'stocks/', views.get_list, name='stocks-list'),
-    path(r'stocks/post/', views.post_list, name='stocks-post'),
-    path(r'stocks/<int:pk>/', views.get_detail, name='stocks-detail'),
+    path(r'stocks/', views.StockList.as_view(), name='stocks-list'),
+    path(r'stocks/<int:pk>/', views.StockDetail.as_view(), name='stocks-detail'),
     path(r'stocks/<int:pk>/put/', views.put_detail, name='stocks-put'),
-    path(r'stocks/<int:pk>/delete/', views.delete_detail, name='stocks-delete'),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
-
     path('admin/', admin.site.urls),
 ]
 ```
@@ -295,7 +304,7 @@ urlpatterns = [
    
     ![6.png](assets/6.png)
     
-5. Можно заметить, что нам вернулись все объекты, которые мы создали, также им присвоились номера, которые написаны в поле pk (Primary Key). Давайте попробуем изменить у объекта с pk=8 название компании, а также курс акций. Для этого поменяем метод на PUT (нужен для обновления объекта), в конце ссылки напишем id и передадим новый объект в body запроса (переименуем VK в Zarathustra).
+5. Можно заметить, что нам вернулись все объекты, которые мы создали, также им присвоились номера, которые написаны в поле pk (Primary Key). Давайте попробуем изменить у объекта с pk=13 курс акций. Для этого поменяем метод на PUT (нужен для обновления объекта), добавим id в путь и передадим новый объект в body запроса.
    
     ![7.png](assets/7.png)
     
@@ -303,9 +312,9 @@ urlpatterns = [
    
     ![8.png](assets/8.png)
     
-7. Мы успешно переименовали VK в Zarathustra в объекте с pk=8 (первый по счету) и изменили стоимость акций у этой компании.
+7. Мы успешно изменили стоимость акций у компании c pk=13.
 
-8. Далее удалим объект с pk=9. Для этого изменим HTTP метод на DELETE и в конце строки аргументом укажем pk. Все почти также, как в методе PUT, только тело запроса здесь не нужно.
+8. Далее удалим объект с pk=14. Для этого изменим HTTP метод на DELETE и в конце строки аргументом укажем pk. Все почти также, как в методе PUT, только тело запроса здесь не нужно.
    
     ![9.png](assets/9.png)
     
@@ -313,6 +322,8 @@ urlpatterns = [
     
     ![10.png](assets/10.png)
     
+10. Протестируем наш дополнительный метод для пользователя, чтобы изменить информацию об акции. 
+    ![11.png](assets/11.png)
 
 ## 10. Полезные ссылки
 1. Статья про API: [https://habr.com/ru/post/464261/](https://habr.com/ru/post/464261/)
