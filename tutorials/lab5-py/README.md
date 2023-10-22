@@ -318,6 +318,6 @@ def auth_view(request):
 
 ## Ограничение прав на приложение для разных ролей
 
-[Методичка по permissions Django](/Permissions.md)
+[Методичка по permissions Django](Permissions.md)
 
 
