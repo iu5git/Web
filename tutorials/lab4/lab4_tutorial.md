@@ -539,6 +539,11 @@ export default StartPage
 npm i react-bootstrap bootstrap
 ```
 
+`bootstrap` необходимо испортировать в файле `main.tsx`
+```tsx
+import 'bootstrap/dist/css/bootstrap.min.css'
+```
+
 Создадим страницу для отрисовки треков из ITunes.
 
 ### ITunesPage

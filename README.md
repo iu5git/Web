@@ -17,7 +17,7 @@
 
 * [Лекция 5. Веб-сервис. REST. Swagger. Микросервисы](lectures/Lecture_5_Web_Service.pdf)
 
-* Лекция 8. Авторизация, куки, сессии, Permissions.
+* [Лекция 8. Авторизация, сессии, permissions. Redis, swagger](lectures/Lecture_8_Authorization.pdf)
 
 * Лекция 9. Redis. JWT. SSO
 
