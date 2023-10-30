@@ -882,7 +882,6 @@ export default defineConfig({
     proxy: {
       // string shorthand: http://localhost:3000/api -> http://localhost:8080/api
       '/api': 'http://localhost:8080',
-      // with options: http://localhost:5173/api/bar-> http://jsonplaceholder.typicode.com/bar
     },
   },
 })
