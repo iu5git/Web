@@ -416,7 +416,7 @@ def put_detail(request, pk, format=None):
 {"email": "check@list.ru", "password": "999", "is_superuser": true}
 ```
 
-![1.png](assets/2.png)
+![1.png](assets/1.png)
 
 Будем использовать Authorization в Postman, чтобы делать запросы от имени разных пользователей. Для put-методов в StockDetail установлено ограничение IsAdmin, так что пользователю none@penguin.com не удаётся его использовать, а вот у пользователя check@list.ru не возникает никаких проблем. 
 
