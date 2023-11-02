@@ -80,9 +80,10 @@ urlpatterns = [
 
 Добавим класс CustomUser в models.py. Заменять username на email, как это сделано в примере, необязательно (в таком случае вам не нужен будет NewUserManager и поле USERNAME_FIELD). С помощью UserManager мы переопределяем метод  create_user, чтобы поле username было необязательно. 
 
-is_staff - показывает, является ли пользователь менеджером;
-is_superuser - показывает, является ли пользователь админом.
-(будет нужно нам в части с permissions)
+- `is_staff` - показывает, является ли пользователь менеджером;
+- `is_superuser` - показывает, является ли пользователь админом.
+
+(Эти поля будут нужны нам в части с permissions)
 
 ```python
 class NewUserManager(UserManager):
@@ -270,6 +271,7 @@ def login_view(request):
 
 class UserViewSet(viewsets.ModelViewSet):
     authentication_classes = [SessionAuthentication, BasicAuthentication]
+    ...
 
 class StockList(APIView):
     authentication_classes = [SessionAuthentication, BasicAuthentication]
@@ -326,8 +328,8 @@ class StockList(APIView):
    ...
 
 class StockDetail(APIView):
-    permission_classes = [IsAuthenticatedOrReadOnly]
-
+   permission_classes = [IsAuthenticatedOrReadOnly]
+   ...
 ```
 IsAuthenticatedOrReadOnly указано по умолчанию в settings.py, так что снова приводить это в атрибутах классов Stock было необязательно. 
 
@@ -528,7 +530,7 @@ import redis
 
 # создаем инстанс и указываем координаты БД на локальной машине
 r = redis.Redis(
-    host= 'localhost',
+    host= '0.0.0.0',
     port= '6379')
 
 r.set('somekey', '1000-7') # сохраняем ключ 'somekey' с значением '1000-7!'
