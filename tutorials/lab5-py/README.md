@@ -322,13 +322,15 @@ def login_view(request):
    ...
 
 class StockList(APIView):
-   permission_classes = [IsAuthenticated]
+   permission_classes = [IsAuthenticatedOrReadOnly]
    ...
 
 class StockDetail(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
 ```
+IsAuthenticatedOrReadOnly указано по умолчанию в settings.py, так что снова приводить это в атрибутах классов Stock было необязательно. 
+
 Перечисленных способов недостаточно для нашего проекта. Аутентифицированные пользователи у нас делятся на клиента, менеджера и администратора. Клиент должен иметь доступ только к части запросов. Например, он может выполнить запрос на запись при добавлении нового бронирования, но не может добавить новую услугу. Поэтому нам необходимо реализовать пользовательские разрешения.
 
 Наша модель пользователя `User` содержит, помимо прочих, следующие логические поля:
@@ -372,6 +374,36 @@ class UserViewSet(viewsets.ModelViewSet):
             permission_classes = [IsAdmin]
         return [permission() for permission in permission_classes]
 
+def method_permission_classes(classes):
+    def decorator(func):
+        def decorated_func(self, *args, **kwargs):
+            self.permission_classes = classes        
+            self.check_permissions(self.request)
+            return func(self, *args, **kwargs)
+        return decorated_func
+    return decorator
+
+class StockDetail(APIView):
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
+    def get(self, request, pk, format=None):
+        ...
+
+    @method_permission_classes((IsAdmin,))
+    def put(self, request, pk, format=None):
+        ...
+
+    @method_permission_classes((IsAdmin,))
+    def put(self, request, pk, format=None):
+        ...
+
+@api_view(['Put'])
+@permission_classes([AllowAny])
+@authentication_classes([])
+def put_detail(request, pk, format=None):
+    ...
+
 ```
 Таким образом, мы разделили методы на группы на основании того, какое разрешение нужно проверять при попытке вызова этих методов. Если аутентифицированный пользователь попытается выполнить запрос, который ему не разрешено выполнять, он получит ответ ` 403 Permission Denied`.
 
@@ -382,12 +414,13 @@ class UserViewSet(viewsets.ModelViewSet):
 {"email": "check@list.ru", "password": "999", "is_superuser": true}
 ```
 
+![1.png](assets/2.png)
+
+Будем использовать Authorization в Postman, чтобы делать запросы от имени разных пользователей. Для put-методов в StockDetail установлено ограничение IsAdmin, так что пользователю none@penguin.com не удаётся его использовать, а вот у пользователя check@list.ru не возникает никаких проблем. 
+
 ![2.png](assets/2.png)
 
-Будем использовать Authorization в Postman, чтобы делать запросы от имени разных пользователей. Для отдельного put-метода установлено ограничение IsAdmin, так что пользователю none@penguin.com не удаётся его использовать, а вот у пользователя check@list.ru не возникает никаких проблем. 
-
 ![3.png](assets/3.png)
-
 
 ![4.png](assets/4.png)
 
