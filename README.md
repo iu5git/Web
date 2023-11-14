@@ -32,7 +32,7 @@
 
 * [Лекция 10. Redux](lectures/Lecture_10_Redux.pdf)
 
-* [Лекция 11. POST Ajax, Axios](lectures/Lecture_11_Axios.pdf)
+* [Лекция 11. POST, Axios. Диаграммы бизнес требований](lectures/Lecture_11_Axios.pdf)
 
 * Лекция 12. Адаптивная верстка. PWA
 
