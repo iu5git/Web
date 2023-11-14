@@ -57,6 +57,48 @@ urlpatterns = [
    ...
 ]
 ```
+Добавим в view.py декораторы swagger_auto_schema для методов 'post' и 'put' и укажем структуру запроса. Также можно задать структуру ответа в поле responses.
+
+```python
+from drf_yasg.utils import swagger_auto_schema
+
+class StockList(APIView):
+
+    @swagger_auto_schema(request_body=StockSerializer)
+    def post(self, request, format=None):
+	...
+
+class StockDetail(APIView):
+    @swagger_auto_schema(request_body=StockSerializer)
+    def put(self, request, pk, format=None):
+	...
+
+@swagger_auto_schema(method='put', request_body=StockSerializer)
+@api_view(['Put'])
+def put_detail(request, pk, format=None):
+    ...
+
+```
+
+Также добавим в serializer.py метод get_field, чтобы было возможно передавать только часть полей в запросах. В models.py можете обозначить также default значения для необязательных полей.
+
+```python
+from collections import OrderedDict
+
+class StockSerializer(serializers.ModelSerializer):
+    class Meta:
+        # Модель, которую мы сериализуем
+        model = Stock
+        # Поля, которые мы сериализуем
+        fields = ["pk", "company_name", "price", "is_growing", "date_modified"]
+
+        def get_fields(self):
+            new_fields = OrderedDict()
+            for name, field in super().get_fields().items():
+                field.required = False
+                new_fields[name] = field
+            return new_fields 
+```
 
 Запускаем приложение и переходим по адресу: *http://127.0.0.1/swagger/* и видим:
 
@@ -64,6 +106,9 @@ urlpatterns = [
 
 Далее при добавлении новый обработчиков, `drf_yasg` будет автоматически добавлять их в swagger. Также сгенерируется файл в формате json из которого мы сможем при надобности сгенерировать типы данных на фронтенде. Этот файл доступен по ссылке http://127.0.0.1:8000/swagger/?format=openapi
 
+Попробуем выполнить запрос через swagger:
+
+![swagger2](assets/swagger2.png)
 
 ## Сущность пользователя
 
@@ -77,6 +122,8 @@ urlpatterns = [
 - имя
 - никнейм
 - и тд...
+
+AbstractBaseUser имеет только функцию аутентификации, у него нет фактических полей, вы предоставите поля для использования при создании подкласса. Вы также должны указать, какое поле будет представлять имя пользователя, обязательные поля и способы управления этими пользователями.
 
 Добавим класс CustomUser в models.py. Заменять username на email, как это сделано в примере, необязательно (в таком случае вам не нужен будет NewUserManager и поле USERNAME_FIELD). С помощью UserManager мы переопределяем метод  create_user, чтобы поле username было необязательно. 
 
@@ -226,9 +273,13 @@ SessionAuthentication подходит для клиентов AJAX, котор�
 from django.contrib.auth import authenticate, login, logout
 from django.http import HttpResponse
 from rest_framework.permissions import AllowAny
+from django.views.decorators.csrf import csrf_exempt
 
 @permission_classes([AllowAny])
 @authentication_classes([])
+@csrf_exempt
+@swagger_auto_schema(method='post', request_body=UserSerializer)
+@api_view(['Post'])
 def login_view(request):
     email = request.POST["email"] # допустим передали username и password
     password = request.POST["password"]
@@ -385,6 +436,17 @@ def method_permission_classes(classes):
         return decorated_func
     return decorator
 
+class StockList(APIView):
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
+    def get(self, request, format=None):
+	...
+
+    @swagger_auto_schema(request_body=StockSerializer)
+    def post(self, request, format=None):
+	...
+
 class StockDetail(APIView):
     authentication_classes = [SessionAuthentication, BasicAuthentication]
     permission_classes = [IsAuthenticatedOrReadOnly]
@@ -392,6 +454,7 @@ class StockDetail(APIView):
     def get(self, request, pk, format=None):
         ...
 
+    @swagger_auto_schema(request_body=StockSerializer)
     @method_permission_classes((IsAdmin,))
     def put(self, request, pk, format=None):
         ...
@@ -400,6 +463,7 @@ class StockDetail(APIView):
     def put(self, request, pk, format=None):
         ...
 
+@swagger_auto_schema(method='put', request_body=StockSerializer)
 @api_view(['Put'])
 @permission_classes([AllowAny])
 @authentication_classes([])
