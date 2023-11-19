@@ -1,11 +1,66 @@
-# Методические указания по выполнению лабораторной работы №7
+# Методические указания по выполнению лабораторной работы №5
 
 ## Задачи:
 
+- добавить Swagger
 - реализовать сущность пользователя;
 - предоставить возможность пользователем создавать и использовать учетные записи;
 - связать пользователей с уже имеющимися бизнес-сущностями(фактами).
-- подключить авторизацию через VK, SMS и тд.
+
+
+## Добавление Swagger
+
+Подключение swagger к Django Rest Framework выполнить просто. Для начала необходимо скачать зависимость:
+
+`pip install -U drf-yasg`
+
+Далее в файле *settings.py* подлючаем:
+
+```python
+INSTALLED_APPS = [
+   ...
+   'django.contrib.staticfiles',  #Необходим для  swagger ui's css/js файлов (По умолчанию включен)
+   'drf_yasg',
+   ...
+]
+```
+
+Затем в файле *urls.py*:
+
+```python
+from rest_framework import permissions
+from django.urls import path, include
+from drf_yasg.views import get_schema_view
+from drf_yasg import openapi
+
+...
+
+schema_view = get_schema_view(
+   openapi.Info(
+      title="Snippets API",
+      default_version='v1',
+      description="Test description",
+      terms_of_service="https://www.google.com/policies/terms/",
+      contact=openapi.Contact(email="contact@snippets.local"),
+      license=openapi.License(name="BSD License"),
+   ),
+   public=True,
+   permission_classes=(permissions.AllowAny,),
+)
+
+urlpatterns = [
+    ...
+    path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
+   ...
+]
+```
+
+Запускаем приложение и переходим по адресу: *http://127.0.0.1/swagger/* и видим:
+
+![swagger](assets/swagger.png)
+
+Далее при добавлении новый обработчиков, `drf_yasg` будет автоматически добавлять их в swagger. Также сгенерируется файл в формате json из которого мы сможем при надобности сгенерировать типы данных на фронтенде. Этот файл доступен по ссылке http://127.0.0.1:8000/swagger/?format=openapi
+
 
 ## Сущность пользователя
 
@@ -263,4 +318,6 @@ def auth_view(request):
 
 ## Ограничение прав на приложение для разных ролей
 
-[Методичка по permissions Django](../homework/Permissions.md)
+[Методичка по permissions Django](Permissions.md)
+
+
