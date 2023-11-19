@@ -229,18 +229,18 @@ JWT состоит из трех частей: заголовок header,
 
 ...
 type loginReq struct {
-Login    string `json:"login"`
-Password string `json:"password"`
+	Login    string `json:"login"`
+	Password string `json:"password"`
 }
 
 type loginResp struct {
-ExpiresIn   int    `json:"expires_in"`
-AccessToken string `json:"access_token"`
-TokenType   string `json:"token_type"`
+	ExpiresIn   int    `json:"expires_in"`
+	AccessToken string `json:"access_token"`
+	TokenType   string `json:"token_type"`
 }
 
 func (a *Application) Login(gCtx *gin.Context) {
-...
+	...
 }
 ```
 
@@ -268,61 +268,58 @@ type JWTClaims struct {
 
 ```go
 type loginReq struct {
-Login    string `json:"login"`
-Password string `json:"password"`
+	Login    string `json:"login"`
+	Password string `json:"password"`
 }
 
 type loginResp struct {
-ExpiresIn   time.Duration `json:"expires_in"`
-AccessToken string        `json:"access_token"`
-TokenType   string        `json:"token_type"`
+	ExpiresIn   time.Duration `json:"expires_in"`
+	AccessToken string        `json:"access_token"`
+	TokenType   string        `json:"token_type"`
 }
 
 func (a *Application) Login(gCtx *gin.Context) {
-cfg := a.config
-req := &loginReq{}
+	cfg := a.config
+	req := &loginReq{}
 
-err := json.NewDecoder(gCtx.Request.Body).Decode(req)
-if err != nil {
-gCtx.AbortWithError(http.StatusBadRequest, err)
+	err := json.NewDecoder(gCtx.Request.Body).Decode(req)
+	if err != nil {
+		gCtx.AbortWithError(http.StatusBadRequest, err)
+		return
+	}
 
-return
-}
+	if req.Login == login && req.Password == password {
+		// значит проверка пройдена
+		// генерируем ему jwt
+		token := jwt.NewWithClaims(cfg.JWT.SigningMethod, &ds.JWTClaims{
+			StandardClaims: jwt.StandardClaims{
+				ExpiresAt: time.Now().Add(cfg.JWT.ExpiresIn).Unix(),
+				IssuedAt:  time.Now().Unix(),
+				Issuer:    "bitop-admin",
+			},
+			UserUUID: uuid.New(), // test uuid
+			Scopes:   []string{}, // test data
+		})
 
-if req.Login == login && req.Password == password {
-// значит проверка пройдена
-// генерируем ему jwt
-token := jwt.NewWithClaims(cfg.JWT.SigningMethod, &ds.JWTClaims{
-StandardClaims: jwt.StandardClaims{
-ExpiresAt: time.Now().Add(cfg.JWT.ExpiresIn).Unix(),
-IssuedAt:  time.Now().Unix(),
-Issuer:    "bitop-admin",
-},
-UserUUID: uuid.New(), // test uuid
-Scopes:   []string{}, // test data
-})
+		if token == nil {
+			gCtx.AbortWithError(http.StatusInternalServerError, fmt.Errorf("token is nil"))
+			return
+		}
 
-if token == nil {
-gCtx.AbortWithError(http.StatusInternalServerError, fmt.Errorf("token is nil"))
+		strToken, err := token.SignedString([]byte(cfg.JWT.Token))
+		if err != nil {
+			gCtx.AbortWithError(http.StatusInternalServerError, fmt.Errorf("cant create str token"))
+			return
+		}
 
-return
-}
+		gCtx.JSON(http.StatusOK, loginResp{
+			ExpiresIn:   cfg.JWT.ExpiresIn,
+			AccessToken: strToken,
+			TokenType:   "Bearer",
+		})
+	}
 
-strToken, err := token.SignedString([]byte(cfg.JWT.Token))
-if err != nil {
-gCtx.AbortWithError(http.StatusInternalServerError, fmt.Errorf("cant create str token"))
-
-return
-}
-
-gCtx.JSON(http.StatusOK, loginResp{
-ExpiresIn:   cfg.JWT.ExpiresIn,
-AccessToken: strToken,
-TokenType:   "Bearer",
-})
-}
-
-gCtx.AbortWithStatus(http.StatusForbidden) // отдаем 403 ответ в знак того что доступ запрещен
+	gCtx.AbortWithStatus(http.StatusForbidden) // отдаем 403 ответ в знак того что доступ запрещен
 }
 ```
 
@@ -362,7 +359,6 @@ func (a *Application) WithAuthCheck(gCtx *gin.Context) {
 	jwtStr := gCtx.GetHeader("Authorization")
 	if !strings.HasPrefix(jwtStr, jwtPrefix) { // если нет префикса то нас дурят!
 		gCtx.AbortWithStatus(http.StatusForbidden) // отдаем что нет доступа
-
 		return // завершаем обработку
 	}
 
@@ -375,7 +371,6 @@ func (a *Application) WithAuthCheck(gCtx *gin.Context) {
 	if err != nil {
 		gCtx.AbortWithStatus(http.StatusForbidden)
 		log.Println(err)
-
 		return
 	}
 }
@@ -391,7 +386,7 @@ r.Use(a.WithAuthCheck).GET("/ping", a.Ping)
 
 ### Проверим что все работает как мы задумывали
 
-403 ответ если пароль и логин не подходят
+403 ответ, если пароль и логин не подходят
 
 ```shell
 $ curl -v --location --request POST 'http://127.0.0.1:8080/login' \
@@ -474,7 +469,7 @@ $ curl --location --request GET 'http://127.0.0.1:8080/ping' \
 # 4. Устанавливаем redis
 
 В установке redis действует все то же правило что и в ЛР2.
-В случае установок на железо - следуйте инструкциям из документации Redis.
+Для установки без докера - следуйте инструкциям из документации Redis.
 В данном случае мы будем использовать docker-compose все так же.
 
 Найти измененный docker-compose можно в текущей директории.
@@ -620,11 +615,11 @@ func main() {
 
 ```go
 func (r *Repository) Register(user *ds.User) error {
-if user.UUID == uuid.Nil {
-user.UUID = uuid.New()
-}
+	if user.UUID == uuid.Nil {
+		user.UUID = uuid.New()
+	}
 
-return r.db.Create(user).Error
+	return r.db.Create(user).Error
 }
 ```
 
@@ -636,58 +631,53 @@ r.POST("/sign_up", a.Register)
 ...
 
 type registerReq struct {
-Name string `json:"name"` // лучше назвать то же самое что login
-Pass string `json:"pass"`
+	Name string `json:"name"` // лучше назвать то же самое что login
+	Pass string `json:"pass"`
 }
 
 type registerResp struct {
-Ok bool `json:"ok"`
+	Ok bool `json:"ok"`
 }
 
 func (a *Application) Register(gCtx *gin.Context) {
-req := &registerReq{}
+	req := &registerReq{}
 
-err := json.NewDecoder(gCtx.Request.Body).Decode(req)
-if err != nil {
-gCtx.AbortWithError(http.StatusBadRequest, err)
+	err := json.NewDecoder(gCtx.Request.Body).Decode(req)
+	if err != nil {
+		gCtx.AbortWithError(http.StatusBadRequest, err)
+		return
+	}
 
-return
-}
+	if req.Pass == "" {
+		gCtx.AbortWithError(http.StatusBadRequest, fmt.Errorf("pass is empty"))
+		return
+	}
 
-if req.Pass == "" {
-gCtx.AbortWithError(http.StatusBadRequest, fmt.Errorf("pass is empty"))
+	if req.Name == "" {
+		gCtx.AbortWithError(http.StatusBadRequest, fmt.Errorf("name is empty"))
+		return
+	}
 
-return
-}
+	err = a.repo.Register(&ds.User{
+		UUID: uuid.New(),
+		Role: role.Buyer,
+		Name: req.Name,
+		Pass: generateHashString(req.Pass), // пароли делаем в хешированном виде и далее будем сравнивать хеши, чтобы их не угнали с базой вместе
+	})
+	if err != nil {
+		gCtx.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
 
-if req.Name == "" {
-gCtx.AbortWithError(http.StatusBadRequest, fmt.Errorf("name is empty"))
-
-return
-}
-
-err = a.repo.Register(&ds.User{
-UUID: uuid.New(),
-Role: role.Buyer,
-Name: req.Name,
-Pass: generateHashString(req.Pass), // пароли делаем в хешированном виде и далее будем сравнивать хеши, чтобы их не угнали с базой вместе
-})
-
-if err != nil {
-gCtx.AbortWithError(http.StatusInternalServerError, err)
-
-return
-}
-
-gCtx.JSON(http.StatusOK, &registerResp{
-Ok: true,
-})
+	gCtx.JSON(http.StatusOK, &registerResp{
+		Ok: true,
+	})
 }
 
 func generateHashString(s string) string {
-h := sha1.New()
-h.Write([]byte(s))
-return hex.EncodeToString(h.Sum(nil))
+	h := sha1.New()
+	h.Write([]byte(s))
+	return hex.EncodeToString(h.Sum(nil))
 }
 
 ```
@@ -699,15 +689,14 @@ return hex.EncodeToString(h.Sum(nil))
 
 # 6. Реализуем ролевую модель на основе JWT
 
-Наверное это будет самая быстрая часть наших с вами стараний.
 Добавим в нашу структуру JWT новое поле role.
 Теперь наш JWT выглядит следующим образом:
 
 ```go
 type JWTClaims struct {
-jwt.StandardClaims
-UserUUID uuid.UUID `json:"user_uuid"`
-Role     role.Role
+	jwt.StandardClaims
+	UserUUID uuid.UUID `json:"user_uuid"`
+	Role     role.Role
 }
 ```
 
@@ -791,16 +780,16 @@ r.Use(a.WithAuthCheck(role.Manager, role.Admin)).GET("/ping", a.Ping)
 
 ```go
 func (r *Repository) GetUserByLogin(login string) (*ds.User, error) {
-user := &ds.User{
-Name: "login",
-}
+	user := &ds.User{
+		Name: "login",
+	}
 
-err := r.db.First(user).Error
-if err != nil {
-return nil, err
-}
+	err := r.db.First(user).Error
+	if err != nil {
+		return nil, err
+	}
 
-return user, nil
+	return user, nil
 }
 ```
 
@@ -808,58 +797,52 @@ return user, nil
 
 ```go
 func (a *Application) Login(gCtx *gin.Context) {
-cfg := a.config
-req := &loginReq{}
+	cfg := a.config
+	req := &loginReq{}
 
-err := json.NewDecoder(gCtx.Request.Body).Decode(req)
-if err != nil {
-gCtx.AbortWithError(http.StatusBadRequest, err)
+	err := json.NewDecoder(gCtx.Request.Body).Decode(req)
+	if err != nil {
+		gCtx.AbortWithError(http.StatusBadRequest, err)
+		return
+	}
 
-return
-}
+	user, err := a.repo.GetUserByLogin(req.Login)
+	if err != nil {
+		gCtx.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
 
-user, err := a.repo.GetUserByLogin(req.Login)
-if err != nil {
-gCtx.AbortWithError(http.StatusInternalServerError, err)
+	if req.Login == user.Name && user.Pass == generateHashString(req.Password) {
+		// значит проверка пройдена
+		// генерируем ему jwt
+		token := jwt.NewWithClaims(cfg.JWT.SigningMethod, &ds.JWTClaims{
+			StandardClaims: jwt.StandardClaims{
+				ExpiresAt: time.Now().Add(cfg.JWT.ExpiresIn).Unix(),
+				IssuedAt:  time.Now().Unix(),
+				Issuer:    "bitop-admin",
+			},
+			UserUUID: uuid.New(), // test uuid
+			Role:     user.Role,
+		})
+		if token == nil {
+			gCtx.AbortWithError(http.StatusInternalServerError, fmt.Errorf("token is nil"))
+			return
+		}
 
-return
-}
+		strToken, err := token.SignedString([]byte(cfg.JWT.Token))
+		if err != nil {
+			gCtx.AbortWithError(http.StatusInternalServerError, fmt.Errorf("cant create str token"))
+			return
+		}
 
-if req.Login == user.Name && user.Pass == generateHashString(req.Password) {
-// значит проверка пройдена
-// генерируем ему jwt
-token := jwt.NewWithClaims(cfg.JWT.SigningMethod, &ds.JWTClaims{
-StandardClaims: jwt.StandardClaims{
-ExpiresAt: time.Now().Add(cfg.JWT.ExpiresIn).Unix(),
-IssuedAt:  time.Now().Unix(),
-Issuer:    "bitop-admin",
-},
-UserUUID: uuid.New(), // test uuid
-Role:     user.Role,
+		gCtx.JSON(http.StatusOK, loginResp{
+			ExpiresIn:   cfg.JWT.ExpiresIn,
+			AccessToken: strToken,
+			TokenType:   "Bearer",
+		})
+	}
 
-})
-
-if token == nil {
-gCtx.AbortWithError(http.StatusInternalServerError, fmt.Errorf("token is nil"))
-
-return
-}
-
-strToken, err := token.SignedString([]byte(cfg.JWT.Token))
-if err != nil {
-gCtx.AbortWithError(http.StatusInternalServerError, fmt.Errorf("cant create str token"))
-
-return
-}
-
-gCtx.JSON(http.StatusOK, loginResp{
-ExpiresIn:   cfg.JWT.ExpiresIn,
-AccessToken: strToken,
-TokenType:   "Bearer",
-})
-}
-
-gCtx.AbortWithStatus(http.StatusForbidden) // отдаем 403 ответ в знак того что доступ запрещен
+	gCtx.AbortWithStatus(http.StatusForbidden) // отдаем 403 ответ в знак того что доступ запрещен
 }
 ```
 
@@ -884,10 +867,10 @@ bmstu.public> UPDATE public.users SET role = 2 WHERE uuid = '90461663-12f6-400c-
 + Удобно передаем в MW роли которые имеют доступ к эндпоинту
 
 Минусы: 
-- Чтобы изменились права токена нужно заново авторизовать пользователя
+- Чтобы изменились права токена, нужно заново авторизовать пользователя
 - Нет гибкой настройки, могут быть 2 менеджера с разными права, что делать тогда?
 - Пароли храняться в sha хэше и их можно подобрать по радужным таблицам
-- Нужно перезагружать сервер чтобы менять доступы к эндпоинтам
+- Нужно перезагружать сервер, чтобы менять доступы к эндпоинтам
 - Нет разлогинивания
 
 Однако, все же у нас получилось разграничить доступ и создать пусть и примитивную,
@@ -895,7 +878,7 @@ bmstu.public> UPDATE public.users SET role = 2 WHERE uuid = '90461663-12f6-400c-
 
 # 7. Refresh Token и logout
 ### Refresh Token
-Думаю каждый обратил внимание что токен не может жить вечно. После вызова ```/login```
+Думаю каждый обратил внимание, что токен не может жить вечно. После вызова ```/login```
 вам возвращается поле в JSON: ```    "expires_in": 3600000000000```.
 Когда истекает токен - он становится недействительным, в этот момент вам придется залогиниваться снова.
 Но ведь разные популярные сервисы, которые пользуются JWT не делают этого!
@@ -915,7 +898,6 @@ bmstu.public> UPDATE public.users SET role = 2 WHERE uuid = '90461663-12f6-400c-
 
 
 Redis (Remote Dictionary Service) — это опенсорсный сервер баз данных типа ключ-значение.
-Чем-то напоминает хэш мап не так ли?
 Обычно его используют в качетсве кеша,
 он умеет хранить какие-то значения только определенное время и потом удалять.
 
@@ -968,7 +950,7 @@ cfg.Redis.Host = os.Getenv(envRedisHost)
 cfg.Redis.Port, err = strconv.Atoi(os.Getenv(envRedisPort))
 
 if err != nil {
-return nil, fmt.Errorf("redis port must be int value: %w", err)
+	return nil, fmt.Errorf("redis port must be int value: %w", err)
 }
 
 cfg.Redis.Password = os.Getenv(envRedisPass)
@@ -1129,11 +1111,8 @@ func (c *Client) CheckJWTInBlacklist(ctx context.Context, jwtStr string) error {
 
 Как проверить записи в Redis? 
 
-Это хороший вопрос и я бы с радостью также посоветовал вам DataGrip. 
-[Однако JetBrains обещают добавить поддержку Redis лишь в версии 2022.3 ](https://blog.jetbrains.com/datagrip/2022/11/02/datagrip-2022-3-eap-2-redis-support/). 
-(история же тянется уже 6 лет https://youtrack.jetbrains.com/issue/DBE-283).
-Потому в нашем случае будем пользоваться любым доступным клиентом(или проверкой на коде).
-Я же воспользуюсь ранним релиз кандидатом JetBrains(на свой страх и риск).
+В нашем случае будем пользоваться любым доступным клиентом(или проверкой на коде).
+Я же воспользуюсь ранним релиз кандидатом JetBrains.
 Можете установить кандидата в релиз с помощью JetBrains Toolbox ![Создание проекта](docs/5.png)
 ![Создание проекта](docs/6.png)
 
