@@ -68,7 +68,7 @@ Swagger или OpenAPI - это спецификация, которая поз�
 2) Установим библиотеку для генерации api, мы будем использовать [swagger-typescript-api][npm-swagger-typescript-api]
 
 ```shell
-npm i swagger-typescript-api -D`
+npm i swagger-typescript-api -D
 ```
 
 3) Подготовим код для генерации, положим его в `scripts/generate-api.mjs`
@@ -167,7 +167,16 @@ generateApi({
 
 Создадим небольшой проект, чтобы разобраться Redux. Структура проекта:
 
-TODO: добавить
+* store
+    * data
+        * slice.ts
+        * selectors.ts
+        * getPetsByStatus.ts
+        * index.ts
+* store.ts
+* hooks.ts
+* types.ts
+* index.ts
 
 #### Создадим slice и selectors
 
