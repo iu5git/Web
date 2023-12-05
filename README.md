@@ -21,7 +21,7 @@
 
 * [Лекция 9. Цифровая подпись. JWT. SSO](lectures/Lecture_9_jwt.pdf)
 
-* Лекция 14. WebSocket, grpc. S3, очереди
+* [Лекция 14. Брокер, очереди, gRPC. WebSocket, Polling](lectures/Lecture_14_Async.pdf)
 
 * Лекция 15. Резерв
 
