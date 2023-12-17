@@ -548,37 +548,6 @@ fetch(`http://${api_socket}/orders/${user_cart[user_cart.length - 1].order_id}/`
 Давайте возьмем одну из них и попробуем воссоздать руками хранение и проверку сессий. Для этого будем использовать Redis.
 
 
-### Установка Redis
-
-Установим в Docker-контейнере с Ubuntu Redis. Для этого выполним действия:
-
-```shell
-sudo apt install lsb-release curl gpg
-
-curl -fsSL https://packages.redis.io/gpg | sudo gpg --dearmor -o /usr/share/keyrings/redis-archive-keyring.gpg
-
-echo "deb [signed-by=/usr/share/keyrings/redis-archive-keyring.gpg] https://packages.redis.io/deb $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/redis.list
-
-sudo apt-get update
-sudo apt-get install redis
-```
-
-Чтобы запустить демон Redis, пишем:
-```shell
-sudo service redis-server start
-```
-
-И наконец запускаем:
-```shell
-redis-cli 
-127.0.0.1:6379> ping
-PONG
-```
-
-6379 - это порт на котором автоматически запускается Redis. 
-
-В одном терминале будет крутиться Redis, а в другом - наш бэкенд на Django.
-
 ### Использование Redis с Python
 
 Чтобы установить библиотеку для работы с Redis пропишем:
