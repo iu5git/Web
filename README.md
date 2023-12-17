@@ -202,6 +202,7 @@
 * [Методические указания Tauri](/tutorials/tauri/)
 * [Методические указания iOS (Swift)](https://github.com/iu5git/web-2022/blob/main/tutorials/ios_tutorial/ios_tutorial.md)
 * [Методические указания Android (Java)](https://github.com/iu5git/web-2022/blob/main/tutorials/android_tutorial/android_tutorial.md)
+* [Методические указания Android (Kotlin + Compose)](/tutorials/lab7-android-kotlin/lab7_android_kotlin_compose_tutorial.md)
 * [Методические указания React Native + Redux Toolkit](/tutorials/react-native/react_native.md)
 
 #### Лабораторная 8
