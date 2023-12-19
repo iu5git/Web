@@ -200,10 +200,10 @@
 Создание простого нативного приложения для интерфейса гостя (без авторизации и редактирования), состоящий из 2 страниц с фильтрацией и картинками. Подключить приложение к разработанному API через IP адрес в локальной сети.
 
 * [Методические указания Tauri](/tutorials/tauri/)
+* [Методические указания React Native + Redux Toolkit](/tutorials/react-native/react_native.md)
 * [Методические указания iOS (Swift)](https://github.com/iu5git/web-2022/blob/main/tutorials/ios_tutorial/ios_tutorial.md)
 * [Методические указания Android (Java)](https://github.com/iu5git/web-2022/blob/main/tutorials/android_tutorial/android_tutorial.md)
-* [Методические указания Android (Kotlin + Compose)](/tutorials/lab7-android-kotlin/lab7_android_kotlin_compose_tutorial.md)
-* [Методические указания React Native + Redux Toolkit](/tutorials/react-native/react_native.md)
+* [Методические указания Android (Kotlin + Compose)](/tutorials/lab7-android-kotlin/README.md)
 
 #### Лабораторная 8
 
@@ -217,6 +217,7 @@
 В исходном веб-сервисе также необходимо добавить http-метод для внесения результатов. Асинхронный сервис взаимодействует с основным через `http`, без прямого обращения в БД. Добавить псевдо авторизацию в методе основного сервиса - передавать как константу какой-нибудь ключ, например на 8 байт, и через if просто проверять на совпадение это поле.
 
 * [Методические указания Django](/tutorials/lab8-py/README.md)
+* [Методические указания Golang](/tutorials/lab8-go/README.md)
 
 #### Домашнее Задание
 
