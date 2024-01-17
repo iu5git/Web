@@ -201,7 +201,7 @@
 
 * [Методические указания Tauri](/tutorials/tauri/)
 * [Методические указания React Native + Redux Toolkit](/tutorials/react-native/react_native.md)
-* [Методические указания iOS (UI kit)](https://github.com/iu5git/web-2022/blob/main/tutorials/ios_tutorial/ios_tutorial.md)
+* [Методические указания iOS (UI kit)](/tutorials/ios_tutorial/)
 * [Методические указания iOS (Swift UI)](/tutorials/swiftui)
 * [Методические указания Android (Java)](https://github.com/iu5git/web-2022/blob/main/tutorials/android_tutorial/android_tutorial.md)
 * [Методические указания Android (Kotlin + Compose)](/tutorials/lab7-android-kotlin/README.md)
