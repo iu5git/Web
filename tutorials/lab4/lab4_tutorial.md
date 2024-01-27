@@ -7,6 +7,7 @@
 ## Введение
 
 <!-- TODO: ссылка на установку VM -->
+
 <!-- TODO: ссылка на настройку IDE -->
 
 ### Как жить с API
@@ -142,7 +143,7 @@ cd my-app
 npm install
 ```
 
-После выполнения этих команд у нас будет готовое приложение. "Под капотом" нашего приложения используется язык [Typescript][typescript], библиотека [React][react] и сборщик [Vite][vite].
+После выполнения этих команд у нас будет готовое приложение. "Под капотом" нашего приложения используется язык [Typescript], библиотека [React] и сборщик [Vite].
 
 Для удобства разработки внесем изменения в `vite.config.ts`, чтобы у нас всегда локальный сервер запускался на **3000 порту**.
 
@@ -425,7 +426,7 @@ const Example: FC = () => {
 ```tsx
 useEffect(() => {
   // Этот код выполнится на mount`е компонента
-        
+    
   return () => {
     // Этот код выполнится на unmount`е компонента
   }
@@ -437,7 +438,7 @@ useEffect(() => {
 Хуки налагают два дополнительных правила для разработки:
 
 * Не вызывайте хуки внутри циклов, условий или вложенных функций.
-Они должны выполняться только **на верхнем уровне**.
+  Они должны выполняться только **на верхнем уровне**.
 * Хуки следует вызывать только из функциональных компонентов React и пользовательских хуков.
 
 Пользовательский хук это такая функция JavaScript, внутри которой используются другие хуки. На этот хук распространяются правила хуков, которые описаны ранее.
@@ -540,6 +541,7 @@ npm i react-bootstrap bootstrap
 ```
 
 `bootstrap` необходимо испортировать в файле `main.tsx`
+
 ```tsx
 import 'bootstrap/dist/css/bootstrap.min.css'
 ```
@@ -627,7 +629,7 @@ const ITunesPage: FC = () => {
                         <Card key={index} className="card">
                             <Card.Img className="cardImage" variant="top" src={item.artworkUrl100} height={100} width={100}  />
                             <Card.Body>
-                            
+                        
                             <div className="textStyle">
                                 <Card.Title>{item.artistName}</Card.Title>
                             </div>
@@ -749,7 +751,7 @@ interface Props {
 const MusicCard: FC<Props> = ({ artworkUrl100, artistName, collectionCensoredName, trackViewUrl }) => (
     <Card className="card">
         <Card.Img className="cardImage" variant="top" src={artworkUrl100} height={100} width={100}  />
-        <Card.Body>                
+        <Card.Body>            
             <div className="textStyle">
                 <Card.Title>{artistName}</Card.Title>
             </div>
@@ -766,7 +768,7 @@ const MusicCard: FC<Props> = ({ artworkUrl100, artistName, collectionCensoredNam
 export default MusicCard;
 ```
 
-### modules/get-music-by-name.ts
+### modules/itunesApi.ts
 
 ```ts
 export interface ITunesMusic {
@@ -794,23 +796,21 @@ export const getMusicByName = async (name = ''): Promise<ITunesResult> =>{
 ```tsx
 import { FC, useState} from 'react'
 import { Col, Row, Spinner } from 'react-bootstrap'
-import { ITunesMusic, getMusicByName } from './modules/get-music-by-name'
+import { ITunesMusic, getMusicByName } from './modules/itunesApi'
 import { InputField } from './components/InputField'
 import { MusicCard } from './components/MusicCard'
 import './ITunesPage.css'
 
 const ITunesPage: FC = () => {
     const [searchValue, setSearchValue] = useState('')
-
     const [loading, setLoading] = useState(false)
-
     const [music, setMusic] = useState<ITunesMusic[]>([])
 
     const handleSearch = async () =>{
-        await setLoading(true)
+        setLoading(true)
         const { results } = await getMusicByName(searchValue)
-        await setMusic(results.filter(item => item.wrapperType === "track"))
-        await setLoading(false)
+        setMusic(results.filter(item => item.wrapperType === "track"))
+        setLoading(false)
     }
 
     return (
@@ -846,21 +846,549 @@ export default ITunesPage
 
 ## Доработка React приложения по варианту
 
-### Реализовать получение данных из mock-объектов
-
-Доработать страницу приложения по вашему варианту. Наполнение данных осуществить через mock-объекты.
-
 ### Добавить Навигационную цепочку и страницу Подробнее
 
 Добавить страницу Подробнее для просмотра данных о вашем товаре/услуге.
 
-Для удобной навигации добавить Навигационную цепочку `Breadcrumbs`: [Магазин](/README.md) / [Название услуги](/README.md).
+Для удобной навигации добавим навигационную цепочку `Breadcrumbs`.
+Создадим компонент BreadCrumbs, который будет отображать путь до текущей страницы на основе  передаваемых параметров. Активная страница (последняя "хлебная крошка") будет выделена другим цветом. При данном подходе необходимо указывать все "крошки", кроме страницы Главная - она отображается всегда.
+
+Для удобства создадим объекты ROUTES и ROUTE_LABELS, которые соответствуют страницам приложения и их названиям:
+
+#### Routes.tsx
+```ts
+export const ROUTES = {
+  HOME: "/",
+  ALBUMS: "/albums",
+}
+export type RouteKeyType = keyof typeof ROUTES;
+export const ROUTE_LABELS: {[key in RouteKeyType]: string} = {
+  HOME: "Главная",
+  ALBUMS: "Альбомы",
+};
+```
+Изменим наше приложение: добавим главную страницу, изменим страницу ITunesPage, добавим страницу альбома, сделаем карточку кликабельной, в itunesApi добавим запрос альбома по ид.
+
+#### HomePage
+```tsx
+import { FC } from "react";
+import { Link } from "react-router-dom";
+import { ROUTES } from "../../Routes";
+import { Button, Col, Container, Row } from "react-bootstrap";
+
+export const HomePage: FC = () => {
+  return (
+    <Container>
+      <Row>
+        <Col md={6}>
+          <h1>Itunes Music</h1>
+          <p>
+            Добро пожаловать в Itunes Music! Здесь вы можете найти музыку на
+            любой вкус.
+          </p>
+          <Link to={ROUTES.ALBUMS}>
+            <Button variant="primary">Просмотреть музыку</Button>
+          </Link>
+        </Col>
+      </Row>
+    </Container>
+  );
+};
+```
+
+#### modules/itunesApi.ts
+```ts
+export interface ITunesMusic {
+  wrapperType: string;
+  artworkUrl100: string;
+  artistName: string;
+  collectionCensoredName: string;
+  trackViewUrl: string;
+  collectionId: number;
+}
+export interface ITunesResult {
+  resultCount: number;
+  results: ITunesMusic[];
+}
+
+export const getMusicByName = async (name = ""): Promise<ITunesResult> => {
+  return fetch(`https://itunes.apple.com/search?term=${name}`).then(
+    (response) => response.json()
+  );
+};
+
+export const getAlbumById = async (
+  id: number | string
+): Promise<ITunesResult> => {
+  return fetch(`https://itunes.apple.com/lookup?id=${id}`).then(
+    (response) => response.json()
+  );
+};
+```
+
+#### components/MusicCard
+```tsx
+import { FC } from "react";
+import { Button, Card } from "react-bootstrap";
+import "./MusicCard.css";
+
+interface ICardProps {
+  artworkUrl100: string;
+  artistName: string;
+  collectionCensoredName: string;
+  trackViewUrl: string;
+  imageClickHandler: () => void;
+}
+
+export const MusicCard: FC<ICardProps> = ({
+  artworkUrl100,
+  artistName,
+  collectionCensoredName,
+  trackViewUrl,
+  imageClickHandler,
+}) => {
+
+  return (
+    <Card className="card">
+      <Card.Img
+        className="cardImage"
+        variant="top"
+        src={artworkUrl100}
+        height={100}
+        width={100}
+        onClick={imageClickHandler}
+      />
+      <Card.Body>
+        <div className="textStyle">
+          <Card.Title>{collectionCensoredName}</Card.Title>
+        </div>
+        <div className="textStyle">
+          <Card.Text>{artistName}</Card.Text>
+        </div>
+        <Button
+          className="cardButton"
+          href={trackViewUrl}
+          target="_blank"
+          variant="primary"
+        >
+          Открыть в ITunes
+        </Button>
+      </Card.Body>
+    </Card>
+  );
+};
+```
+
+
+#### BreadCrumbs.tsx
+```tsx
+import "./BreadCrumbs.css";
+import React from "react";
+import { Link } from "react-router-dom";
+import { FC } from "react";
+import { ROUTES } from "../../Routes";
+
+interface ICrumb {
+  label: string;
+  path?: string;
+}
+
+interface BreadCrumbsProps {
+  crumbs: ICrumb[];
+}
+
+export const BreadCrumbs: FC<BreadCrumbsProps> = (props) => {
+  const { crumbs } = props;
+
+  return (
+    <ul className="breadcrumbs">
+      <li>
+        <Link to={ROUTES.HOME}>Главная</Link>
+      </li>
+      {!!crumbs.length &&
+        crumbs.map((crumb, index) => (
+          <React.Fragment key={index}>
+            <li className="slash">/</li>
+            {index === crumbs.length - 1 ? (
+              <li>{crumb.label}</li>
+            ) : (
+              <li>
+                <Link to={crumb.path || ""}>{crumb.label}</Link>
+              </li>
+            )}
+          </React.Fragment>
+        ))}
+    </ul>
+  );
+};
+```
+
+#### BreadCrumbs.css
+```css
+:root {
+  --active_color: black;
+  --additional_color: gray;
+}
+
+.breadcrumbs {
+  list-style: none;
+  display: flex;
+  gap: 10px;
+  padding: 20px;
+}
+
+.breadcrumbs * {
+  color: var(--additional_color);
+  transition: 0.5s;
+}
+
+.breadcrumbs *:not(.slash):hover {
+  color: var(--active_color);
+}
+
+.breadcrumbs li {
+  position: relative;
+  cursor: pointer;
+}
+
+.breadcrumbs li:last-child {
+  color: var(--active_color);
+}
+```
+
+Пример использования BreadCrumbs на странице альбомов (ITunesPage):
+#### ITunesPage
+```tsx
+import "./ITunesPage.css";
+import { FC, useState } from "react";
+import { Col, Row, Spinner } from "react-bootstrap";
+import { ITunesMusic, getMusicByName } from "../../modules/itunesApi";
+import { InputField } from "../../components/InputField";
+import { BreadCrumbs } from "../../components/BreadCrumbs";
+import { ROUTES, ROUTE_LABELS } from "../../Routes";
+import { MusicCard } from "../../components/MusicCard";
+import { useNavigate } from "react-router-dom";
+
+const ITunesPage: FC = () => {
+  const [searchValue, setSearchValue] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [music, setMusic] = useState<ITunesMusic[]>([]);
+
+  const navigate = useNavigate();
+
+  const handleSearch = () => {
+    setLoading(true);
+    getMusicByName(searchValue)
+      .then((response) => {
+        setMusic(
+          response.results.filter((item) => item.wrapperType === "track")
+        );
+        setLoading(false);
+      });
+  };
+  const handleCardClick = (id: number) => {
+    // клик на карточку, переход на страницу альбома
+    navigate(`${ROUTES.ALBUMS}/${id}`);
+  };
+
+  return (
+    <div className="container">
+      <BreadCrumbs crumbs={[{ label: ROUTE_LABELS.ALBUMS }]} />
+      
+      <InputField
+        value={searchValue}
+        setValue={(value) => setSearchValue(value)}
+        loading={loading}
+        onSubmit={handleSearch}
+      />
+
+      {loading && ( // здесь можно было использовать тернарный оператор, но это усложняет читаемость
+        <div className="loadingBg">
+          <Spinner animation="border" />
+        </div>
+      )}
+      {!loading &&
+        (!music.length /* Проверка на существование данных */ ? (
+          <div>
+            <h1>К сожалению, пока ничего не найдено :(</h1>
+          </div>
+        ) : (
+          <Row xs={4} md={4} className="g-4">
+            {music.map((item, index) => (
+              <Col key={index}>
+                <MusicCard
+                  imageClickHandler={() => handleCardClick(item.collectionId)}
+                  {...item}
+                />
+              </Col>
+            ))}
+          </Row>
+        ))}
+    </div>
+  );
+};
+
+export default ITunesPage;
+```
+В crumbs указываем только label, так как путь нам не важен, последняя крошка не активна.
+
+Пример использования BreadCrumbs на странице альбома (название альбома получаем из запроса и прокидываем в BreadCrumbs как конечную точку):
+#### AlbumPage
+```tsx
+import "./AlbumPage.css";
+import { FC, useEffect, useState } from "react";
+import { BreadCrumbs } from "../../components/BreadCrumbs";
+import { ROUTES, ROUTE_LABELS } from "../../Routes";
+import { useParams } from "react-router-dom";
+import { ITunesMusic, getAlbumById } from "../../modules/itunesApi";
+import { Col, Row, Spinner, Image } from "react-bootstrap";
+import { ALBUMS_MOCK } from "../../modules/mock";
+import defaultImage from "/DefaultImage.jpg";
+
+export const AlbumPage: FC = () => {
+  const [pageData, setPageDdata] = useState<ITunesMusic>();
+
+  const { id } = useParams(); // ид страницы, пример: "/albums/12"
+
+  useEffect(() => {
+    if (!id) return;
+    getAlbumById(id)
+      .then((response) => setPageDdata(response.results[0]));
+  }, [id]);
+
+  return (
+    <div>
+      <BreadCrumbs
+        crumbs={[
+          { label: ROUTE_LABELS.ALBUMS, path: ROUTES.ALBUMS },
+          { label: pageData?.collectionCensoredName || "Альбом" },
+        ]}
+      />
+      {pageData ? ( // проверка на наличие данных, иначе загрузка
+        <div className="container">
+          <Row>
+            <Col md={6}>
+              <p>
+                Альбом: <strong>{pageData.collectionCensoredName}</strong>
+              </p>
+              <p>
+                Исполнитель: <strong>{pageData.artistName}</strong>
+              </p>
+            </Col>
+            <Col md={6}>
+              <Image
+                src={pageData.artworkUrl100 || defaultImage} // дефолтное изображение, если нет artworkUrl100
+                alt="Картинка"
+                width={100}
+              />
+            </Col>
+          </Row>
+        </div>
+      ) : (
+        <div className="album_page_loader_block">{/* загрузка */}
+          <Spinner animation="border" />
+        </div>
+      )}
+    </div>
+  );
+};
+```
+
+#### AlbumPage.css
+```css
+.album_page_loader_block {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+```
+
+Новый роутинг:
+```tsx
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { AlbumPage, AlbumsPage } from "./pages";
+import ITunesPage from "./pages/ItunesPage";
+import { ROUTES } from "./Routes";
+
+function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path={ROUTES.HOME} index element={<ITunesPage />} />
+        <Route path={ROUTES.ALBUMS} element={<AlbumsPage />} />
+        <Route path={`${ROUTES.ALBUMS}/:id`} element={<AlbumPage />} />
+      </Routes>
+    </BrowserRouter>
+  );
+}
+
+export default App;
+```
+
+![Gif 4](./assets/4.gif)
+
+### Реализовать получение данных из mock-объектов
+
+Доработать страницу приложения по вашему варианту. Наполнение данных осуществить через mock-объекты.
+
+Для этого создадим файл mock.ts:
+
+#### modules/mock.ts
+```ts
+import { ITunesResult } from "./getMusicByName";
+
+export const SONGS_MOCK: ITunesResult = {
+  resultCount: 3, 
+  results: [
+    {
+      wrapperType: "track",
+      artistName: "Pink Floyd",
+      collectionCensoredName: "The Wall",
+      trackViewUrl: "",
+      artworkUrl100: "",
+    },
+    {
+      wrapperType: "track",
+      artistName: "Queen",
+      collectionCensoredName: "A Night At The Opera",
+      trackViewUrl: "",
+      artworkUrl100: "",
+    },
+    {
+      wrapperType: "track",
+      artistName: "AC/DC",
+      collectionCensoredName: "Made in Heaven",
+      trackViewUrl: "",
+      artworkUrl100: "",
+    },
+  ],
+};
+
+```
+Примеры использования:
+#### ITunesPage
+```tsx
+import "./ITunesPage.css";
+import { FC, useState } from "react";
+import { Col, Row, Spinner } from "react-bootstrap";
+import { ITunesMusic, getMusicByName } from "../../modules/itunesApi";
+import { InputField } from "../../components/InputField";
+import { BreadCrumbs } from "../../components/BreadCrumbs";
+import { ROUTES, ROUTE_LABELS } from "../../Routes";
+import { MusicCard } from "../../components/MusicCard";
+import { useNavigate } from "react-router-dom";
+import { ALBUMS_MOCK } from "../../modules/mock";
+
+const ITunesPage: FC = () => {
+  const [searchValue, setSearchValue] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [music, setMusic] = useState<ITunesMusic[]>([]);
+
+  const navigate = useNavigate();
+
+  const handleSearch = () => {
+    setLoading(true);
+    getMusicByName(searchValue)
+      .then((response) => {
+        setMusic(
+          response.results.filter((item) => item.wrapperType === "track")
+        );
+        setLoading(false);
+      })
+      .catch(() => { // В случае ошибки используем mock данные, фильтруем по имени
+        setMusic(
+          ALBUMS_MOCK.results.filter((item) =>
+            item.collectionCensoredName
+              .toLocaleLowerCase()
+              .startsWith(searchValue.toLocaleLowerCase())
+          )
+        );
+        setLoading(false);
+      });
+  };
+
+  // тот же код
+};
+
+export default ITunesPage;
+```
+
+Добавим дефолтное изображение и используем его в MusicCard:
+```jsx
+import { FC } from 'react'
+import { Button, Card } from 'react-bootstrap'
+import "./MusicCard.css"
+import image from "/DefaultImage.jpg";
+
+interface Props {
+    artworkUrl100: string
+    artistName: string
+    collectionCensoredName: string
+    trackViewUrl: string
+}
+
+export const MusicCard: FC<Props> = ({ artworkUrl100, artistName, collectionCensoredName, trackViewUrl }) => (
+    <Card className="card">{/*                          // изображение по умолчанию   */}
+        <Card.Img className="cardImage" variant="top" src={artworkUrl100 || image} height={100} width={100}  />
+        <Card.Body>                
+            <div className="textStyle">
+                <Card.Title>{artistName}</Card.Title>
+            </div>
+            <div className="textStyle">
+                <Card.Text>
+                    {collectionCensoredName}
+                </Card.Text>
+            </div>
+            <Button className="cardButton" href={trackViewUrl} target="_blank" variant="primary">Открыть в ITunes</Button>
+        </Card.Body>
+    </Card>
+)
+```
+Теперь, если изображение не пришло, будет отрисовываться дефолтное.
+
+#### AlbumPage
+```tsx
+import "./AlbumPage.css";
+import { FC, useEffect, useState } from "react";
+import { BreadCrumbs } from "../../components/BreadCrumbs";
+import { ROUTES, ROUTE_LABELS } from "../../Routes";
+import { useParams } from "react-router-dom";
+import { ITunesMusic, getAlbumById } from "../../modules/itunesApi";
+import { Col, Row, Spinner, Image } from "react-bootstrap";
+import { ALBUMS_MOCK } from "../../modules/mock";
+import defaultImage from "/DefaultImage.jpg";
+
+export const AlbumPage: FC = () => {
+  const [pageData, setPageDdata] = useState<ITunesMusic>();
+
+  const { id } = useParams(); // ид страницы, пример: "/albums/12"
+
+  useEffect(() => {
+    if (!id) return;
+    getAlbumById(id)
+      .then((response) => setPageDdata(response.results[0]))
+      .catch(
+        () =>
+          setPageDdata(
+            ALBUMS_MOCK.results.find(
+              (album) => String(album.collectionId) == id
+            )
+          ) /* В случае ошибки используем мок данные, фильтруем по ид */
+      );
+  }, [id]);
+
+ // ....
+};
+```
+
+![Gif 5](./assets/5.gif)
 
 ### Подключение к собственному API из web-сервиса
 
 Вернемся к нашему примеру с iTunes. Теперь нам требуется заменить наши запросы `fetch` к сервису iTunes на обращение к нашему сервису `Django` или `Golang`.
 
-## Важный момент. CORS
+## Важный момент. CORS  
 
 У вас возникнет проблема с отображением проекта React с частью, связанной с json'ом, при подключении приложения к вашему веб-сервису.
 
@@ -874,20 +1402,22 @@ export default ITunesPage
 
 Мы можем проксировать запросы через наш dev сервер. Схема проксирования такая: фронт -> прокси -> бек. В таком случае у нас не будет проблем с `CORS` запросами.
 
-Для настройки необходимо в файле `vite.config.ts` указать поле [proxy][vite-proxy]. К примеру, если мы будем делать запрос на `/api`, то наш dev сервер будет проксировать его на `http://localhost:8080/api`.
+Для настройки необходимо в файле `vite.config.ts` указать поле [proxy][vite-proxy]. К примеру, если мы будем делать запрос на `/api/someroute`, то наш dev сервер будет проксировать его на `http://localhost:8080/someroute`.
 
 ```ts
 export default defineConfig({
+  plugins: [react()],
   server: {
     proxy: {
-      // string shorthand: http://localhost:3000/api -> http://localhost:8080/api
-      '/api': 'http://localhost:8080',
+      "/api": {
+        target: "http://localhost:8080",
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, "/"),
+      },
     },
   },
-})
+});
 ```
-
-Важно момент, что такое решение работает только при локальной разработке. Если мы будем разворачивать приложение в prod окружении, то нам нужно будет настраивать `proxy` другим способом.
 
 ### CORS. Настройка на бекенде
 
@@ -902,6 +1432,83 @@ export default defineConfig({
 С помощью `GitHub Pages` возможно развернуть статическое приложение, например наш React проект. Но развернуть наш бекенд здесь не получится.
 
 [Пример развертывания React + Vite][vite-gh-pages]
+
+### Использование библиотеки gh-pages
+Для удобства используем библиотеку gh-pages:
+```shell
+npm install gh-pages
+```
+
+Добавим в `package.json` команду `"deploy": "gh-pages -d dist"`:
+```json
+{
+  "name": "RepoName",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "preview": "vite preview",
+    "deploy": "gh-pages -d dist"
+  }
+}
+```
+
+### Важные аспекты для успешного деплоя
+- Убедитесь, что в проекте нет ошибок и предупреждений.
+- Настройте роутинг корректно, предполагается использование react-router-dom.
+
+#### Пример правильной настройки роутинга:
+```tsx
+import "./App.css";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BasketPage, HomePage, ProductPage, ProductsPage } from "./pages";
+
+function App() {
+  return (
+    <BrowserRouter basename="/RepoName"> {/* RepoName - название вашего репозитория */}
+      <Routes>
+        <Route path="/" index element={<HomePage />} />
+        <Route path="/basket" element={<BasketPage />} />
+        <Route path="/products" element={<ProductsPage />} />
+        <Route path="/products/:id" element={<ProductPage />} />
+      </Routes>
+    </BrowserRouter>
+  );
+}
+
+export default App;
+```
+
+### Настройка vite.config.ts
+Укажите название вашего репозитория в vite.config.ts:
+```ts
+export default defineConfig({
+  plugins: [react()],
+  base: "/RepoName", // Замените RepoName на имя вашего репозитория
+  server: {
+    proxy: {
+      "/api": {
+        target: "http://localhost:8080",
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, "/"),
+      },
+    },
+  },
+});
+```
+
+### Сборка и развертывание приложения
+Используйте следующие команды для сборки и развертывания вашего приложения:
+```shell
+npm run build
+npm run deploy
+```
+
+### Доступ к приложению
+После выполнения этих шагов, ваше приложение будет доступно по адресу https://YourGitHubUsername.github.io/RepoName/, где YourGitHubUsername - ваше имя пользователя на GitHub, а RepoName - название вашего репозитория. Ссылку на приложение можно найти во вкладке "deployments" вашего репозитория.
 
 ### Обратите внимание
 
@@ -952,10 +1559,10 @@ export default BasicExample;
 
 ## Полезные ссылки
 
-* [React][react]
+* [React]
 * [React Router][react-router]
-* [Typescript][typescript]
-* [Vite][vite]
+* [Typescript]
+* [Vite]
 
 [iu5-javascript]: https://github.com/iu5git/JavaScript
 [react]: https://react.dev
