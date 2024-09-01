@@ -3,6 +3,7 @@
 Отчеты по лабораторным работам и ДЗ отправлять на почту `aikanev@bmstu.ru`
 
 ## [Видеозаписи лекций в youtube](https://youtube.com/playlist?list=PLLELLTvDgUQ9cpB1XzSuZ0mNSBkbjVNJ_)
+## [Видеозаписи лекций на VK Видео](https://vk.com/video/playlist/-211704031_2)
 #### Образ виртуальной машины Linux [Ubuntu 22.04](https://github.com/iu5git/Standards/blob/main/Linux/Linux.md) для выполнения заданий курса 
 
 ## Лекции
