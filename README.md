@@ -75,6 +75,7 @@
 * [Инструкция по работе c Python](/tutorials/python/python.md)
 * [Методические указания Django](/tutorials/lab1-py/lab1_tutorial.md)
 * [Методические указания Golang](/tutorials/lab1-go/README.md)
+* [Установка и администрирование Minio](https://github.com/iu5git/Networking/tree/main/S3)
 
 #### Лабораторная 2
 
@@ -151,7 +152,6 @@
 
 * [Методические указания DRF](/tutorials/lab3-py/lab3_tutorial.md)
 * [Методические указания Golang](/tutorials/lab3-go/README.md)
-* [Пример подключения S3-хранилища](https://github.com/iu5git/Networking/tree/main/S3)
 
 #### Лабораторная 4
 
