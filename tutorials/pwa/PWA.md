@@ -1,6 +1,100 @@
-# Методические указания по выполнению задания Progressive Web App
+# Методические указания по GitHub Pages, PWA и адаптивности
 
-[Решения](https://github.com/iu5git/web-2022/issues/14) для типовых проблем при выполнении задания по PWA
+## План работы
+1. Развертывание приложения React в GitHub Pages
+2. Progressive Web Application
+3. Добавление адаптивности
+
+## 1. Развертывание приложения React в GitHub Pages
+
+С помощью `GitHub Pages` возможно развернуть статическое приложение, например наш React проект. Но развернуть наш бекенд здесь не получится.
+
+[Пример развертывания React + Vite][vite-gh-pages]
+
+### Использование библиотеки gh-pages
+Для удобства используем библиотеку gh-pages:
+```shell
+npm install gh-pages
+```
+
+Добавим в `package.json` команду `"deploy": "gh-pages -d dist"`:
+```json
+{
+  "name": "RepoName",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "preview": "vite preview",
+    "deploy": "gh-pages -d dist"
+  }
+}
+```
+
+### Важные аспекты для успешного деплоя
+- Убедитесь, что в проекте нет ошибок и предупреждений.
+- Настройте роутинг корректно, предполагается использование react-router-dom.
+
+#### Пример правильной настройки роутинга:
+```tsx
+import "./App.css";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BasketPage, HomePage, ProductPage, ProductsPage } from "./pages";
+
+function App() {
+  return (
+    <BrowserRouter basename="/RepoName"> {/* RepoName - название вашего репозитория */}
+      <Routes>
+        <Route path="/" index element={<HomePage />} />
+        <Route path="/basket" element={<BasketPage />} />
+        <Route path="/products" element={<ProductsPage />} />
+        <Route path="/products/:id" element={<ProductPage />} />
+      </Routes>
+    </BrowserRouter>
+  );
+}
+
+export default App;
+```
+
+### Настройка vite.config.ts
+Укажите название вашего репозитория в vite.config.ts:
+```ts
+export default defineConfig({
+  plugins: [react()],
+  base: "/RepoName", // Замените RepoName на имя вашего репозитория
+  server: {
+    proxy: {
+      "/api": {
+        target: "http://localhost:8080",
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, "/"),
+      },
+    },
+  },
+});
+```
+
+### Сборка и развертывание приложения
+Используйте следующие команды для сборки и развертывания вашего приложения:
+```shell
+npm run build
+npm run deploy
+```
+
+### Доступ к приложению
+После выполнения этих шагов, ваше приложение будет доступно по адресу https://YourGitHubUsername.github.io/RepoName/, где YourGitHubUsername - ваше имя пользователя на GitHub, а RepoName - название вашего репозитория. Ссылку на приложение можно найти во вкладке "deployments" вашего репозитория.
+
+### Обратите внимание
+
+При развертывании приложения `React` через `GitHub Pages`, ваши `AJAX` запросы будут идти по `http`, в то время как приложение будет доступно по `https`. Работать это будет только при использовании адреса `localhost` в `AJAX` запросах.
+
+## 2. Progressive Web Application
+
+[Решения](https://github.com/iu5git/web/issues/14) для типовых проблем при выполнении задания по PWA
 
 [PWA](https://ru.wikipedia.org/wiki/Прогрессивное_веб-приложение) (Progressive Web Application, Прогрессивное web-приложение) - это веб-приложение с характеристиками мобильного приложения. Приложения также запускается в браузере, но браузер пустой, без тулбаров и разных менюшек.
 
@@ -13,9 +107,7 @@
 
 Подробнее про pwa можно почитать [здесь](https://habr.com/ru/post/418923/)
 
-## Создание PWA
-
-Для этого базово нужно 2 шага:
+Для создания `PWA` базово нужно 2 шага:
 
 - иметь manifest.json
 - и зарегистрированный service worker, который умеет кешировать запросы, то есть приложение может работать в оффлайн
@@ -99,7 +191,7 @@ self.addEventListener('fetch',() => console.log("fetch"));
 
 Нажимаем `Добавить на главный экран`. Готово - иконка должна появиться на рабочем столе.
 
-## Добавление адаптивности
+## 3. Добавление адаптивности
 Зачем это нужно? Адаптивность помогает вашему веб-приложению нормально выглядить на устройствах с разными размерами экрана, а также влияет на продвижение сайта в поисковых системах. Сделать это можно c помощью использования относительно новых моделей макета (flexbox, grid), а так же через media queries в css. [Здесь](https://ru.hexlet.io/courses/css-adaptive/lessons/media-queries/theory_unit) можно почитать про последние.
 
 ### Практические примеры:
@@ -483,3 +575,5 @@ export const Navbar = () => {
 - в активном состоянии
 
 ![](./assets/13.png)
+
+[vite-gh-pages]: https://rashidshamloo.hashnode.dev/deploying-vite-react-app-to-github-pages

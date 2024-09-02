@@ -1,4 +1,4 @@
-# Методические указания по выполнению лабораторной работы №4
+# Методические указания по выполнению лабораторной работы №5
 
 **Цель лабораторной работы** - разработка базового приложения на React, знакомство с жизненным циклом приложения и хуками.
 
@@ -28,8 +28,7 @@
 - 7.3. Главное меню приложения
 - 7.4. Подключение к собственному API из web-сервиса
 8. Важный момент. CORS
-9. Развертывание приложения React в GitHub Pages
-10. Полезные ссылки
+9. Полезные ссылки
 
 
 ## 1. Введение
@@ -1506,94 +1505,7 @@ export default defineConfig({
 
 С помощью специальных расширений мы можем отключить работу `CORS` политик на фронтенде. К пример, вот полезное расширение для [Google Chrome][chrome-cors-unblock]. Но расширение браузера не лучшее решение данной проблемы, это небезопасно при использовании в сторонних сайтах. Поэтому его можно использовать только для отладки на этапе разработки, но не для конечного решения.
 
-## 9. Развертывание приложения React в GitHub Pages
-
-С помощью `GitHub Pages` возможно развернуть статическое приложение, например наш React проект. Но развернуть наш бекенд здесь не получится.
-
-[Пример развертывания React + Vite][vite-gh-pages]
-
-### Использование библиотеки gh-pages
-Для удобства используем библиотеку gh-pages:
-```shell
-npm install gh-pages
-```
-
-Добавим в `package.json` команду `"deploy": "gh-pages -d dist"`:
-```json
-{
-  "name": "RepoName",
-  "private": true,
-  "version": "0.0.0",
-  "type": "module",
-  "scripts": {
-    "dev": "vite",
-    "build": "tsc && vite build",
-    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview",
-    "deploy": "gh-pages -d dist"
-  }
-}
-```
-
-### Важные аспекты для успешного деплоя
-- Убедитесь, что в проекте нет ошибок и предупреждений.
-- Настройте роутинг корректно, предполагается использование react-router-dom.
-
-#### Пример правильной настройки роутинга:
-```tsx
-import "./App.css";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
-import { BasketPage, HomePage, ProductPage, ProductsPage } from "./pages";
-
-function App() {
-  return (
-    <BrowserRouter basename="/RepoName"> {/* RepoName - название вашего репозитория */}
-      <Routes>
-        <Route path="/" index element={<HomePage />} />
-        <Route path="/basket" element={<BasketPage />} />
-        <Route path="/products" element={<ProductsPage />} />
-        <Route path="/products/:id" element={<ProductPage />} />
-      </Routes>
-    </BrowserRouter>
-  );
-}
-
-export default App;
-```
-
-### Настройка vite.config.ts
-Укажите название вашего репозитория в vite.config.ts:
-```ts
-export default defineConfig({
-  plugins: [react()],
-  base: "/RepoName", // Замените RepoName на имя вашего репозитория
-  server: {
-    proxy: {
-      "/api": {
-        target: "http://localhost:8080",
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, "/"),
-      },
-    },
-  },
-});
-```
-
-### Сборка и развертывание приложения
-Используйте следующие команды для сборки и развертывания вашего приложения:
-```shell
-npm run build
-npm run deploy
-```
-
-### Доступ к приложению
-После выполнения этих шагов, ваше приложение будет доступно по адресу https://YourGitHubUsername.github.io/RepoName/, где YourGitHubUsername - ваше имя пользователя на GitHub, а RepoName - название вашего репозитория. Ссылку на приложение можно найти во вкладке "deployments" вашего репозитория.
-
-### Обратите внимание
-
-При развертывании приложения `React` через `GitHub Pages`, ваши `AJAX` запросы будут идти по `http`, в то время как приложение будет доступно по `https`. Работать это будет только при использовании адреса `localhost` в `AJAX` запросах.
-
-## 10. Полезные ссылки
+## 9. Полезные ссылки
 
 * [React]
 * [React Router][react-router]
@@ -1607,7 +1519,6 @@ npm run deploy
 [vite]: https://vitejs.dev
 [vite-proxy]: https://vitejs.dev/config/server-options.html#server-proxy
 [vite-template-project]: https://vitejs.dev/guide/#scaffolding-your-first-vite-project
-[vite-gh-pages]: https://rashidshamloo.hashnode.dev/deploying-vite-react-app-to-github-pages
 [typescript]: https://www.typescriptlang.org/
 [habr-react-diff-class-function-component]: https://habr.com/ru/company/ruvds/blog/444348
 [habr-react-hooks]: https://habr.com/ru/company/ruvds/blog/554280
