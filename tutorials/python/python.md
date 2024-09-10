@@ -1,3 +1,5 @@
+# Linux
+
 # 1.	Установка Python
 Сначала посмотрите какая версия Python установлена в вашей системе. Для этого выполните команду:
 ```sh
@@ -77,6 +79,14 @@ django
 Далее путем применения отдельной команды `pip-compile` данный файл "компилируется" и преобразуется в набор неконфликтующих зависимостей с зафиксированными версиями (файл requirements.txt).
 
 Подробнее в [документации](https://pypi.org/project/pip-tools/)
+
+# macOS
+
+для установки Python на macOS используйте [Homebrew](https://brew.sh)
+
+# Windows
+
+С официального [сайта](https://www.python.org/downloads/windows/) скачайте необходимую версию Python на Windows
 
 # 4.	SetPolicy (https://winrcmd.wordpress.com/2019/01/23/razreshit-powershell-scripty-powershell-execution-policy/)
 По умолчанию скрипты Powershell блокируются для запуска. Механизм этот называется Execution Policy. Однако, зачастую необходимо разрешить выполнение скриптов, чтобы, например, иметь возможность выполнять их по расписанию в планировщике заданий.
