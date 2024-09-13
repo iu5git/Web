@@ -51,7 +51,7 @@
 * [Примеры](/tutorials/homework) UML и ER диаграмм
 * [Примеры](/reports/) документации
 * Видео мастер-классов по UML [ER и структура системы](https://www.youtube.com/watch?v=-gm3A2Lk67A) и [Бизнес процесс, развертывание и запросы](https://www.youtube.com/watch?v=yx1LBQkQkMA&t=11s)
-* Мастер-классы по [основам Git](https://devops.wiki.iu5edu.ru/docs/lectures/gitcicd/git/lectures/gitcicd/git) и [основам Docker](https://iu5edu.ru/wiki/devops/docs/master-classes/docker/)
+* Мастер-классы по [основам Git](https://iu5edu.ru/wiki/devops/docs/master-classes/git/) и [основам Docker](https://iu5edu.ru/wiki/devops/docs/master-classes/docker/)
 
 ## Лабораторные 2024
 
