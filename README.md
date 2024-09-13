@@ -51,7 +51,7 @@
 * [Примеры](/tutorials/homework) UML и ER диаграмм
 * [Примеры](/reports/) документации
 * Видео мастер-классов по UML [ER и структура системы](https://www.youtube.com/watch?v=-gm3A2Lk67A) и [Бизнес процесс, развертывание и запросы](https://www.youtube.com/watch?v=yx1LBQkQkMA&t=11s)
-* [Курс](https://devops.wiki.iu5edu.ru/docs/lectures/gitcicd/git/lectures/gitcicd/git) по основам Git
+* Мастер-классы по [основам Git](https://devops.wiki.iu5edu.ru/docs/lectures/gitcicd/git/lectures/gitcicd/git) и [основам Docker](https://iu5edu.ru/wiki/devops/docs/master-classes/docker/)
 
 ## Лабораторные 2024
 
@@ -100,8 +100,8 @@
 
 Обязательно наличие 5 или более статусов `заявок`: черновик, удалён, сформирован, завершён, отклонён. У каждого пользователя не более одной заявки в статусе `черновик`. Названия таблиц и их полей должны соответствовать предметной области. Одно из доп. полей `заявки` или `м-м` рассчитывается при завершении заявки.
 
-* [Курс по основам БД](https://aiintro.docs.iu5edu.ru/docs/db/)
-* [Методические указания PostgreSQL](/tutorials/lab2-db/README.md)
+* [Курс по основам PostgreSQL](https://iu5edu.ru/wiki/devops/docs/master-classes/postgres/)
+* [Методические указания PostgreSQL 4 семестр](/tutorials/lab2-db/README.md)
 * [Методические указания Django](/tutorials/lab2-py/lab2_tutorial.md)
 * [Методические указания Golang](/tutorials/lab2-go/README.md)
 * Видео мастер-класс [gORM и шаблоны Golang](https://www.youtube.com/watch?v=Hh9Lf__Wohw)
