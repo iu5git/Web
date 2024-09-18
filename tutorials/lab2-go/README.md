@@ -364,3 +364,13 @@ func (a *Application) StartServer() {
 ```
 
 Самостоятельное задание - добавить еще 1 query параметр в запрос  http://127.0.0.1:8080/ping - `?create=true` и если он указан записывать новое значение в таблицу со случайными параметрами.
+
+
+## Пример составной уникальный ключ
+```go
+type UserGroup struct {
+    ID      uint gorm:"primaryKey"
+    UserID  uint gorm:"uniqueIndex:idx_user_group"
+    GroupID uint gorm:"uniqueIndex:idx_user_group"
+}
+```
