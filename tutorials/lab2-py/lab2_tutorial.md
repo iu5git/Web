@@ -315,4 +315,20 @@ from .models import Book
 admin.site.register(Book)
 ```
 
-## to-do Использование методов модели
+## Составной уникальный ключ
+
+Добавим ограничение в виде составного уникального ключа, чтобы поля `name` и `description` в базе данных не имели одинаковых пар значений. Такое ограничение можно использовать для таблицы `м-м`
+
+`models.py`
+```python
+class Book(models.Model):
+    name = models.CharField(max_length=30)
+    description = models.CharField(max_length=255)
+
+    class Meta:
+        managed = False
+        db_table = 'books'
+        constraints = [
+            models.UniqueConstraint(fields=['name', 'description'], name='name of constraint')
+        ]
+```
