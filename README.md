@@ -110,8 +110,9 @@
 
 Обязательно наличие 5 или более статусов `заявок`: черновик, удалён, сформирован, завершён, отклонён. У каждого пользователя не более одной заявки в статусе `черновик`. Названия таблиц и их полей должны соответствовать предметной области. Одно из доп. полей `заявки` или `м-м` рассчитывается при завершении заявки.
 
+* [Установка в Docker и использование PostgreSQL](/tutorials/lab2-db/README.md)
 * [Курс по основам PostgreSQL](https://iu5edu.ru/wiki/devops/docs/master-classes/postgresql/)
-* [Методические указания PostgreSQL 4 семестр](/tutorials/lab2-db/README.md)
+* [Лабораторные по PostgreSQL, индексы, Tauri, чат-бот](https://github.com/iu5git/Database)
 * [Методические указания Django](/tutorials/lab2-py/lab2_tutorial.md)
 * [Методические указания Golang](/tutorials/lab2-go/README.md)
 * Видео мастер-класс [gORM и шаблоны Golang](https://www.youtube.com/watch?v=Hh9Lf__Wohw)
