@@ -24,7 +24,7 @@
 
 * [Лекция 8. Введение в React, жизненный цикл компонентов, CORS](lectures/Lecture_8_React_Introduction.pdf)
 
-* [Лекция 9. React Hooks. SSG](lectures/Lecture_9_Hooks.pdf)
+* [Лекция 9. Архитектура фронтенда: SSG, BFF, FSD](lectures/Lecture_9_Frontend_architecture.pdf)
 
 * [Лекция 10. Redux](lectures/Lecture_10_Redux.pdf)
 
@@ -61,7 +61,8 @@
 * [Примеры](/tutorials/homework) UML и ER диаграмм
 * [Примеры](/reports/) документации
 * Видео мастер-классов по UML [ER и структура системы](https://www.youtube.com/watch?v=-gm3A2Lk67A) и [Бизнес процесс, развертывание и запросы](https://www.youtube.com/watch?v=yx1LBQkQkMA&t=11s)
-* Мастер-классы по [основам Git](https://iu5edu.ru/wiki/devops/docs/master-classes/git/) и [основам Docker](https://iu5edu.ru/wiki/devops/docs/master-classes/docker/)
+* [Основные команды](/tutorials/git) и мастер-класс по [основам Git](https://iu5edu.ru/wiki/devops/docs/master-classes/git/)
+* Мастер-класс по  [основам Docker](https://iu5edu.ru/wiki/devops/docs/master-classes/docker/)
 
 ## Лабораторные 2024
 
