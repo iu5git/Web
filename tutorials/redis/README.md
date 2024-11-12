@@ -49,3 +49,8 @@ docker exec -it redis redis-cli CLIENT LIST
 keys *
 ```
 
+Также в `Redis` доступен свой язык для скриптов `Lua`, он понадобится, например, для получения списка логинов ваших пользователей по активным сессиям в `Redis`. Вот пример:
+
+```shell
+EVAL "local key_name = 'example_key'; for iterated_value=0,4 do redis.call('hmset', KEYS[1], key_name .. tostring(iterated_value), iterated_value) end; return redis.call('hgetall', KEYS[1])" 1 example_hash
+```
