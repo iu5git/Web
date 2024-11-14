@@ -81,9 +81,9 @@
 
 В приложении должны быть использованы стили, для каждого элемента списка подгружается свое изображение. Изображения `услуг` отображатся на всех трех страницах. Изображения хранятся в `Minio`, наименование изображение совпадает с id `услуги`, но хранится в модели отдельным полем. Разработать стиль приложения, который будет применяться далее в последующих лабораторных по фронтенду. `CSS` вынести в отдельный файл. 
 
-* [Методические указания](/tutorials/lab1-design/README.md) по верстке и дизайну Figma. [Видеоуроки](https://www.youtube.com/watch?v=DWicd2qo2pk) по Figma
+* [Методические указания](/tutorials/lab1-design/README.md) по верстке и дизайну Figma [arabic Figma](/tutorials/lab1-design/arabic.md). [Видеоуроки](https://www.youtube.com/watch?v=DWicd2qo2pk) по Figma
 * [Инструкция по работе c Python](/tutorials/python/python.md)
-* [Методические указания Django](/tutorials/lab1-py/lab1_tutorial.md)
+* [Методические указания Django](/tutorials/lab1-py/lab1_tutorial.md) / [arabic Django](/tutorials/lab1-py/arabic.md)
 * [Методические указания Golang](/tutorials/lab1-go/README.md)
 * [Установка и администрирование Minio](https://github.com/iu5git/Networking/tree/main/S3)
 
