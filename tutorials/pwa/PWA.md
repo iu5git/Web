@@ -191,6 +191,141 @@ self.addEventListener('fetch',() => console.log("fetch"));
 
 Нажимаем `Добавить на главный экран`. Готово - иконка должна появиться на рабочем столе.
 
+## 2.5 Vite PWA
+
+При работе с Vite так же существует более простой способ настройки PWA - библиотека vite-plugin-pwa.
+Во первых необходимо установить библиотеку с помощью комманды:
+
+```
+npm install -D vite-plugin-pwa
+```
+После этого необходимо настроить биоблиотеку в `vite.config.ts`
+```
+import { VitePWA } from 'vite-plugin-pwa'
+
+export default defineConfig({
+  plugins: [
+    VitePWA({ registerType: 'autoUpdate' })
+  ]
+})
+```
+На данном этапе если вы развернете приложение на github pages или запустите его в режиме preview, то вы увидите работающий manifest.json, но его не будет при запуске в режиме dev.
+Это происходит потому, что по умолчанию VitePWA не работает в режиме разработчика. Для того чтобы это исправить, можно добавить данное поле в `vite.config.ts`
+```
+VitePWA({
+  registerType: 'autoUpdate',
+  devOptions: {
+    enabled: true,
+  },
+})
+```
+
+Теперь, у нас есть и manifest, но при этом manifest, отображаемы на сервера - это созданный по умолчанию manifest, а не тот, который мы создали выше. Для указания собственного manifest, его надо прописать как отдельное поле в `vite.config.ts`
+```
+VitePWA({
+  registerType: 'autoUpdate',
+  devOptions: {
+    enabled: true,
+  },
+  manifest:{
+    name: "Tile Notes",
+    short_name: "Tile Notes",
+    start_url: "/",
+    display: "standalone",
+    background_color: "#fdfdfd",
+    theme_color: "#db4938",
+    orientation: "portrait-primary",
+    icons: [
+      {
+      	"src": "/logo192.png",
+      	"type": "image/png", "sizes": "192x192"
+      },
+      {
+      	"src": "/logo512.png",
+      	"type": "image/png", "sizes": "512x512"
+      }
+    ],
+  }
+})
+```
+Теперб перейдем к Service Worker. в vite-plugin-pwa уже есть работаюшь Service Worker который так же производит кеширование, в отличие от прописанного нами. Даныный Service Worker при запуске Github Pages вы можете увидить, но он не будет active. Для того чтобы он заработал, нам нужно его зарегестрировать. 
+Для этого перейдем в `main.tsx` и зарегистрируем Service Worker.
+
+Подключим registerSW:
+```
+import {registerSW} from "virtual:pwa-register";
+```
+И после кода, где мы подключили наше приложение, пропишем:
+```
+if ("serviceWorker" in navigator) {
+  registerSW()
+}
+```
+На данном этапе настройка Service Worker закончена, и при запуске build на Github Pages можно будет увидеть и Mainfest.json и Service Worker. Уюедительно проверьте, что в Manifest нет ошибок, которые могли бы повлиять на установку PWA. Эти ошибки отмечены во вкладке Manifest в отдельной группе. Если ошибок нет, то после скачивание PWA вы дожны иметь возможность перейти в авиарежим и при этом приложение все еще будет работать, даже если его закрыть и отклыть снова.
+
+Важно! Если при ипортировании registerSW появляется ошибка об отсутствии модуля, необходимо перейти в `tsconfig.app.json ` и в `CompilerOptions` добавить:
+```
+{
+  "compilerOptions": {
+    "types": [
+      "vite-plugin-pwa/info.d.ts",
+      "vite-plugin-pwa/client.d.ts"
+    ],
+...
+```
+
+Однако, как вы могли заметить, при запуске где-либо кроме Github Pages, Service Worker либо вообще не зупускается, либо выдает ошибку `The script has an unsupported MIME type ('text/html').`
+В дополнение к этому, на вашем телефоне (если у вас Android) не будет возможности скачать PWA по ip адрессу. 
+
+Обе эти ошибки связаны с тем, что для работы PWA сайт должен работать по протоколу https, а не http. Как настроить сайт для работы с https рассмотрим ниже.
+## Настройка https на React
+
+Для того, чтобы сайт работал по протоколу https он должен иметь сертификат. Данные сертификаты подтверждаются несколько одобренных компаний за небольшую ссумму, но для нас будет достаточно автоматически сгенерированного локально подтвержденного сертификата.
+
+Для работы с сертификатами, во первых, установим модуль mkcert
+```
+npm install mkcert
+```
+После этого нам нужно создать Authority которая будет подтверждать наш сертификат. Сертифиткаты, подтвержденные данным образом реально работают только при работе на localhost. 
+
+После создания Authority необходимо создать сам сертификат. Для этого использует комманды:
+```
+mkcert create-ca
+mkcert create-cert
+```
+
+После выполнения данных комманд у вас появится 4 новых файла: 
+```
+ca.crt
+ca.key
+cert.crt
+cert.key
+```
+`ca.crt` и `cert.crt` - это публичные ключи Authority и сертификата соответственно, а ca.key и cert.key - приватные ключи. 
+
+##### Никогда не выкладывайте частные ключи в общий доступ, даже на GitHub!
+
+После создания данных ключей, остался один шаг - настроить `vite.config.ts`, перед началом установив `vite-plugin-mkcert` и `@types/node`:
+```
+import mkcert from 'vite-plugin-mkcert'
+import fs from 'fs';
+import path from 'path';
+
+server:{
+  https:{
+    key: fs.readFileSync(path.resolve(__dirname, 'cert.key')),
+    cert: fs.readFileSync(path.resolve(__dirname, 'cert.crt')),
+  },
+}
+```
+После добавления данного кода, вы можете открыть вашь сервер по вашему основному ip(не localhost и не vpn) и увидеть, что Service Worker поключен. 
+
+#### Настройка доверия https на телефоне
+Если сейчас открыть сервер по ip на телефоне, то вам будет сказано, что данный сайт небезопасен, и, если на него перейти, то вы все еще не сможете скачать PWA, но остался последний шаг! 
+
+Нужно всего лишь в настройках браузера сказать что данному сайту можно доверять(Для Chrome это вкладка [flags](chrome://flags) затем `Insecure origins treated as secure` и добавляйте сюда ip).
+После этого вы сможете на своем телефоне скачать PWA через IP.
+
 ## 3. Добавление адаптивности
 Зачем это нужно? Адаптивность помогает вашему веб-приложению нормально выглядить на устройствах с разными размерами экрана, а также влияет на продвижение сайта в поисковых системах. Сделать это можно c помощью использования относительно новых моделей макета (flexbox, grid), а так же через media queries в css. [Здесь](https://ru.hexlet.io/courses/css-adaptive/lessons/media-queries/theory_unit) можно почитать про последние.
 
