@@ -306,6 +306,8 @@ import mkcert from 'vite-plugin-mkcert'
 import fs from 'fs';
 import path from 'path';
 
+plugins: [react(), mkcert(), VitePWA({})]
+
 server:{
   https:{
     key: fs.readFileSync(path.resolve(__dirname, 'cert.key')),
