@@ -36,7 +36,7 @@ npm install gh-pages
 
 ### Важные аспекты для успешного деплоя
 - Убедитесь, что в проекте нет ошибок и предупреждений.
-- Настройте роутинг корректно, предполагается использование react-router-dom.
+- Настройте роутинг корректно, предполагается использование react-router-dom. 
 
 #### Пример правильной настройки роутинга:
 ```tsx
@@ -59,6 +59,8 @@ function App() {
 
 export default App;
 ```
+
+#### В ```a href=""``` не учитывается basename, поэтому их нужно заменить на ```Link to=""```, который будет автоматически подставлять basename
 
 ### Настройка vite.config.ts
 Укажите название вашего репозитория в vite.config.ts:
@@ -120,7 +122,7 @@ npm run deploy
 {
   "name": "Tile Notes",
   "short_name": "Tile Notes",
-  "start_url": "/",
+  "start_url": "/RepoName/",
   "display": "standalone",
   "background_color": "#fdfdfd",
   "theme_color": "#db4938",
@@ -142,6 +144,10 @@ npm run deploy
 
 Этот файлик должен быть доступен по пути /manifest.json относительно корня, то есть url примерно такой http://localhost:3000/manifest.json. Если мы используем react, то кладем данный файл в public директорию, которая находится в корне проекта. Туда же кладем иконки.
 
+Чтобы его подключить к проекту, нужно его добавить в head в index.html:
+```html
+<link rel="manifest" href="manifest.json">
+```
 Проверить то, что файлик корректно подтянулся можно так:
 
 ![](assets/1.png)
