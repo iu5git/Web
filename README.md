@@ -1,4 +1,4 @@
-# Разработка Интернет Приложений (РИП) 2023
+# Разработка Интернет Приложений (РИП) 2024
 
 Отчеты по лабораторным работам и ДЗ отправлять на почту `aikanev@bmstu.ru`
 
@@ -61,7 +61,7 @@
 * [Примеры](/tutorials/homework) UML и ER диаграмм
 * [Примеры](/reports/) документации
 * Видео мастер-классов по UML [ER и структура системы](https://vk.com/video-211704031_456239172) и [Бизнес процесс, развертывание и запросы](https://vk.com/video-211704031_456239171)
-* [Основные команды](/tutorials/git) и мастер-класс по [основам Git](https://iu5edu.ru/wiki/devops/docs/master-classes/git/)
+* [Основные команды](/tutorials/git) и подробный мастер-класс по [основам Git](https://iu5edu.ru/wiki/devops/docs/master-classes/git/)
 * Мастер-класс по  [основам Docker](https://iu5edu.ru/wiki/devops/docs/master-classes/docker/)
 
 ## Лабораторные 2024
@@ -111,12 +111,9 @@
 
 Обязательно наличие 5 или более статусов `заявок`: черновик, удалён, сформирован, завершён, отклонён. У каждого пользователя не более одной заявки в статусе `черновик`. Названия таблиц и их полей должны соответствовать предметной области. Одно из доп. полей `заявки` или `м-м` рассчитывается при завершении заявки.
 
-* [Установка в Docker и использование PostgreSQL](/tutorials/lab2-db/README.md)
-* [Курс по основам PostgreSQL](https://iu5edu.ru/wiki/devops/docs/master-classes/postgresql/)
-* [Лабораторные по PostgreSQL, индексы, Tauri, чат-бот](https://github.com/iu5git/Database)
+* [Установка в Docker и использование](/tutorials/lab2-db/README.md) PostgreSQL. [Курс](https://iu5edu.ru/wiki/devops/docs/master-classes/postgresql/) по основам PostgreSQL. [Лабораторные](https://github.com/iu5git/Database) по PostgreSQL, индексы, Tauri, чат-бот
 * [Методические указания Django](/tutorials/lab2-py/lab2_tutorial.md)
-* [Методические указания Golang](/tutorials/lab2-go/README.md)
-* Видео мастер-класс [gORM и шаблоны Golang](https://vk.com/video-211704031_456239173)
+* [Методические указания Golang](/tutorials/lab2-go/README.md). Видео мастер-класс [gORM и шаблоны Golang](https://vk.com/video-211704031_456239173)
 
 #### Лабораторная 3
 
@@ -176,12 +173,9 @@
 
 Добавить проверку `Permissions` для методов `модератора`. Без авторизации в `Swagger` должно быть доступно только чтение-получение данных через API, с авторизацией - методы `пользователя`, а для `модератора` доступны все методы.
 
-* [Настройка через WSL](https://github.com/iu5git/Networking/tree/main/kafka_wsl)
-* [Методические указания Redis](/tutorials/redis/README.md)
-* [Методические указания DRF Сессии](/tutorials/lab4-py/README.md)
-* Видео мастер-класс [Авторизация на Django](https://vk.com/video-211704031_456239170)
-* [Методические указания Golang JWT](/tutorials/lab4-go/README.md)
-* Видео мастер-класс [Авторизация, Swagger и Redis на Golang](https://vk.com/video-211704031_456239169)
+* [Методические указания](/tutorials/redis/README.md) Redis. [Настройка](https://github.com/iu5git/Networking/tree/main/kafka_wsl) через WSL
+* [Методические указания DRF Сессии](/tutorials/lab4-py/README.md). Видео мастер-класс [Авторизация на Django](https://vk.com/video-211704031_456239170)
+* [Методические указания Golang JWT](/tutorials/lab4-go/README.md). Видео мастер-класс [Авторизация, Swagger и Redis на Golang](https://vk.com/video-211704031_456239169)
 
 Вместе с 4 лабораторной сдается текущий комплект документации, который требуется оформить в виде `.doc`:
 - титульный лист РПЗ
@@ -232,10 +226,9 @@
 
 Создание простого нативного приложения на `Tauri` для интерфейса гостя (без авторизации и редактирования), состоящий из 3 страниц с фильтрацией и картинками. Подключить приложение к разработанному API через IP адрес в локальной сети (не `localhost`).
 
-* [GitHub Pages, PWA и адаптивный дизайн](/tutorials/pwa/PWA.md)
+* [Адаптивный дизайн и развертывание](/tutorials/pwa/PWA.md) (GitHub Pages, PWA, HTTPS)
 * [Методические указания Redux Toolkit + fetch](/tutorials/redux/redux_toolkit.md)
-* [Методические указания Tauri](/tutorials/tauri/)
-* Видео мастер-классов [Tauri на основе проекта React](https://vk.com/video-211704031_456239168) и [Tauri приложения с нуля](https://vk.com/video-211704031_456239167)
+* [Методические указания Tauri](/tutorials/tauri/). Видео мастер-классов [Tauri на основе проекта React](https://vk.com/video-211704031_456239168) и [Tauri приложения с нуля](https://vk.com/video-211704031_456239167)
 
 #### Лабораторная 7
 
@@ -314,8 +307,7 @@
 
 Создание простого нативного приложения для интерфейса гостя (без авторизации и редактирования), состоящий из 2 страниц с фильтрацией и картинками. Подключить приложение к разработанному API через IP адрес в локальной сети.
 
-* [Методические указания React Native + Redux Toolkit](/tutorials/react-native/react_native.md)
-* Видео мастер-класс [React Native](https://vk.com/video-211704031_456239166)
+* [Методические указания React Native + Redux Toolkit](/tutorials/react-native/react_native.md). Видео мастер-класс [React Native](https://vk.com/video-211704031_456239166)
 * [Методические указания iOS (UI kit)](/tutorials/ios_tutorial/)
 * [Методические указания iOS (Swift UI)](/tutorials/swiftui)
 * [Методические указания Android (Kotlin + Compose)](/tutorials/android-kotlin/README.md)
