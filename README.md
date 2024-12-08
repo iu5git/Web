@@ -243,7 +243,7 @@
 Для обращений к методам веб-сервиса использовать `axios`, кодогенерацию и `redux-thunk middleware`. При выполнении запросов отображать на странице анимацию.
 
 * [Методические указания Redux Toolkit + кодогенерация и Axios](/tutorials/lab7/README.md)
-* [Методические указания ChatGPT для кода Redux Slice](/tutorials/Chat-GPT/README.md)
+* Методические указания ChatGPT для кода Redux Slice
 
 #### Лабораторная 8
 
