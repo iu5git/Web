@@ -205,7 +205,7 @@
 Чат предоставил подробные разъяснения с кодом.  
 ![chat9](assets/images/chat9.png) 
 
-**Пример Redux-среза:**  
+Пример `ReduxSlice` полученного в ответ от `ChatGPT`:  
 ```javascript
 import { configureStore, createSlice } from '@reduxjs/toolkit';
 
