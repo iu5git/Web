@@ -48,11 +48,11 @@ flutter run
 
 
 
-Создаем папку screens, в ней создадим две страницы – главную страницу магазина(shop_screen.dart) и страницу товара(device_screen.dart)
+Создаем папку screens, в ней создадим две страницы – главную страницу магазина(`shop_screen.dart`) и страницу товара(`device_screen.dart`)
 
-<code>shop_screen.dart</code>
+`shop_screen.dart`
 
-```bash
+```dart
 import 'package:flutter/material.dart';
 
 class ShopScreen extends StatelessWidget {
@@ -75,9 +75,9 @@ class ShopScreen extends StatelessWidget {
 ```
 
 
-Обновите файл main.dart:
+Обновите файл `main.dart`:
 
-```bash
+```dart
 import 'package:flutter/material.dart';
 import 'screens/shop_screen.dart';
 import 'screens/device_screen.dart';
@@ -117,7 +117,7 @@ lib/
 
 создаем <code>store.dart</code>
 
-```bash
+```dart
 class AppState {
   final List<Device> devices;    
   final Device? selectedDevice; 
@@ -130,7 +130,7 @@ devices: Список всех доступных устройств.
 selectedDevice: Одно устройство, которое выбрано пользователем.
 
 
-```bash
+```dart
 class SetDevicesAction {
   final List<Device> devices;
 
@@ -139,10 +139,10 @@ class SetDevicesAction {
 ```
 
 Экшен — это класс, описывающий действие, которое нужно выполнить с состоянием.
-SetDevicesAction:
+`SetDevicesAction`:
 Содержит список устройств devices, который будет установлен в глобальное состояние.
 
-```bash
+```dart
 AppState appReducer(AppState state, dynamic action) {
   if (action is SetDevicesAction) {
     return AppState(devices: action.devices, selectedDevice: state.selectedDevice);
@@ -153,11 +153,11 @@ AppState appReducer(AppState state, dynamic action) {
 редюсер — функция, которая принимает текущее состояние (state) и экшен (action), а затем возвращает новое состояние.
 В данном случае:
 
-Если получен экшен SetDevicesAction, обновляется список устройств в состоянии.
+Если получен экшен `SetDevicesAction`, обновляется список устройств в состоянии.
 В противном случае возвращается текущее состояние.
 
 
-```bash
+```dart
 final store = Store<AppState>(
   appReducer,  // Основной редюсер.
   initialState: AppState(devices: [], selectedDevice: null), // Начальное состояние.
@@ -171,7 +171,7 @@ final store = Store<AppState>(
 devices: Пустой список.
         selectedDevice: null.
 
-```bash
+```dart
 
 import 'package:redux/redux.dart';
 import 'package:shopingapp/models/device.dart'; 
@@ -204,7 +204,7 @@ final store = Store<AppState>(
 
 создаем модель устройства (Device), которая используется для представления данных об устройствах в приложении
 
-```bash
+```dart
 
 class Device {
   final int id;
@@ -236,7 +236,7 @@ class Device {
 
 
 
-Обновите файл shop_screen.dart:
+Обновите файл `shop_screen.dart`:
 
 
 1. ShopScreen
@@ -245,14 +245,15 @@ class Device {
         Это главный экран, где отображается список устройств.
         Используется StoreConnector из пакета flutter_redux, чтобы получить данные из хранилища состояния (AppState).
 
-```bash
+```dart
 StoreConnector<AppState, List<Device>>(
   converter: (store) => store.state.devices,
 ```
 converter: Функция, которая преобразует данные из Redux-хранилища в список устройств devices.
 
 Добавление устройств по умолчанию (если список пуст):
-```bash
+
+```dart
 if (devices.isEmpty) {
   devices = [
     Device(
@@ -267,7 +268,7 @@ if (devices.isEmpty) {
 }
 ```
 Отображение списка устройств:
-```bash
+```dart
 ListView.builder(
   itemCount: devices.length,
   itemBuilder: (context, index) {
@@ -275,7 +276,7 @@ ListView.builder(
     ...
 ```
 Переход на экран деталей устройства:
-```bash
+```dart
 ElevatedButton(
   onPressed: () {
     Navigator.push(
@@ -288,9 +289,9 @@ ElevatedButton(
   child: Text('View Details'),
 ),
 ```
-2. DeviceDetailScreen
+2. `DeviceDetailScreen`
     Экран с подробностями устройства:
-```bash
+```dart
 class DeviceDetailScreen extends StatelessWidget {
   final Device device;
 
@@ -298,7 +299,7 @@ class DeviceDetailScreen extends StatelessWidget {
 ```
 
 Отображение деталей устройства:
-```bash
+```dart
 Center(
   child: Column(
     mainAxisAlignment: MainAxisAlignment.center,
@@ -310,9 +311,9 @@ Center(
   ),
 ),
 ```
-<code>shop_screen.dart</code>
+`shop_screen.dart`
 
-```bash
+```dart
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:shopingapp/models/device.dart'; 
@@ -427,7 +428,7 @@ class DeviceDetailScreen extends StatelessWidget {
 
 Откройте файл pubspec.yaml и добавьте необходимые пакеты для работы приложения.
 
-```bash
+```dart
 dependencies:
   flutter:
     sdk: flutter
@@ -445,7 +446,7 @@ flutter:
 
 И конечно Обновите файл <code>main.dart</code>:
 
-```bash
+```dart
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:shopingapp/store/store.dart'; 
@@ -502,7 +503,7 @@ class MyApp extends StatelessWidget {
 
 создаем <code>cart_screen.dart</code>
 
-```bash
+```dart
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:shopingapp/models/device.dart'; 
@@ -552,7 +553,7 @@ class CartScreen extends StatelessWidget {
 создаем <code>device_detail_screen.dart</dart>
 
 
-```bash
+```dart
 return Scaffold(
   appBar: AppBar(title: Text(device.title)), // Заголовок с названием устройства.
   body: Center(
@@ -569,7 +570,7 @@ Image.asset: Показывает картинку устройства из л�
 Text: Отображает бренд и цену устройства.
 
 Добавление устройства в корзину
-```bash
+```dart
 ElevatedButton(
   onPressed: () {
     StoreProvider.of<AppState>(context).dispatch(AddToCartAction(device));
@@ -590,7 +591,7 @@ ElevatedButton(
 Для работы этой кнопки необходим экшен AddToCartAction и соответствующий редюсер, который добавляет устройство в корзину (их нужно реализовать в Redux-хранилище).
 
  Кнопка "Back to Shop"
-```bash
+```dart
 ElevatedButton(
   onPressed: () {
     Navigator.pop(context);
@@ -605,7 +606,7 @@ Redux: Добавление устройства в корзину
 Чтобы функциональность "добавления в корзину" работала, необходимо:
 
 Создать экшен AddToCartAction:
-```bash
+```dart
 class AddToCartAction {
   final Device device;
 
@@ -629,7 +630,7 @@ class AppState {
 
 Обновить редюсер (appReducer):
 
-```bash
+```dart
 AppState appReducer(AppState state, dynamic action) {
   if (action is AddToCartAction) {
     return AppState(
@@ -644,7 +645,7 @@ AppState appReducer(AppState state, dynamic action) {
 
 
 
-```bash
+```dart
 import 'package:flutter/material.dart';
 import 'package:shopingapp/models/device.dart';
 import 'package:shopingapp/store/store.dart'; 
@@ -706,7 +707,6 @@ class DeviceDetailScreen extends StatelessWidget {
 Android Studio (с установленным SDK).
 Flutter SDK.
 Правильно настроенные переменные окружения (flutter и adb должны быть доступны в терминале).
-
 Проверьте работоспособность Flutter и Android SDK командой:
 ```bash
 flutter doctor
@@ -777,7 +777,7 @@ python manage.py startapp auth_app
 
 `auth_app/views.py`
 
-```bash
+```python
 
 from django.contrib.auth.models import User
 from django.http import JsonResponse
@@ -829,7 +829,7 @@ def login_view(request):
 ```
 
 `auth_app/urls.py`
-```bash
+```python
 from django.urls import path
 from . import views
 
@@ -842,7 +842,7 @@ urlpatterns = [
 ```
 
 `admin.py`
-```bash
+```python
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from .models import CustomUser
@@ -855,7 +855,7 @@ class CustomUserAdmin(UserAdmin):
 
 ```
 `models.py`
-```bash
+```python
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
@@ -875,7 +875,7 @@ class CustomUser(AbstractUser):
     )
 ```
 `settings.py` `INSTALLED_APPS` 
-```bash
+```python
 INSTALLED_APPS = [
     ...
     'auth_app',
@@ -890,20 +890,20 @@ INSTALLED_APPS = [
 
 
 ### **Импорты**
-```bash
+```dart
 import 'dart:convert'; // Для кодирования/декодирования JSON
 import 'package:http/http.dart' as http; // Для выполнения HTTP-запросов
 import 'package:flutter/material.dart'; // Для создания пользовательского интерфейса
 ```
 cоздаем классы
 
-```bash
+```python
 class LoginScreen extends StatelessWidget {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 ```
 Метод `build`
-```bash
+```dart
 @override
 Widget build(BuildContext context)
 ```
@@ -911,7 +911,7 @@ Widget build(BuildContext context)
 Возвращает виджет Scaffold, который содержит структуру экрана с полем для ввода данных и кнопками.
 
 Кнопка "Login"
-```bash
+```dart
 ElevatedButton(
   onPressed: () async {
     String email = emailController.text.trim();
@@ -952,12 +952,12 @@ ElevatedButton(
 Проверяет, что оба поля заполнены.
 Отправляет POST-запрос на сервер (Django API) по адресу `http://127.0.0.1:8000/api/auth/login/`.
 В заголовках указывается, что данные отправляются в формате JSON.
-Если сервер возвращает статус 200, пользователь получает сообщение об успешной авторизации и перенаправляется на экран /shop.
+Если сервер возвращает статус `200`, пользователь получает сообщение об успешной авторизации и перенаправляется на экран /shop.
 Если сервер возвращает ошибку, показывается сообщение с текстом ошибки.
 
 `login_screen.dart`
 
-```bash
+```dart
 import 'dart:convert'; // For JSON encoding/decoding
 import 'package:http/http.dart' as http; // For HTTP requests
 import 'package:flutter/material.dart';
@@ -1042,7 +1042,7 @@ class LoginScreen extends StatelessWidget {
 
 `register_screen.dart`
 создаем класс 
-```bash
+```dart
 class RegisterScreen extends StatelessWidget {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
@@ -1051,7 +1051,7 @@ class RegisterScreen extends StatelessWidget {
 `emailController` и `passwordController` — контроллеры для полей ввода email и пароля, соответственно.
 
 Метод `build`
-```bash
+```dart
 @override
 Widget build(BuildContext context)
 ```
@@ -1061,7 +1061,7 @@ Widget build(BuildContext context)
 
 
 `register_screen.dart`
-```bash
+```dart
 ElevatedButton(
   onPressed: () async {
     String email = emailController.text.trim();
@@ -1107,12 +1107,12 @@ ElevatedButton(
 Проверяется, что оба поля заполнены.
 Если поля заполнены, отправляется POST-запрос на сервер для создания аккаунта. URL запроса: `http://127.0.0.1:8000/api/auth/register/`.
 В заголовках указывается, что данные отправляются в формате JSON.
-Если регистрация успешна (статус 201), показывается сообщение о успешной регистрации и пользователь перенаправляется на экран авторизации (`/login`).
+Если регистрация успешна (статус `201`), показывается сообщение о успешной регистрации и пользователь перенаправляется на экран авторизации (`/login`).
 Если произошла ошибка (например, неправильные данные или уже существует аккаунт), выводится соответствующее сообщение об ошибке.
 В случае исключения (например, проблемы с интернет-соединением) также показывается сообщение об ошибке.
 
 
-```bash
+```dart
 import 'dart:convert'; // For encoding/decoding JSON
 import 'package:http/http.dart' as http; // For making HTTP requests
 import 'package:flutter/material.dart';
