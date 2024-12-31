@@ -1197,19 +1197,14 @@ lib/
 </pre>
 
 
-## Проверяет
+## Проверка
 
 ![f](Resources/16.png)
 ![f](Resources/17.png)
 ![f](Resources/18.png)
 
 
-## django administration
-
-![f](Resources/19.png)
-
-
-## Проверяет запросы 
+## Проверка запросов
 
 ![f](Resources/20.png)
 ![f](Resources/21.png)
