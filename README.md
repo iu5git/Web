@@ -260,6 +260,7 @@
 - Окно списка `заявок` переделать на `short polling` чтобы отображать актуальные статусы.
 
 * [Short Polling](/tutorials/short-polling/README.md)
+* [QR Code Django/React](/tutorials/qr/README.md)
 
 ### Домашнее Задание
 
