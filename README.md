@@ -60,6 +60,7 @@
 * [Демо версия](https://iu5git.github.io/Web/) интерфейса создателя заявки
 * [Примеры](/reports/) документации - РПЗ. 
 * [Примеры](/tutorials/homework) UML и ER диаграмм. Видео мастер-классов по UML [ER и структура системы](https://vk.com/video-211704031_456239172) и [Бизнес процесс, развертывание и запросы](https://vk.com/video-211704031_456239171)
+* [Установка](/tutorials/install/README.md) `Python`, `NodeJS`, `Git`, `Docker` на Windows, MacOS, Linux
 * [Основные команды git и описание Docker Compose](/tutorials/git-docker/). Подробные мастер-классы по [основам Git](https://iu5edu.ru/wiki/devops/docs/master-classes/git/) и [основам Docker](https://iu5edu.ru/wiki/devops/docs/master-classes/docker/)
 
 ## Лабораторные 2024
