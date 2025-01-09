@@ -35,19 +35,15 @@ axios.post('http://localhost/api/user', {
 
 Swagger или OpenAPI - это спецификация, которая позволяет нашему бэкенду описывать запросы. При взаимодействии между фронтендом и бэкендом нам нужно как-то хранить контракт на основе которого мы будем работать. Swagger решает эту проблему позволяя легко и просто описать этот контракт. Как правильно описывать контракт прописано в [спецификации OpenAPI](openapi-spec). Примеры описания контракта в Swagger можно посмотреть [тут](habr-openapi).
 
+### Стейт менеджеры
+
+Стейт менеджер – инструмент, который используется в разработке программного обеспечения для управления состоянием приложения. В основе работы стейт менеджера лежит концепция хранения и изменения данных (состояния) приложения. В нашем случае мы будем использовать библиотеку [Redux](redux) и ее дополнение [Redux Toolkit](redux-toolkit). Подробнее про эти библиотеки можно почитать [тут](habr-redux) и [тут](habr-redux-toolkit).
+
 ### Кодогенерация api
 
 Как мы уже знаем при взаимодействии фронтенда и бэкенда мы делаем запросы используя какой-то контракт. Для описания контракта можно использовать Swagger/OpenAPI.
 
 Для того, чтобы после каждого изменения контракта на стороне бэкенда нам не приходилось вручную вносить изменения в фронтенде придумали кодогенерацию.
-
-### Redux Thunk middleware
-
-**Redux Thunk** - это middleware библиотека, которая позволяет вам вызвать action creator, возвращая при этом функцию вместо объекта.
-
-*Подробнее можно ознакомиться по [ссылке](https://github.com/reduxjs/redux-thunk)*
-
-Ранее у нас был метод обращения к API, который вызывался внутри компонента и затем клал полученные данные внутрь Store. Сейчас у нас запрос перенесен внутрь специального middleware, который называется AsyncThunk, теперь мы не выполняем запрос в самом компоненте, а просто делаем dispatch этого action.
 
 ## Шаг 1. Добавление кодогенерации.
 
@@ -104,27 +100,48 @@ export const api = new Api({
 
 2) Используем API (рассмотрим пример использования в компоненте):
 
-Расмотрим ПРИМЕР, где метод api.pet.findPetsByStatus обращается к эндпоинту метода GET /pet/findByStatus на сервере Swagger. Этот метод был автоматически сгенерирован в файле Api.ts на основе спецификации OpenAPI:
+Расмотрим ПРИМЕР, где метод api.cities.citiesList обращается к эндпоинту метода GET /cities/citiesList на сервере Swagger. Этот метод был автоматически сгенерирован в файле Api.ts на основе спецификации OpenAPI:
 
 ```tsx
-import { api } from './api'
+import { useState } from "react";
+import { Cities } from '../../api/Api';
+import { api } from '../../api';
 
-export const Test = () => {
-    const handleClick = async () => {
-      
-        const { data } = await api.pet.findPetsByStatus({
-            status: 'available',
-        })
-        console.log(data)
+const CitiesPage: FC = () => {
+  
+  const [cities, setCities] = useState<Cities[]>([]);
+
+  useEffect(() => {
+    const handleSearch = async () => {
+      const response = await api.cities.citiesList();
+        
+      setCities(response.data);
     }
-    
-    return (
-        <button onClick={handleClick}>Кнопочка</button>
-    )
-}
+  }, []);
+
+  return (
+  
+  );
+};
+
+export default CitiesPage;
 ```
 
+Сам сгенерированный метод выглядит так:
+
+![Img-1](assets/step1.png)
+
+Основной плюс заключается в том, что API полностью типизировано. Вы не сможете передать параметры, которые ваш бэкенд не ожидает. Также важным плюсом является то, что при изменении API на бэкенде вам нужно будет просто заново запустить команду кодогенерации и все будет готово.
+
 ## Шаг 2. Страница со списком услуг с использованием redux-toolkit и кодогенерации.
+
+### Redux Thunk middleware
+
+**Redux Thunk** - это middleware библиотека, которая позволяет вам вызвать action creator, возвращая при этом функцию вместо объекта.
+
+*Подробнее можно ознакомиться по [ссылке](https://github.com/reduxjs/redux-thunk)*
+
+Ранее у нас был метод обращения к API, который вызывался внутри компонента и затем клал полученные данные внутрь Store. Сейчас у нас запрос перенесен внутрь специального middleware, который называется AsyncThunk, теперь мы не выполняем запрос в самом компоненте, а просто делаем dispatch этого action.
 
 ### 2.1. Редактирование слайса
 
@@ -169,10 +186,12 @@ const initialState = {
 
 export const getCitiesList = createAsyncThunk(
   'cities/getCitiesList',
-  async (searchValue: string, { rejectWithValue }) => {
+  async (_, { getState, dispatch, rejectWithValue }) => {
+    const { cities }: any = getState();
     try {
-      const response = await api.cities.citiesList(searchValue);
-      return response.data.cities;
+      const response = await api.cities.citiesList({city_name: cities.searchValue});
+
+      return response.data;
     } catch (error) {
       return rejectWithValue('Ошибка при загрузке данных');
     }
@@ -196,7 +215,7 @@ export default citiesSlice.reducer;
 * `cities/getCitiesList ` — уникальный тип действия для Redux. Оно используется для идентификации действия в слайсе.
 
 * Функция принимает:
-    * `searchValue`: значение, необходимое для запроса к API.
+    * Использует метод getState, чтобы получить текущее состояние Redux, включая searchValue из слайса cities. Это значение затем передаётся в запрос к API.
     * Второй параметр `{ rejectWithValue }` предоставляет метод для обработки ошибок.
 
 Функция `createAsyncThunk` обрабатывает жизненные циклы:
@@ -226,10 +245,12 @@ const initialState: CitiesState = {
 
 export const getCitiesList = createAsyncThunk(
   'cities/getCitiesList',
-  async (searchValue: string, { rejectWithValue }) => {
+  async (_, { getState, dispatch, rejectWithValue }) => {
+    const { cities }: any = getState();
     try {
-      const response = await api.cities.citiesList(searchValue);
-      return response.data.cities;
+      const response = await api.cities.citiesList({city_name: cities.searchValue});
+
+      return response.data;
     } catch (error) {
       return rejectWithValue('Ошибка при загрузке данных');
     }
@@ -251,7 +272,7 @@ const citiesSlice = createSlice({
       })
       .addCase(getCitiesList.fulfilled, (state, action) => {
         state.loading = false;
-        state.cities = action.payload;
+        state.cities = action.payload.cities;
       })
       .addCase(getCitiesList.rejected, (state) => {
         state.loading = false;
@@ -419,7 +440,7 @@ const InputField: FC<Props> = ({ value, loading }) => {
 export default InputField
 ```
 
-В результате получим:
+В результате получим: Страница со списком услуг с работающим поиском, сохранение поля поиска в сторе.
 
 ![Гиф-1](assets/step2.gif)
 
@@ -587,10 +608,13 @@ import { Form, Button, Alert, Container } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../store';
 import { loginUserAsync } from '../../slices/userSlice';
+import { useNavigate } from "react-router-dom";
 import Header from "../../components/Header/Header";
+import { ROUTES } from '../../../Routes';
 
 const LoginPage: React.FC = () => {
     const dispatch = useDispatch<AppDispatch>();
+    const navigate = useNavigate();
 
     const [formData, setFormData] = useState({ username: '', password: '' });
     const error = useSelector((state: RootState) => state.user.error);
@@ -601,10 +625,11 @@ const LoginPage: React.FC = () => {
     };
 
     // Обработчки события нажатия на кнопку "Войти"
-    const handleSubmit = (e: FormEvent) => {
+    const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
         if (formData.username && formData.password) {
-            dispatch(loginUserAsync(formData)); // Отправляем 'thunk'
+            await dispatch(loginUserAsync(formData)); // Отправляем 'thunk'
+            navigate(`${ROUTES.CITIES}`); // переход на страницу услуг
         }
     };
 
@@ -799,9 +824,10 @@ import { setAppId, setCount } from './vacancyApplicationDraftSlice';
 
 export const getCitiesList = createAsyncThunk(
   'cities/getCitiesList',
-  async (searchValue: string, { rejectWithValue }) => {
+  async (_, { getState, dispatch, rejectWithValue }) => {
+    const { cities }: any = getState();
     try {
-      const response = await api.cities.citiesList(searchValue);
+      const response = await api.cities.citiesList({city_name: cities.searchValue});
 
       const app_id = response.data.draft_vacancy_application; // ID черновой заявки
       const count = response.data.count; // количество услуг в черновой заявке
@@ -809,7 +835,7 @@ export const getCitiesList = createAsyncThunk(
       dispatch(setAppId(app_id));
       dispatch(setCount(count));
 
-      return response.data.cities;
+      return response.data;
     } catch (error) {
       return rejectWithValue('Ошибка при загрузке данных');
     }
@@ -859,14 +885,14 @@ const InputField: FC<Props> = ({ value, loading }) => {
                     </Button>
                 </Col>
 
-                {(isAuthenticated == true) && (app_id) && (
-                    <Col xs={2} sm={2} md={2}>
-                        <a className="btn-favorites">
-                            <img src={favoriteImg} alt="Избранное" />
-                            <span className="badge rounded-pill position-absolute">{ count }</span>
-                        </a>
-                    </Col>
-                )}
+                <Col xs={2} sm={2} md={2}>
+                    <Button className="btn-favorites">
+                        <img src={favoriteImg} alt="Избранное" />
+                        {(!isAuthenticated || !app_id) ? null : (
+                            <span className="badge rounded-pill position-absolute">{count}</span>
+                        )}
+                    </Button>
+                </Col>
 
             </Row>
         </div>
@@ -874,7 +900,7 @@ const InputField: FC<Props> = ({ value, loading }) => {
 };
 ```
 
-В результате получим:
+В результате получим: Авторизация и активация кнопки "корзины" с появлением логина в меню, деавторизация и деактивация кнопки "корзины" с очищением фильтра поиска и логина в меню.  
 
 ![Гиф-2](assets/step3.gif)
 
@@ -1202,14 +1228,12 @@ const handleClick = (app_id: number | null) => {
 В return сама кнопка теперь должна выглядеть так:
 
 ```tsx
-{(isAuthenticated == true) && (app_id) && (
-    <Col xs={2} sm={2} md={2}>
-        <a className="btn-favorites" onClick={() => handleClick(app_id) }>
-            <img src={favoriteImg} alt="Избранное" />
-            <span className="badge rounded-pill position-absolute">{ count }</span>
-        </a>
-    </Col>
-)}
+<Button className="btn-favorites" onClick={() => handleClick(app_id? app_id : NaN)} disabled={(!isAuthenticated) || (!app_id)}>
+  <img src={favoriteImg} alt="Избранное" />
+  {(!isAuthenticated || !app_id) ? null : (
+      <span className="badge rounded-pill position-absolute">{count}</span>
+  )}
+</Button>
 ```
 
 ### 4.2. Добавление услуги в заявку
@@ -1250,7 +1274,7 @@ const handleAdd = async () => {
 )}
 ```
 
-В результате получим:
+В результате получим: Страница заявки и возможность добавления услуг в заявку (при деавторизации происходит редирект на страницу услуг).
 
 ![Гиф-3](assets/step4.gif)
 
@@ -1589,6 +1613,16 @@ const handleDeleteCity = async () => {
 )}
 ```
 
-В результате получим:
+В результате получим: 
 
-![Гиф-4](assets/step5.gif)
+1) Редактирование заявки, сохранение полей заявки, удаление услуги из заявки (затем происходит refresh страницы, флаг `isDraft` становится `false`, из-за чего заявка больше не доступна для редакции).
+
+![Гиф-4](assets/step5_1.gif)
+
+2) Заявка после refresh страницы.
+
+![Img-2](assets/step5_2.png)
+
+3) Очистка заявки и редирект на страницу услуг.
+
+![Гиф-5](assets/step5_3.gif)
