@@ -1354,12 +1354,10 @@ export const { setError, setAppId, setCount } = vacancyApplicationDraftSlice.act
 import { deleteVacancyApplication, setError } from '../../slices/vacancyApplicationDraftSlice';
 ```
 
-До return добавим обработчик события нажатия на кнопку "Очистить" и получение значения флага `isDraft` и `isAuthenticated` из стора:
+До return добавим обработчик события нажатия на кнопку "Очистить" и получение значения флага `isDraft` из стора:
 
 ```tsx
 const isDraft = useSelector((state: RootState) => state.vacancyApplicationDraft.isDraft);
-const isAuthenticated = useSelector((state: RootState) => state.user.isAuthenticated);
-
 
 const handleDelete = async (e: React.FormEvent) => {
   e.preventDefault();
@@ -1374,10 +1372,10 @@ const handleDelete = async (e: React.FormEvent) => {
 };
 ```
 
-В return само отображение кнопки (если `isDraft == false` или `isAuthenticated == false`, кнопка отображаться не будет):
+В return само отображение кнопки (если `isDraft == false`, кнопка отображаться не будет):
 
 ```tsx
-{(isDraft) && (isAuthenticated)) &&
+{(isDraft) &&
   <Button className="save-button" onClick={handleDelete}>
     Очистить
   </Button>
@@ -1489,7 +1487,7 @@ const handleSaveVacancy = () => {
 прописываем следующее:
 
 ```tsx
-{(!isDraft) || (!isAuthenticated) ? (
+{(!isDraft) ? (
   <div>
     <h4>Название вакансии: {vacancyData.vacancy_name}</h4>
     <h4>Обязанности: {vacancyData.vacancy_responsibilities}</h4>
@@ -1606,7 +1604,7 @@ const handleDeleteCity = async () => {
 В варианте рендеринга карточки на странице заявки добавим саму кнопку "Удалить":
 
 ```tsx
-{(isDraft) && (isAuthenticated) && (
+{(isDraft) && (
     <Button className="fav-btn-open" onClick={() => handleDeleteCity()}>
         Удалить
     </Button>
@@ -1615,11 +1613,11 @@ const handleDeleteCity = async () => {
 
 В результате получим: 
 
-1) Редактирование заявки, сохранение полей заявки, удаление услуги из заявки (затем происходит refresh страницы, флаг `isDraft` становится `false`, из-за чего заявка больше не доступна для редакции).
+1) Редактирование заявки, сохранение полей заявки, удаление услуги из заявки.
 
 ![Гиф-4](assets/step5_1.gif)
 
-2) Заявка после refresh страницы.
+2) Заявка в статусе сформирован/завершен.
 
 ![Img-2](assets/step5_2.png)
 
