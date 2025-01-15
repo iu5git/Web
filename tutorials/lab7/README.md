@@ -481,7 +481,19 @@ export default userSlice.reducer;
 
 ```ts
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { api } from '../api'; 
+import { api } from '../api';
+
+interface UserState {
+  username: string;
+  isAuthenticated: boolean;
+  error?: string | null; 
+}
+
+const initialState: UserState = {
+  username: '',
+  isAuthenticated: false,
+  error: null,
+};
  
 // Асинхронное действие для авторизации
 export const loginUserAsync = createAsyncThunk(
