@@ -455,6 +455,18 @@ export default InputField
 ```ts
 import { createSlice } from '@reduxjs/toolkit';
 
+interface UserState {
+  username: string;
+  isAuthenticated: boolean;
+  error?: string | null; 
+}
+
+const initialState: UserState = {
+  username: '',
+  isAuthenticated: false,
+  error: null,
+};
+
 const userSlice = createSlice({
   name: 'user',
   initialState,
