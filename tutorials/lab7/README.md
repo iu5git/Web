@@ -585,7 +585,7 @@ const userSlice = createSlice({
         state.error = null;
       })
       .addCase(loginUserAsync.fulfilled, (state, action) => {
-        const { username, password, is_staff, is_superuser } = action.payload;
+        const { username } = action.payload;
         state.username = username;
         state.isAuthenticated = true;
         state.error = null;
