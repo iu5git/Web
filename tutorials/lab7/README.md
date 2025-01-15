@@ -617,7 +617,13 @@ import userReducer from './slices/userSlice';
 ```
 
 ```ts
-user: userReducer,  
+const store = configureStore({
+  reducer: {
+    cities: citiesReducer,
+    user: userReducer,       
+  },
+});
+
 ```
 
 #### Создание компонента
