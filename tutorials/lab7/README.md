@@ -1405,7 +1405,7 @@ const handleDelete = async (e: React.FormEvent) => {
 В return само отображение кнопки (если `isDraft == false`, кнопка отображаться не будет):
 
 ```tsx
-{(isDraft) &&
+{(isDraft) && (
   <Button className="save-button" onClick={handleDelete}>
     Очистить
   </Button>
