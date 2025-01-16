@@ -444,7 +444,7 @@ export default InputField
 
 ![Гиф-1](assets/step2.gif)
 
-## Шаг 3. Сраница авторизации. Реализация двух состояний приложения (Гость/Авторизированный пользователь). Добавление иконки "корзины".
+## Шаг 3. Страница авторизации. Реализация двух состояний приложения (Гость/Авторизированный пользователь). Добавление иконки "корзины".
 
 ### 3.1. Страница авторизации
 
@@ -454,6 +454,18 @@ export default InputField
 
 ```ts
 import { createSlice } from '@reduxjs/toolkit';
+
+interface UserState {
+  username: string;
+  isAuthenticated: boolean;
+  error?: string | null; 
+}
+
+const initialState: UserState = {
+  username: '',
+  isAuthenticated: false,
+  error: null,
+};
 
 const userSlice = createSlice({
   name: 'user',
@@ -469,7 +481,19 @@ export default userSlice.reducer;
 
 ```ts
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { api } from '../api'; 
+import { api } from '../api';
+
+interface UserState {
+  username: string;
+  isAuthenticated: boolean;
+  error?: string | null; 
+}
+
+const initialState: UserState = {
+  username: '',
+  isAuthenticated: false,
+  error: null,
+};
  
 // Асинхронное действие для авторизации
 export const loginUserAsync = createAsyncThunk(
@@ -561,7 +585,7 @@ const userSlice = createSlice({
         state.error = null;
       })
       .addCase(loginUserAsync.fulfilled, (state, action) => {
-        const { username, password, is_staff, is_superuser } = action.payload;
+        const { username } = action.payload;
         state.username = username;
         state.isAuthenticated = true;
         state.error = null;
@@ -593,7 +617,13 @@ import userReducer from './slices/userSlice';
 ```
 
 ```ts
-user: userReducer,  
+const store = configureStore({
+  reducer: {
+    cities: citiesReducer,
+    user: userReducer,       
+  },
+});
+
 ```
 
 #### Создание компонента
@@ -1375,7 +1405,7 @@ const handleDelete = async (e: React.FormEvent) => {
 В return само отображение кнопки (если `isDraft == false`, кнопка отображаться не будет):
 
 ```tsx
-{(isDraft) &&
+{(isDraft) && (
   <Button className="save-button" onClick={handleDelete}>
     Очистить
   </Button>
