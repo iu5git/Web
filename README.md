@@ -211,7 +211,7 @@
 
 Содержимое карточек получать из вашего веб-сервиса. Ajax-запросы написать самостоятельно через `fetch`. Ограничение с `CORS` решить через проксирование `React`. В методах `fetch` предусмотреть получение данных из коллекции с `mock`-объектами при отсутствии доступа к вашему бэкенду.
 
-* [Методические указания](/tutorials/lab5/README.md)
+* [Методические указания](/tutorials/lab5/README.md). Видео мастер-класс [Создание приложения на React](https://vkvideo.ru/video-211704031_456239220)
 
 #### Лабораторная 6
 
@@ -243,7 +243,7 @@
 
 Для обращений к методам веб-сервиса использовать `axios`, кодогенерацию и `redux-thunk middleware`. При выполнении запросов отображать на странице анимацию.
 
-* [Методические указания Redux Toolkit + кодогенерация и Axios](/tutorials/lab7/README.md)
+* [Методические указания Redux Toolkit + кодогенерация и Axios](/tutorials/lab7/README.md). Видео мастер-класс [Внедрение Redux-Toolkit и кодогенерация из Swagger](https://vkvideo.ru/video-211704031_456239221)
 * [Методические указания ChatGPT для кода Redux Slice](/tutorials/ReduxLLM/README.md)
 
 #### Лабораторная 8
@@ -262,6 +262,7 @@
 
 * [Short Polling](/tutorials/short-polling/README.md)
 * [QR Code Django/React](/tutorials/qr/README.md)
+* [GraphQL](/tutorials/graphQL/README.md)
 
 ### Домашнее Задание
 
