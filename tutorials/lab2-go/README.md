@@ -895,6 +895,8 @@ header {
 }
 ```
 
+Также вам пригодятся картинки из [папки](/assets/)
+
 И наконец не забываем изменить роуты в `internal/app/handler/handler.go`:
 ```go
 package handler
