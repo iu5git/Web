@@ -5,7 +5,6 @@
 
 ## [Видеозаписи лекций в youtube](https://youtube.com/playlist?list=PLLELLTvDgUQ9cpB1XzSuZ0mNSBkbjVNJ_)
 ## [Видеозаписи лекций на VK Видео](https://vk.com/video/playlist/-211704031_2)
-#### Образ виртуальной машины Linux [Ubuntu 22.04](https://github.com/iu5git/Standards/blob/main/Linux/Linux.md) для выполнения заданий курса 
 
 ## Лекции
 
@@ -54,6 +53,7 @@
 * документацию (UML диаграмму из `StarUML`(`draw.io`)/`figma` + 1 модуль ТЗ, 2 модуль - РПЗ). Все диаграммы делать в 1 файле `StarUML`
 * отдельную ветку в `github` с кодом
 * подготовить скриншоты в соответствии с `Порядоком показа`
+* показать конспекты всех прошедших лекций
 * перед показом письменно ответить на `Контрольные вопросы`
 
 Основной вариант лабораторных по бэкенду - это `Django` и `Go`. Но можно самостоятельно изучить и выполнять их на `Java`, `C#`, `Rust` и `Node.js`, но только при согласовании с лектором и при выполнении всех условий лабораторных работ. В этом случае обязательно требуется согласовать веб-фреймворк, шаблонизатор, ORM и способ авторизации. При развертывании выбирается один из двух вариантов: все три хранилища `PostgreSQL`, `Minio`, `Redis` разворачиваются через `docker`; либо вся серверная часть развернута в виртуальной машине `Ubuntu 22.04`. Для фронтенда один стек `React`+`Redux`+`axios`+`React-Bootstrap`.
@@ -63,6 +63,8 @@
 * [Примеры](/tutorials/homework) UML и ER диаграмм. Видео мастер-классов по UML [ER и структура системы](https://vk.com/video-211704031_456239172) и [Бизнес процесс, развертывание и запросы](https://vk.com/video-211704031_456239171)
 * [Установка](/tutorials/install/README.md) `Python`, `NodeJS`, `Git`, `Docker` на Windows, MacOS, Linux
 * [Основные команды git и описание Docker Compose](/tutorials/git-docker/). Подробные мастер-классы по [основам Git](https://iu5edu.ru/wiki/devops/docs/master-classes/git/) и [основам Docker](https://iu5edu.ru/wiki/devops/docs/master-classes/docker/)
+* Образ виртуальной машины Linux [Ubuntu 22.04](https://github.com/iu5git/Standards/blob/main/Linux/Linux.md) для компьютеров с ограниченной оперативной памятью 
+
 
 ## Лабораторные 2024
 
@@ -82,9 +84,9 @@
 В приложении должны быть использованы стили, для каждого элемента списка подгружается свое изображение. Изображения `услуг` отображатся на всех трех страницах. Изображения хранятся в `Minio`, наименование изображение указано ключом на латинице, хранится в модели отдельным полем. Разработать стиль приложения, который будет применяться далее в последующих лабораторных по фронтенду. `CSS` вынести в отдельный файл. 
 
 * [Методические указания](/tutorials/lab1-design/README.md) по верстке и дизайну Figma [arabic Figma](/tutorials/lab1-design/arabic.md). [Видеоуроки](https://www.youtube.com/watch?v=DWicd2qo2pk) по Figma
+* [Методические указания Golang](/tutorials/lab1-go/README.md)
 * [Инструкция по работе c Python](/tutorials/python/python.md)
 * [Методические указания Django](/tutorials/lab1-py/lab1_tutorial.md) / [arabic Django](/tutorials/lab1-py/arabic.md)
-* [Методические указания Golang](/tutorials/lab1-go/README.md)
 * [Установка и администрирование Minio](https://github.com/iu5git/Networking/tree/main/S3)
 
 #### Лабораторная 2
