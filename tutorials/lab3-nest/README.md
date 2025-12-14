@@ -650,12 +650,12 @@ bootstrap();
 ## 12. Тестирование GET в Postman
 1. Поднимете `docke контейнер` командой `docker compose up`:
 
-   ![](https://github.com/thePontific/Method-lab3/blob/main/images/1.png)
+   ![](images/1.png)
 
 2. Проверьте, что `PostgreSQL` и `MinIo`в состоянии `listening`
 3. Запустите ваш проект: `npm run start:dev`
 
-    ![](https://github.com/thePontific/Method-lab3/blob/main/images/2.png)
+    ![](images/2.png)
 
 4. Скачайте `Postman` с официального сайта: https://www.postman.com/downloads/
 5. Установите и откройте приложение
@@ -665,7 +665,7 @@ bootstrap();
 http://localhost:3000/api/products
 ```
 
-    ![](https://github.com/thePontific/Method-lab3/blob/main/images/3.png)
+  ![](images/3.png)
 
 Отлично! Вы сделали первый `REST IP` запрос! Теперь давайте реализуем `POST` запрос.
 
@@ -784,7 +784,7 @@ http://localhost:3000/api/products
 }
 ```
 
-![](https://github.com/thePontific/Method-lab3/blob/main/images/4.png)
+![](images/4.png)
 
 ---
 
@@ -1013,7 +1013,7 @@ export class ProductsController {
  http://localhost:3000/api/products?category=Электроника&inStock=true&minPrice=1000&maxPrice=25000&search=test
  ```
 
-![](https://github.com/thePontific/Method-lab3/blob/main/images/7.png)
+![](images/7.png)
 
 2. `GET` 1 услуги:
 
@@ -1021,7 +1021,7 @@ export class ProductsController {
 http://localhost:3000/api/products/2
 ```
 
-![](https://github.com/thePontific/Method-lab3/blob/main/images/6.png)
+![](images/6.png)
 
 ---
 
@@ -1232,11 +1232,11 @@ http://localhost:3000/api/products/6
 }
 ```
 
-![](https://github.com/thePontific/Method-lab3/blob/main/images/8.png)
+![](images/8.png)
 
 Проверим что услуга действительно изменилась:
 
-![](https://github.com/thePontific/Method-lab3/blob/main/images/9.png)
+![](images/9.png)
 
 
 2. Проверим `DELETE` запрос:
@@ -1245,11 +1245,11 @@ http://localhost:3000/api/products/6
 http://localhost:3000/api/products/1
 ```
 
-![](https://github.com/thePontific/Method-lab3/blob/main/images/10.png)
+![](images/10.png)
 
 Проверим что услуга действительно удалилась:
 
-![](https://github.com/thePontific/Method-lab3/blob/main/images/11.png)
+![](images/11.png)
 
 Отлично! Мы реализовали основные запросы необходимые для сервиса. Остальные запросы буду делаться аналогично, просто выполняться с другими сущностями и с другой бизнес-логикой.
 
@@ -1734,11 +1734,11 @@ Body:
 3.  Тип: File (не Text!)
 4.  Нажмите "Select Files" и выберите любое изображение (jpg, png и т.д.)
 
-![](https://github.com/thePontific/Method-lab3/blob/main/images/12.png)
+![](images/12.png)
 
 Отлично! Проверим открывается ли само изображение:
 
-![](https://github.com/thePontific/Method-lab3/blob/main/images/13.png)
+![](images/13.png)
 
 ---
 
