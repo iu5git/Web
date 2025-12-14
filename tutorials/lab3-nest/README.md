@@ -8,10 +8,10 @@
 2. [Что такое API и REST](#2-что-такое-api-и-rest)
 3. [Описание проекта](#3-описание-проекта)
 4. [Установка проекта и настройка окружения](#4-установка-проекта-и-настройка-окружения)
-5. [Конфигурация TypeORM в app.module.ts](#5-конфигурация-TypeORM-в-app.module.ts)
+5. [Конфигурация TypeORM в app.module.ts](#5-конфигурация-typeorm-в-appmodulets)
 6. [Создание сущностей (Entity)](#6-создание-сущностей-entity)
 7. [Реализация репозитория для работы с БД](#7-реализация-репозитория-для-работы-с-бд)
-8. [DTO. Сервис с бизнес-логикой](#8-DTO.-Сервис-с-бизнес-логикой)
+8. [DTO. Сервис с бизнес-логикой](#8-dto-сервис-с-бизнес-логикой)
 9. [Контроллер и REST API маршруты](#9-контроллер-и-rest-api-маршруты)
 10. [Модуль ProductsModule](#10-модуль-ProductsModule)
 11. [Валидация и глобальные пайпы](#11-валидация-и-глобальные-пайпы)
@@ -650,12 +650,12 @@ bootstrap();
 ## 12. Тестирование GET в Postman
 1. Поднимете `docke контейнер` командой `docker compose up`:
 
-   ![](images/1.png)
+   ![](https://github.com/thePontific/Method-lab3/blob/main/images/1.png)
 
 2. Проверьте, что `PostgreSQL` и `MinIo`в состоянии `listening`
 3. Запустите ваш проект: `npm run start:dev`
 
-    ![](images/2.png)
+    ![](https://github.com/thePontific/Method-lab3/blob/main/images/2.png)
 
 4. Скачайте `Postman` с официального сайта: https://www.postman.com/downloads/
 5. Установите и откройте приложение
@@ -665,7 +665,7 @@ bootstrap();
 http://localhost:3000/api/products
 ```
 
-  ![](images/3.png)
+    ![](https://github.com/thePontific/Method-lab3/blob/main/images/3.png)
 
 Отлично! Вы сделали первый `REST IP` запрос! Теперь давайте реализуем `POST` запрос.
 
@@ -784,7 +784,7 @@ http://localhost:3000/api/products
 }
 ```
 
-![](images/4.png)
+![](https://github.com/thePontific/Method-lab3/blob/main/images/4.png)
 
 ---
 
@@ -1013,7 +1013,7 @@ export class ProductsController {
  http://localhost:3000/api/products?category=Электроника&inStock=true&minPrice=1000&maxPrice=25000&search=test
  ```
 
-![](images/7.png)
+![](https://github.com/thePontific/Method-lab3/blob/main/images/7.png)
 
 2. `GET` 1 услуги:
 
@@ -1021,7 +1021,7 @@ export class ProductsController {
 http://localhost:3000/api/products/2
 ```
 
-![](images/6.png)
+![](https://github.com/thePontific/Method-lab3/blob/main/images/6.png)
 
 ---
 
@@ -1232,11 +1232,11 @@ http://localhost:3000/api/products/6
 }
 ```
 
-![](images/8.png)
+![](https://github.com/thePontific/Method-lab3/blob/main/images/8.png)
 
 Проверим что услуга действительно изменилась:
 
-![](images/9.png)
+![](https://github.com/thePontific/Method-lab3/blob/main/images/9.png)
 
 
 2. Проверим `DELETE` запрос:
@@ -1245,11 +1245,11 @@ http://localhost:3000/api/products/6
 http://localhost:3000/api/products/1
 ```
 
-![](images/10.png)
+![](https://github.com/thePontific/Method-lab3/blob/main/images/10.png)
 
 Проверим что услуга действительно удалилась:
 
-![](images/11.png)
+![](https://github.com/thePontific/Method-lab3/blob/main/images/11.png)
 
 Отлично! Мы реализовали основные запросы необходимые для сервиса. Остальные запросы буду делаться аналогично, просто выполняться с другими сущностями и с другой бизнес-логикой.
 
@@ -1734,11 +1734,11 @@ Body:
 3.  Тип: File (не Text!)
 4.  Нажмите "Select Files" и выберите любое изображение (jpg, png и т.д.)
 
-![](images/12.png)
+![](https://github.com/thePontific/Method-lab3/blob/main/images/12.png)
 
 Отлично! Проверим открывается ли само изображение:
 
-![](images/13.png)
+![](https://github.com/thePontific/Method-lab3/blob/main/images/13.png)
 
 ---
 
