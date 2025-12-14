@@ -26,7 +26,7 @@
 4.  **Эмбеддинг:** Подготовленная последовательность проходит через слои Энкодера, и на выходе мы получаем один итоговый вектор - **эмбеддинг изображения**.
 
 Для наглядности приведена схема ViT
-<img src="https://github.com/David-bomb/CLIP_method/blob/main/additional/ViT.png">
+<img src="https://github.com/David-bomb/CLIP_method/blob/main/screens/ViT.png">
 
 #### 3. Модель CLIP: единое смысловое пространство
 Проблема классических подходов в том, что модели для текста и модели для картинок существуют в разных "мирах". Вектор слова "собака" и вектор фотографии собаки, полученные разными нейросетями, математически никак не связаны. Их нельзя просто взять и сравнить.
@@ -41,7 +41,7 @@ CLIP - это мультимодальная архитектура, котор�
 *   Вектор изображения собаки и вектор текста "тарелка супа" были **далеки** друг от друга.
 
 Также приведем схему CLIP
-<img src="https://github.com/David-bomb/CLIP_method/blob/main/additional/CLIP.jpeg">
+<img src="https://github.com/David-bomb/CLIP_method/blob/main/screens/CLIP.jpeg">
 
 #### 4. Применение для поиска
 Благодаря тому, что CLIP (и его современные вариации, такие как SigLIP) создает единое пространство для разных модальностей, мы можем реализовать поиск без использования сложной классификации и разметки данных:
@@ -94,7 +94,7 @@ npm install bootstrap react-bootstrap
 #### `src/modules/mock.ts`
 Определение типов и моковых данных. Убедитесь, что в папке `src/assets` есть изображения `1.jpg` ... `8.jpg`, `default.jpg`. Взять их можно в <a href="https://github.com/David-bomb/CLIP_method/tree/main/card_images">папке</a>. 
 
-**Примечание:** Mock данные **обязательно** описывать на английском языке. Дело в том, что создатель библиотеки `transformers.js`, Xenova, еще не конвертировал под свою библиотеку ни одну поддерживающую русский язык модель типа CLIP. На русском языке векторы будут формироваться неправильно. 
+**Примечание:** Mock описания **обязательно** писать на английском языке. Дело в том, что создатель библиотеки `transformers.js`, Xenova, еще не конвертировал под свою библиотеку ни одну поддерживающую русский язык модель типа CLIP. На русском языке векторы будут формироваться неправильно. Названия оставим русскими, они в формировании эмбеддинга не участвуют.
 
 ```typescript
 import img1 from '../assets/1.jpg';
@@ -113,61 +113,62 @@ export interface IFurniture {
     description: string;
     price: number;
     image: string;
+    embedding?: number[]; // Эмбеддинг
 }
 
 export const FURNITURE_MOCK: IFurniture[] = [
     {
         id: 1,
-        name: "Cloud Sofa",
+        name: "Диван 'Облако'",
         description: "Soft white three-seater sofa with high-quality upholstery.",
         price: 45990,
         image: img1
     },
     {
         id: 2,
-        name: "Retro Armchair",
+        name: "Кресло 'Ретро'",
         description: "Comfortable armchair with wooden legs and red upholstery.",
         price: 12500,
         image: img2
     },
     {
         id: 3,
-        name: "Dining Table",
+        name: "Стол обеденный",
         description: "Solid natural oak table. Seats up to 6 people.",
         price: 28000,
         image: img3
     },
     {
         id: 4,
-        name: "Plastic Chair",
+        name: "Стул пластиковый",
         description: "Gray plastic chair with plastic legs.",
         price: 3500,
         image: img4
     },
     {
         id: 5,
-        name: "Floor Lamp",
+        name: "Торшер напольный",
         description: "Gray metal loft-style floor lamp.",
         price: 5900,
         image: img5
     },
     {
         id: 6,
-        name: "White Dresser",
+        name: "Комод белый",
         description: "White dresser with three handle-less drawers.",
         price: 15990,
         image: img6
     },
     {
         id: 7,
-        name: "Double Bed",
+        name: "Кровать двуспальная",
         description: "White double bed with a padded headboard.",
         price: 32000,
         image: img7
     },
     {
         id: 8,
-        name: "Wall Shelf",
+        name: "Полка настенная",
         description: "Wooden shelf with an unusual S-shaped design.",
         price: 1900,
         image: img8
@@ -175,27 +176,55 @@ export const FURNITURE_MOCK: IFurniture[] = [
     // Карточки без картинок. Это показательный пример того, что поиск идет именно по описанию.
     {
         id: 9,
-        name: "Sliding Wardrobe",
+        name: "Шкаф-купе",
         description: "Large oak sliding-door wardrobe with a full-length mirror.",
         price: 45000,
         image: defaultImg
     },
     {
         id: 10,
-        name: "Bedside Table",
+        name: "Тумба прикроватная",
         description: "Small oak bedside table for the bedroom.",
         price: 4500,
         image: defaultImg
     },
     {
         id: 11,
-        name: "Wall Mirror",
+        name: "Зеркало настенное",
         description: "Round mirror in a gold frame.",
         price: 3200,
         image: defaultImg
     }
 ];
 ```
+
+#### `src/modules/math.ts`
+
+В машинном обучении для сравнения векторов чаще всего используется **Косинусное сходство (Cosine Similarity)**.
+Если не вдаваться в глубокую геометрию: это вычисление косинуса угла между двумя векторами.
+*   **1.0**: Векторы сонаправлены (идеальное совпадение).
+*   **0.0**: Векторы перпендикулярны (ничего общего).
+*   **-1.0**: Векторы противоположны.
+
+Создадим файл для математических функций. Он нам понадобится.
+
+```typescript
+export function cosineSimilarity(vecA: number[], vecB: number[]): number {
+    let dotProduct = 0;
+    let normA = 0;
+    let normB = 0;
+
+    for (let i = 0; i < vecA.length; i++) {
+        dotProduct += vecA[i] * vecB[i];
+        normA += vecA[i] * vecA[i];
+        normB += vecB[i] * vecB[i];
+    }
+
+    if (normA === 0 || normB === 0) return 0;
+    return dotProduct / (Math.sqrt(normA) * Math.sqrt(normB));
+}
+```
+
 
 #### `src/App.css`
 
@@ -217,6 +246,29 @@ export const FURNITURE_MOCK: IFurniture[] = [
   padding: 20px;
   background: #f8f9fa;
   border-radius: 12px;
+}
+
+.action-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 200px;
+}
+
+.action-btn {
+  width: 100%;
+  min-height: 42px;
+}
+
+.action-progress {
+  width: 100%;
+}
+
+.embed-preview {
+  font-size: 10px;
+  color: #0d6efd;
+  max-width: 100%;
+  word-break: break-all;
 }
 
 .preview-image {
@@ -275,57 +327,78 @@ export const FURNITURE_MOCK: IFurniture[] = [
   font-size: 0.85rem;
   color: #666;
 }
+
+.similarity-value {
+    font-weight: bold;
+    color: #198754; 
+}
+
+.embed-preview-text {
+    font-size: 10px; 
+    margin-top: 5px; 
+    word-break: break-all; 
+    color: #666;
+}
 ```
 
 #### `src/App.tsx`
 
-Теперь создадим страницу с карточками с нашими стилями
+Теперь создадим страницу с карточками с нашими стилями. Пока мы будем использовать заглушки для симуляции работы CLIP (фрагмент с ними выделен знаками "="), потом мы этот фрагмент заменим на **реальные** сущности. В остальном это уже готовый код файла `App.tsx`.
 
 ```tsx
 import { useState, useRef } from 'react';
-import { Button } from 'react-bootstrap';
+import { Button, ProgressBar } from 'react-bootstrap';
 import { FURNITURE_MOCK } from './modules/mock';
+import type { IFurniture } from './modules/mock';
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-function App() {
-  // Состояние для отображения выбранной картинки
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
-  
-  // Список товаров (пока просто берем все из мока)
-  const [items] = useState(FURNITURE_MOCK);
+// Расширяем интерфейс для UI (добавляем score и видимость)
+interface IProcessedItem extends IFurniture {
+    score: number;      
+    isVisible: boolean; 
+}
 
-  // Ссылка на скрытый input для загрузки файла
+function App() {
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Обработка выбора файла
+  // === ЗАГЛУШКИ (В будущем заменим на хук) ===
+  const ready = true; // Делаем вид, что модель загружена
+  const progress = 0;
+  const imageEmbedding: number[] | null = null;
+  // Просто отображаем моки, как будто score = 0
+  const items: IProcessedItem[] = FURNITURE_MOCK.map(i => ({...i, score: 0, isVisible: true}));
+  
+  const searchByImage = (file: File) => { console.log("Searching...", file) };
+  const resetSearch = () => { console.log("Resetting...") };
+  // ===========================================
+
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      // Создаем URL для предпросмотра
       const imageUrl = URL.createObjectURL(file);
       setSelectedImage(imageUrl);
-      
-      // TODO: Здесь будем отправлять картинку в нейросеть на следующем этапе
+      searchByImage(file);
     }
   };
 
-  // Очистка поиска
   const handleClear = () => {
     setSelectedImage(null);
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
-    }
+    resetSearch();
+    if (fileInputRef.current) fileInputRef.current.value = '';
   };
+
+  const uploadLabel = ready ? 'Загрузить фото' : 'Загрузка нейросети...';
+  const isUploadDisabled = !ready;
+  const canReset = Boolean(selectedImage);
 
   return (
     <div className="app-container">
       <h1>AI Поиск мебели</h1>
       <p className="text-muted">Загрузите фото, чтобы найти похожий товар</p>
 
-      {/* Секция поиска */}
       <div className="search-section">
-        {/* Скрытый инпут */}
         <input 
           type="file" 
           accept="image/*" 
@@ -334,7 +407,6 @@ function App() {
           onChange={handleImageUpload}
         />
 
-        {/* Область предпросмотра или кнопка загрузки */}
         <div style={{ flexShrink: 0 }}>
             {selectedImage ? (
                 <img src={selectedImage} alt="Query" className="preview-image" />
@@ -343,43 +415,71 @@ function App() {
             )}
         </div>
 
-        <div className="d-flex flex-column gap-2">
+        <div className="action-panel">
             <Button 
-                variant="primary" 
-                onClick={() => fileInputRef.current?.click()}
+              className="action-btn" 
+              variant="primary" 
+              onClick={() => fileInputRef.current?.click()} 
+              disabled={isUploadDisabled}
             >
-                Загрузить фото
+                {uploadLabel}
             </Button>
-            
-            {selectedImage && (
-                <Button variant="outline-danger" onClick={handleClear}>
-                    Сбросить
-                </Button>
+
+            {!ready && (
+              <ProgressBar className="action-progress" now={progress} label={`${Math.round(progress)}%`} animated />
             )}
+
+            {imageEmbedding && (
+                <div className="embed-preview">
+                    <strong>Image Embed: </strong><br/>
+                    [{imageEmbedding.slice(0, 5).map(n => n.toFixed(3)).join(', ')}...]
+                </div>
+            )}
+            
+            <Button 
+              className="action-btn" 
+              variant="outline-danger" 
+              onClick={handleClear} 
+              disabled={!canReset}
+            >
+              Сбросить
+            </Button>
         </div>
       </div>
 
-      {/* Список карточек (в 1 столбец) */}
       <div className="items-list">
-        {items.map((item) => (
-            <div key={item.id} className="furniture-row">
-                <img src={item.image} alt={item.name} className="row-image" />
-                
-                <div className="row-content">
-                    <h5>{item.name}</h5>
-                    <p className="text-muted mb-1">{item.description}</p>
-                    <strong className="text-primary">{item.price.toLocaleString()} ₽</strong>
-                </div>
+        {items.map((item) => {
+            if (!item.isVisible) return null;
 
-                {/* Место для вывода данных нейросети */}
-                <div className="row-stats">
-                    <div>Similarity: <span className="text-muted">-</span></div>
-                    <div style={{ fontSize: '10px', marginTop: '5px', wordBreak: 'break-all' }}>
-                        Embedding: [ ... ]
+            return (
+              <div key={item.id} className="furniture-row">
+                    <img src={item.image} alt={item.name} className="row-image" />
+                    
+                    <div className="row-content">
+                        <h5>{item.name}</h5>
+                        <p className="text-muted mb-1">{item.description}</p>
+                        <strong className="text-primary">{item.price.toLocaleString()} ₽</strong>
+                    </div>
+
+                    <div className="row-stats">
+                        <div>
+                            Similarity: 
+                            <span className="similarity-value">
+                                { `${(item.score * 100).toFixed(1)}%`}
+                            </span>
+                        </div>
+                        
+                        {/* Отображаем вектор, если он есть */}
+                        {item.embedding && (
+                            <div className="embed-preview-text">
+                                <strong>Text Embed:</strong><br/>
+                                [{item.embedding.slice(0, 5).map(n => n.toFixed(3)).join(', ')}...]
+                            </div>
+                        )}
                     </div>
                 </div>
-            </div>
-        ))}
+            );
+        })}
       </div>
     </div>
   );
@@ -416,6 +516,8 @@ npm install @huggingface/transformers
 ### Разработка search.worker.js
 
 Здесь мы разработаем главную часть нашей работы. Этот файл несет в себе логику нарботы с SigLIP. 
+
+Сначала мы разберем фрагменты, которые должны быть в этом файле, а затем соберем их воедино.
 
 #### Импорты и настройки окружения
 
@@ -468,7 +570,6 @@ class SiglipService {
 
 Также стоит упомянть о настройках запуска. В данном случае запускается квантизованная модель и CPU. В качестве device запуска можно также указывать `webgpu`, и тогда модель будет работать на GPU. А про доступные степени квантизации в ветодичке написано следующее:
 > While the available options may vary depending on the specific model, typical choices include "fp32" (default for WebGPU), "fp16", "q8" (default for WASM), and "q4".
-
 Подробней про квантизацию в `transformers.js` можно прочитать <a href="https://huggingface.co/docs/transformers.js/guides/dtypes">здесь</a>, а про то, что такое квантизация в принципе - <a href="https://habr.com/ru/articles/887466/">тут</a>.
 
 #### Обработчик сообщений
@@ -649,697 +750,166 @@ self.addEventListener('message', async (event) => {
 });
 ```
 
+### `src/hooks/useFurnitureSearch.ts`
 
-### Теперь обновим `src/App.tsx`
-
-#### Обновление импортов
-
-Добавим импортирование useEffect и ProgressBar. 
+Нам нужно создать хуки для взаимодействия с воркером. Это лучше сделать в отдельном файле с хуками, и эти же хуки потом использовать в `App.tsx`
 
 ```tsx
-import { useState, useRef, useEffect } from 'react'; 
-import { Button, ProgressBar } from 'react-bootstrap'; 
-```
+import { useState, useRef, useEffect } from 'react';
+import type { IFurniture } from '../modules/mock';
+import { cosineSimilarity } from '../modules/math';
 
-#### Добавление новых состояний
+// Расширяем интерфейс для UI (добавляем score и видимость)
+export interface IProcessedItem extends IFurniture {
+    score: number;
+    isVisible: boolean;
+}
 
-Мы добавляем состояния для хранения эмбеддингов текста (помним, что мы их рассчитываем при инициализации), картинки (это состояние уже заполняется при вводе картинки) и нужные состояния для progressBar. 
+export const useFurnitureSearch = (initialItems: IFurniture[]) => { 
+    const [items, setItems] = useState<IProcessedItem[]>(
+        initialItems.map(item => ({ ...item, score: 0, isVisible: true }))
+    );
+    
+    const [imageEmbedding, setImageEmbedding] = useState<number[] | null>(null);
+    const [ready, setReady] = useState(false);
+    const [progress, setProgress] = useState(0);
+    
+    const workerRef = useRef<Worker | null>(null);
 
-Также важным является создание воркера, он и будет выполнять ML-задачи. 
+    // 1. Инициализация и получение текстовых векторов
+    useEffect(() => {
+        workerRef.current = new Worker(new URL('../workers/search.worker.ts', import.meta.url), {
+            type: 'module'
+        });
 
-```tsx
-function App() {
-  // Состояние для отображения выбранной картинки
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
-  
-  // Список товаров (пока просто берем все из мока)
-  const [items] = useState(FURNITURE_MOCK);
+        workerRef.current.onmessage = (e) => {
+            const { type, data } = e.data;
 
-  // --- НОВЫЕ СОСТОЯНИЯ ---
-  // Храним вектора текстов: id товара -> массив чисел
-  const [textEmbeddings, setTextEmbeddings] = useState<Record<number, number[]>>({});
-  // Храним вектор текущей картинки
-  const [imageEmbedding, setImageEmbedding] = useState<number[] | null>(null);
-  // Состояние загрузки модели
-  const [ready, setReady] = useState(false);
-  const [progress, setProgress] = useState(0);
+            switch (type) {
+                case 'progress':
+                    if (data.status === 'progress') setProgress(data.progress);
+                    else if (data.status === 'ready') setReady(true);
+                    break;
+                
+                case 'text_embeddings_ready':
+                    setItems(prev => prev.map(item => ({
+                        ...item,
+                        embedding: data[item.id]
+                    })));
+                    setReady(true);
+                    break;
 
-  // Web Worker  
-  const workerRef = useRef<Worker | null>(null);
-  // -----------------------
+                case 'image_embedding_ready':
+                    setImageEmbedding(data);
+                    break;
+            }
+        };
 
-  // Ссылка на скрытый input для загрузки файла
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  ```
+        workerRef.current.postMessage({ type: 'init', data: initialItems });
 
+        return () => workerRef.current?.terminate();
+    }, [initialItems]);
 
-#### Добавление UseEffect для запуска воркера
+    // 2. Логика поиска и сортировки
+    useEffect(() => {
+        if (!imageEmbedding) return;
 
-Здесь мы по факту инициализируем воркур и запускамет расчет текстовых векторов. Этот код должен стоять перед handleImageUpload, потому что в handleImageUpload мы будем использовать инициализированный воркер.
+        setItems(prevItems => {
+            // Если вектора описаний еще не посчитаны, нет смысла искать
+            if (!prevItems[0].embedding) return prevItems;
 
-```tsx
-useEffect(() => {
-    // Инициализация воркера
-    workerRef.current = new Worker(new URL('./workers/search.worker.ts', import.meta.url), {
-      type: 'module'
-    });
+            const threshold = 0.005;
 
-    // Обработка сообщений от воркера
-    workerRef.current.onmessage = (e) => {
-      const { type, data } = e.data;
+            const processed = prevItems.map(item => {
+                if (!item.embedding) return item; 
+                
+                const similarity = cosineSimilarity(imageEmbedding, item.embedding);
+                
+                return {
+                    ...item,
+                    score: similarity,
+                    isVisible: similarity > threshold
+                };
+            });
 
-      if (type === 'progress') {
-        // Обновляем прогресс-бар загрузки модели
-        if (data.status === 'progress') {
-            setProgress(data.progress);
-        } else if (data.status === 'ready') {
-            setReady(true);
-        }
-      } 
-      else if (type === 'text_embeddings_ready') {
-        console.log("Векторы текстов получены:", data);
-        setTextEmbeddings(data);
-        setReady(true);
-      }
-      else if (type === 'image_embedding_ready') {
-        console.log("Вектор картинки получен:", data);
-        setImageEmbedding(data);
-      }
+            // Сортировка по убыванию рейтинга
+            processed.sort((a, b) => b.score - a.score);
+            
+            return processed;
+        });
+
+    }, [imageEmbedding]);
+
+    // 3. Методы управления
+    const searchByImage = (file: File) => {
+        workerRef.current?.postMessage({ type: 'image', data: file });
     };
 
-    // Запускаем инициализацию и расчет текстовых векторов
-    workerRef.current.postMessage({ type: 'init', data: FURNITURE_MOCK });
-
-    return () => workerRef.current?.terminate();
-  }, []);
-  ```
-
-
-#### Обновление handleImageUpload 
-
-Вместо TODO комментария в handleImageUpload в конце условного блока `if (file)` мы ставим строчку:
-
-```tsx
-workerRef.current?.postMessage({ type: 'image', data: file });
-```
-
-Здесь мы подаем нашу картинку на обработку воркеру, который посчитает ее эмбеддинг.
-
-
-#### Обновление handleClear
-
-После удаления картинки при сбросе мы также очищаем вектор картинки
-
-```tsx
-    setSelectedImage(null);
-    setImageEmbedding(null); // Очищаем вектор картинки
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
-    }
-```
-
-#### Обновим верстку
-
-```tsx
-  return (
-    <div className="app-container">
-      <h1>AI Поиск мебели</h1>
-      <p className="text-muted">Загрузите фото, чтобы найти похожий товар</p>
-
-      {/* Секция поиска */}
-      <div className="search-section">
-        {/* Скрытый инпут */}
-        <input 
-          type="file" 
-          accept="image/*" 
-          ref={fileInputRef}
-          style={{ display: 'none' }}
-          onChange={handleImageUpload}
-        />
-
-        {/* Область предпросмотра или кнопка загрузки */}
-        <div style={{ flexShrink: 0 }}>
-            {selectedImage ? (
-                <img src={selectedImage} alt="Query" className="preview-image" />
-            ) : (
-                <div className="placeholder-image">Нет фото</div>
-            )}
-        </div>
-
-        <div className="d-flex flex-column gap-2">
-                    <Button 
-                        variant="primary" 
-                        onClick={() => fileInputRef.current?.click()}
-                        disabled={!ready} // Блокируем пока модель не загрузится
-                    >
-                        {ready ? "Загрузить фото" : "Загрузка нейросети..."}
-                    </Button>
-                    
-                    {/* Прогресс бар загрузки модели */}
-                    {!ready && <ProgressBar now={progress} label={`${Math.round(progress)}%`} animated />}
-
-                    {/* Вывод вектора картинки */}
-                    {imageEmbedding && (
-                        <div style={{ fontSize: '10px', color: 'blue', maxWidth: '200px', wordBreak: 'break-all' }}>
-                            <strong>Image Vector (first 5):</strong><br/>
-                            [{imageEmbedding.slice(0, 5).map(n => n.toFixed(3)).join(', ')}...]
-                        </div>
-                    )}
-                    
-                    {selectedImage && (
-                        <Button variant="outline-danger" onClick={handleClear}>
-                            Сбросить
-                        </Button>
-                    )}
-          </div>
-      </div>
-
-      {/* Список карточек (в 1 столбец) */}
-      <div className="items-list">
-        {items.map((item) => (
-            <div key={item.id} className="furniture-row">
-                <img src={item.image} alt={item.name} className="row-image" />
-                
-                <div className="row-content">
-                    <h5>{item.name}</h5>
-                    <p className="text-muted mb-1">{item.description}</p>
-                    <strong className="text-primary">{item.price.toLocaleString()} ₽</strong>
-                </div>
-
-                {/* Место для вывода данных нейросети */}
-                <div className="row-stats">
-                    <div>Similarity: <span className="text-muted">-</span></div>
-                    
-                    {/* Выводим вектор, если он посчитан */}
-                    {textEmbeddings[item.id] ? (
-                        <div style={{ fontSize: '10px', marginTop: '5px', wordBreak: 'break-all' }}>
-                            <strong>Text Vector:</strong><br/>
-                            [{textEmbeddings[item.id].slice(0, 5).map(n => n.toFixed(3)).join(', ')}...]
-                        </div>
-                    ) : (
-                        <div style={{ fontSize: '10px' }} className="text-muted">Calculating...</div>
-                    )}
-                </div>
-            </div>
-        ))}
-      </div>
-    </div>
-  );
-```
-
-
-#### Полный код `scr/App.tsx`
-
-Вот полный код файла App.tsx
-
-```tsx
-import { useState, useRef, useEffect } from 'react'; 
-import { Button, ProgressBar } from 'react-bootstrap'; 
-import { FURNITURE_MOCK } from './modules/mock';
-import './App.css';
-import 'bootstrap/dist/css/bootstrap.min.css';
-
-function App() {
-  // Состояние для отображения выбранной картинки
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
-  
-  // Список товаров (пока просто берем все из мока)
-  const [items] = useState(FURNITURE_MOCK);
-
-  // --- НОВЫЕ СОСТОЯНИЯ ---
-  // Храним вектора текстов: id товара -> массив чисел
-  const [textEmbeddings, setTextEmbeddings] = useState<Record<number, number[]>>({});
-  // Храним вектор текущей картинки
-  const [imageEmbedding, setImageEmbedding] = useState<number[] | null>(null);
-  // Состояние загрузки модели
-  const [ready, setReady] = useState(false);
-  const [progress, setProgress] = useState(0);
-
-  const workerRef = useRef<Worker | null>(null);
-  // -----------------------
-
-  // Ссылка на скрытый input для загрузки файла
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    // Инициализация воркера
-    workerRef.current = new Worker(new URL('./workers/search.worker.ts', import.meta.url), {
-      type: 'module'
-    });
-
-    // Обработка сообщений от воркера
-    workerRef.current.onmessage = (e) => {
-      const { type, data } = e.data;
-
-      if (type === 'progress') {
-        // Обновляем прогресс-бар загрузки модели
-        if (data.status === 'progress') {
-            setProgress(data.progress);
-        } else if (data.status === 'ready') {
-            setReady(true);
-        }
-      } 
-      else if (type === 'text_embeddings_ready') {
-        console.log("Векторы текстов получены:", data);
-        setTextEmbeddings(data);
-        setReady(true);
-      }
-      else if (type === 'image_embedding_ready') {
-        console.log("Вектор картинки получен:", data);
-        setImageEmbedding(data);
-      }
+    const resetSearch = () => {
+        setImageEmbedding(null);
+        // Сброс: возвращаем исходный порядок (по ID), обнуляем score
+        setItems(prev => {
+            const sortedById = [...prev].sort((a, b) => a.id - b.id);
+            return sortedById.map(item => ({
+                ...item,
+                score: 0,
+                isVisible: true
+            }));
+        });
     };
 
-    // Запускаем инициализацию и расчет текстовых векторов
-    workerRef.current.postMessage({ type: 'init', data: FURNITURE_MOCK });
-
-    return () => workerRef.current?.terminate();
-  }, []);
-
-  // Обработка выбора файла
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      // Создаем URL для предпросмотра
-      const imageUrl = URL.createObjectURL(file);
-      setSelectedImage(imageUrl);
-      
-      // TODO: Здесь будем отправлять картинку в нейросеть на следующем этапе
-      workerRef.current?.postMessage({ type: 'image', data: file });
-    }
-  };
-
-  // Очистка поиска
-const handleClear = () => {
-    setSelectedImage(null);
-    setImageEmbedding(null); // Очищаем вектор картинки
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
-    }
-  };
-
-  return (
-    <div className="app-container">
-      <h1>AI Поиск мебели</h1>
-      <p className="text-muted">Загрузите фото, чтобы найти похожий товар</p>
-
-      {/* Секция поиска */}
-      <div className="search-section">
-        {/* Скрытый инпут */}
-        <input 
-          type="file" 
-          accept="image/*" 
-          ref={fileInputRef}
-          style={{ display: 'none' }}
-          onChange={handleImageUpload}
-        />
-
-        {/* Область предпросмотра или кнопка загрузки */}
-        <div style={{ flexShrink: 0 }}>
-            {selectedImage ? (
-                <img src={selectedImage} alt="Query" className="preview-image" />
-            ) : (
-                <div className="placeholder-image">Нет фото</div>
-            )}
-        </div>
-
-        <div className="d-flex flex-column gap-2">
-                    <Button 
-                        variant="primary" 
-                        onClick={() => fileInputRef.current?.click()}
-                        disabled={!ready} // Блокируем пока модель не загрузится
-                    >
-                        {ready ? "Загрузить фото" : "Загрузка нейросети..."}
-                    </Button>
-                    
-                    {/* Прогресс бар загрузки модели */}
-                    {!ready && <ProgressBar now={progress} label={`${Math.round(progress)}%`} animated />}
-
-                    {/* Вывод вектора картинки */}
-                    {imageEmbedding && (
-                        <div style={{ fontSize: '10px', color: 'blue', maxWidth: '200px', wordBreak: 'break-all' }}>
-                            <strong>Image Vector (first 5):</strong><br/>
-                            [{imageEmbedding.slice(0, 5).map(n => n.toFixed(3)).join(', ')}...]
-                        </div>
-                    )}
-                    
-                    {selectedImage && (
-                        <Button variant="outline-danger" onClick={handleClear}>
-                            Сбросить
-                        </Button>
-                    )}
-          </div>
-      </div>
-
-      {/* Список карточек (в 1 столбец) */}
-      <div className="items-list">
-        {items.map((item) => (
-            <div key={item.id} className="furniture-row">
-                <img src={item.image} alt={item.name} className="row-image" />
-                
-                <div className="row-content">
-                    <h5>{item.name}</h5>
-                    <p className="text-muted mb-1">{item.description}</p>
-                    <strong className="text-primary">{item.price.toLocaleString()} ₽</strong>
-                </div>
-
-                {/* Место для вывода данных нейросети */}
-                <div className="row-stats">
-                    <div>Similarity: <span className="text-muted">-</span></div>
-                    
-                    {/* Выводим вектор, если он посчитан */}
-                    {textEmbeddings[item.id] ? (
-                        <div style={{ fontSize: '10px', marginTop: '5px', wordBreak: 'break-all' }}>
-                            <strong>Text Vector:</strong><br/>
-                            [{textEmbeddings[item.id].slice(0, 5).map(n => n.toFixed(3)).join(', ')}...]
-                        </div>
-                    ) : (
-                        <div style={{ fontSize: '10px' }} className="text-muted">Calculating...</div>
-                    )}
-                </div>
-            </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-export default App;
+    return {
+        items,
+        ready,
+        progress,
+        imageEmbedding,
+        searchByImage,
+        resetSearch
+    };
+};
 ```
 
-## Внедрение ранжирования
+Здесь получаются эмбеддинги и происходит сортировка. Сортировка здесь происходит с помощью `cosineSimilarity`, который мы ранее описали в `math.ts`. 
 
-На текущем этапе наше приложение умеет превращать и текст, и картинки в наборы чисел (векторы). Но сами по себе эти числа нам ничего не дают. Нам нужно научить приложение отвечать на вопрос: **"Насколько вектор картинки А близок к вектору описания Б?"**.
+Ранжирование идет по следующему принципу:
 
-### `src/modules/math.ts`
-
-В машинном обучении для сравнения векторов чаще всего используется **Косинусное сходство (Cosine Similarity)**.
-Если не вдаваться в глубокую геометрию: это вычисление косинуса угла между двумя векторами.
-*   **1.0**: Векторы сонаправлены (идеальное совпадение).
-*   **0.0**: Векторы перпендикулярны (ничего общего).
-*   **-1.0**: Векторы противоположны.
-
-Создадим файл для математических функций.
-
-```typescript
-export function cosineSimilarity(vecA: number[], vecB: number[]): number {
-    let dotProduct = 0;
-    let normA = 0;
-    let normB = 0;
-
-    for (let i = 0; i < vecA.length; i++) {
-        dotProduct += vecA[i] * vecB[i];
-        normA += vecA[i] * vecA[i];
-        normB += vecB[i] * vecB[i];
-    }
-
-    if (normA === 0 || normB === 0) return 0;
-    return dotProduct / (Math.sqrt(normA) * Math.sqrt(normB));
-}
-```
-
-### `src/App.tsx`
-
-#### Состояния для отображения
-Теперь перейдем в `App.tsx`. Нам нужно изменить то, как мы храним список товаров. Раньше это был статический массив, теперь нам нужно динамическое состояние, которое хранит для каждого товара его **рейтинг соответствия (score)** и **видимость (isVisible)**.
-
-Добавим новый интерфейс и импортируем функцию сравнения:
-
-```tsx
-import { cosineSimilarity } from './modules/math'; // Новый импорт
-
-// ...
-
-// Расширяем интерфейс товара.
-interface IProcessedItem extends IFurniture {
-    score: number;      // Степень схожести (от -1 до 1)
-    isVisible: boolean; // Флаг для фильтрации неподходящих результатов
-}
-```
-
-Внутри компонента `App` изменим инициализацию `items`:
-
-```tsx
-function App() {
-  // ... (остальные стейты)
-
-  // Состояние теперь хранит "Обработанные товары"
-  // По умолчанию score = 0, isVisible = true (показываем все)
-  const [items, setItems] = useState<IProcessedItem[]>(
-    FURNITURE_MOCK.map(item => ({ ...item, score: 0, isVisible: true }))
-  );
-  
-  // ...
-}
-```
-
-#### Логика сравнения
-
-Самая важная часть. Мы добавим `useEffect`, который будет следить за изменениями вектора картинки (`imageEmbedding`).
-Как только пользователь загружает фото и Worker возвращает вектор:
 1.  Мы проходимся по всем товарам.
 2.  Берем вектор описания товара (который мы посчитали при старте).
 3.  Сравниваем его с вектором картинки через `cosineSimilarity`.
 4.  Сортируем массив: товары с наибольшим сходством поднимаются наверх.
 
-```tsx
-  useEffect(() => {
-    if (imageEmbedding && Object.keys(textEmbeddings).length > 0) {
-        
-        const threshold = 0.005; 
+> **Примечание про Threshold (порог):** Порог был взят маленький в силу особенности SigLIP, так как в нем вместо softmax используется Sigmoid. Подробнее про это можно посмотреть в виде <a href="https://github.com/David-bomb/CLIP_method/blob/main/screens/CLIP_meme.jpg">мема</a>, а также в виде <a href="https://habr.com/ru/articles/908168/">статьи</a>. 
 
-        const processed = items.map(item => {
-            const textVec = textEmbeddings[item.id];
-            if (!textVec) return item;
 
-            // Считаем сходство
-            const similarity = cosineSimilarity(imageEmbedding, textVec);
+### Теперь обновим `src/App.tsx`
 
-            return {
-                ...item,
-                score: similarity,
-                // Eсли сходство выше порога, то отображаем товар
-                isVisible: similarity > threshold
-            };
-        });
+#### Обновление импортов
 
-        // Сортируем: сначала самые похожие
-        processed.sort((a, b) => b.score - a.score);
-
-        setItems(processed);
-    }
-  }, [imageEmbedding, textEmbeddings]);
-```
-
-> **Примечание про Threshold (порог):** Порог был взят маленький в силу особенности SigLIP, так как в нем вместо softmax используется Sigmoid. Подробнее про то, почему так сделано (да и про весь CLIP в целом) можно посмотреть в <a href="https://habr.com/ru/articles/908168/">статье</a>, а наглядное сравнение выходных формул CLIP и SigLIP можно посмотреть в виде <a href="https://github.com/David-bomb/CLIP_method/blob/main/additional/CLIP_meme.jpg">мема</a>. 
-
-### 4. Обновление интерфейса и функция сброса
-
-Нам нужно обновить функцию `handleClear`, чтобы при нажатии "Сбросить" товары возвращались в исходный порядок (по ID), а рейтинги обнулялись.
+Добавим импортирование нашего `useFurnitureSearch`.
 
 ```tsx
-  const handleClear = () => {
-    setSelectedImage(null);
-    setImageEmbedding(null);
-    // При сбросе возвращаем список в исходное состояние (сортировка по ID, все видимы)
-    setItems(FURNITURE_MOCK.map(item => ({ ...item, score: 0, isVisible: true })));
-    if (fileInputRef.current) fileInputRef.current.value = '';
-  };
+import { useFurnitureSearch } from './hooks/useFurnitureSearch';
 ```
 
-И, наконец, обновим `return` (JSX), чтобы визуально выделять победителей поиска. Мы добавим подсветку зеленого цвета для самого релевантного товара и будем выводить процент сходства. Это уже реализовано в итоговом коде. 
+Так как вся работа с `IProcessedItem` есть в `useFurnitureSearch`, объявление `IProcessedItem` в `App.tsx` теперь не нужно, ровно как и импорт `IFurniture`. Фрагменты с объявлением интерфейса `IProcessedItem` и импортом `IFurniture` можно безболезненно удалить.
 
-### Итоговый код `src/App.tsx`
+#### Замена моков на хук
 
-Вот финальная версия компонента, объединяющая все части:
+Тот фрагмент кода с моками который мы выделили знаками `=` теперь можно заменить на **реальное** использование `useFurnitureSearch`. 
+
+Вот код реального использования:
 
 ```tsx
-import { useState, useRef, useEffect } from 'react';
-import { Button, ProgressBar } from 'react-bootstrap';
-import { FURNITURE_MOCK } from './modules/mock';
-import type { IFurniture } from './modules/mock';
-import { cosineSimilarity } from './modules/math'; 
-import './App.css';
-import 'bootstrap/dist/css/bootstrap.min.css';
+  const { 
+    items, 
+    ready, 
+    progress, 
+    imageEmbedding, 
+    searchByImage, 
+    resetSearch 
+  } = useFurnitureSearch(FURNITURE_MOCK);
+ ```
 
-interface IProcessedItem extends IFurniture {
-    score: number;      
-    isVisible: boolean; 
-}
-
-function App() {
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
-  
-  // Состояние теперь хранит "Обработанные товары" (с рейтингом и галочкой)
-  // По умолчанию score = 0, isVisible = true (показываем все)
-  const [items, setItems] = useState<IProcessedItem[]>(
-    FURNITURE_MOCK.map(item => ({ ...item, score: 0, isVisible: true }))
-  );
-
-  const [textEmbeddings, setTextEmbeddings] = useState<Record<number, number[]>>({});
-  const [imageEmbedding, setImageEmbedding] = useState<number[] | null>(null);
-  const [ready, setReady] = useState(false);
-  const [progress, setProgress] = useState(0);
-
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const workerRef = useRef<Worker | null>(null);
-
-  useEffect(() => {
-    workerRef.current = new Worker(new URL('./workers/search.worker.ts', import.meta.url), {
-      type: 'module'
-    });
-
-    workerRef.current.onmessage = (e) => {
-      const { type, data } = e.data;
-
-      if (type === 'progress') {
-        if (data.status === 'progress') setProgress(data.progress);
-        else if (data.status === 'ready') setReady(true);
-      } 
-      else if (type === 'text_embeddings_ready') {
-        setTextEmbeddings(data);
-        setReady(true);
-      }
-      else if (type === 'image_embedding_ready') {
-        setImageEmbedding(data);
-      }
-    };
-
-    workerRef.current.postMessage({ type: 'init', data: FURNITURE_MOCK });
-    return () => workerRef.current?.terminate();
-  }, []);
-
-  useEffect(() => {
-    if (imageEmbedding && Object.keys(textEmbeddings).length > 0) {
-        
-        const threshold = 0.005; // Порог (если сходство меньше, isVisible будет false)
-
-        const processed = items.map(item => {
-            const textVec = textEmbeddings[item.id];
-            if (!textVec) return item;
-
-            // Считаем сходство
-            const similarity = cosineSimilarity(imageEmbedding, textVec);
-
-            return {
-                ...item,
-                score: similarity,
-                // Eсли сходство выше порога, то отображаем товар
-                isVisible: similarity > threshold
-            };
-        });
-
-        // Сортируем: сначала самые похожие
-        processed.sort((a, b) => b.score - a.score);
-
-        setItems(processed);
-    }
-  }, [imageEmbedding, textEmbeddings]);
-
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const imageUrl = URL.createObjectURL(file);
-      setSelectedImage(imageUrl);
-      workerRef.current?.postMessage({ type: 'image', data: file });
-    }
-  };
-
-  const handleClear = () => {
-    setSelectedImage(null);
-    setImageEmbedding(null);
-    // При сбросе возвращаем список в исходное состояние (сортировка по ID, все видимы)
-    setItems(FURNITURE_MOCK.map(item => ({ ...item, score: 0, isVisible: true })));
-    if (fileInputRef.current) fileInputRef.current.value = '';
-  };
-
-  return (
-    <div className="app-container">
-      <h1>AI Поиск мебели</h1>
-      <p className="text-muted">Загрузите фото, чтобы найти похожий товар</p>
-
-      <div className="search-section">
-        <input 
-          type="file" 
-          accept="image/*" 
-          ref={fileInputRef}
-          style={{ display: 'none' }}
-          onChange={handleImageUpload}
-        />
-
-        <div style={{ flexShrink: 0 }}>
-            {selectedImage ? (
-                <img src={selectedImage} alt="Query" className="preview-image" />
-            ) : (
-                <div className="placeholder-image">Нет фото</div>
-            )}
-        </div>
-
-        <div className="d-flex flex-column gap-2">
-            <Button variant="primary" onClick={() => fileInputRef.current?.click()} disabled={!ready}>
-                {ready ? "Загрузить фото" : "Загрузка нейросети..."}
-            </Button>
-            
-            {!ready && <ProgressBar now={progress} label={`${Math.round(progress)}%`} animated />}
-            
-            {imageEmbedding && (
-                <div style={{ fontSize: '10px', color: 'blue', maxWidth: '200px', wordBreak: 'break-all' }}>
-                    <strong>Image Embed (5 dims):</strong><br/>
-                    [{imageEmbedding.slice(0, 5).map(n => n.toFixed(3)).join(', ')}...]
-                </div>
-            )}
-            
-            {selectedImage && <Button variant="outline-danger" onClick={handleClear}>Сбросить</Button>}
-        </div>
-      </div>
-
-      <div className="items-list">
-        {items.map((item) => {
-            // ОТОБРАЖЕНИЕ ПО ГАЛОЧКЕ
-            // Если галочка false, мы просто возвращаем null (не рендерим товар)
-            if (!item.isVisible) return null;
-
-            return (
-                <div key={item.id} className="furniture-row" style={{ 
-                    // Подсветим топ-1 результат легким зеленым фоном
-                    background: item.score > 0 && item === items[0] ? '#f0fff4' : 'white',
-                    borderColor: item.score > 0 && item === items[0] ? '#48bb78' : '#e0e0e0'
-                }}>
-                    <img src={item.image} alt={item.name} className="row-image" />
-                    
-                    <div className="row-content">
-                        <h5>{item.name}</h5>
-                        <p className="text-muted mb-1">{item.description}</p>
-                        <strong className="text-primary">{item.price.toLocaleString()} ₽</strong>
-                    </div>
-
-                    <div className="row-stats">
-                        {/* Вывод Сходства */}
-                        <div>
-                            Similarity: 
-                            <span style={{ fontWeight: 'bold', color: item.score > 0.15 ? 'green' : 'black' }}>
-                                {item.score > 0 ? ` ${(item.score * 100).toFixed(1)}%` : ' -'}
-                            </span>
-                        </div>
-                        
-                        {/* Вывод Эмбеддинга */}
-                        {textEmbeddings[item.id] && (
-                            <div style={{ fontSize: '10px', marginTop: '5px', wordBreak: 'break-all', color: '#666' }}>
-                                <strong>Text Embed:</strong><br/>
-                                [{textEmbeddings[item.id].slice(0, 5).map(n => n.toFixed(3)).join(', ')}...]
-                            </div>
-                        )}
-                    </div>
-                </div>
-            );
-        })}
-      </div>
-    </div>
-  );
-}
-
-export default App;
-```
 
 ## Запуск
 
@@ -1351,7 +921,7 @@ npm run dev
 Теперь мы можем проводить полноценный поиск! В целом за одну сессию использования браузера можно перезапускать проект и модели будут сохраняться. Если вы хотите вручную удалить модели из памяти, то зайдите в режим разработчика => `Application` => `Storage` => `Clear Site Data`. После этого модели будут загружаться заново. 
 
 
-Для проверки работы подготовлены картинки в <a href="https://github.com/David-bomb/CLIP_method/tree/main/search_examples">папке</a>. 
+Для проверки работы подготовлены картинки для ввода в поиск в <a href="https://github.com/David-bomb/CLIP_method/tree/main/search_examples">папке</a>. 
 
 Вот пример поиска при вводе картинки с белой кроватью:
 
