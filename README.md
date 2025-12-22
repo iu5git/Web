@@ -290,6 +290,7 @@
 * [Методические указания NestJS](/tutorials/async-nest/README.md)
 * [Методические указания Golang](/tutorials/async-go/README.md)
 * [Методические указания Django](/tutorials/async-py/README.md)
+* [Методические указания Rust](/tutorials/async-rust/README.md)
 * [Short Polling](/tutorials/short-polling/README.md)
 
 ### Домашнее Задание
