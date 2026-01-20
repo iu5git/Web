@@ -1408,10 +1408,6 @@ func (h *Handler) AddStockAPI(ctx *gin.Context) {
 }
 ```
 
-```go
-CreatorID: 1, // временный хардкод
-```
-
 Добавим метод API для получения данных пользователя. Создадим файл `internal/app/repository/user.go`:
 
 ```go
