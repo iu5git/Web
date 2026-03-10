@@ -119,6 +119,7 @@
 
 * [Установка в Docker и использование](/tutorials/lab2-db/README.md) PostgreSQL. [Курс](https://iu5edu.ru/wiki/devops/docs/master-classes/postgresql/) по основам PostgreSQL. [Лабораторные](https://github.com/iu5git/Database) по PostgreSQL, индексы, Tauri, чат-бот
 * [Методические указания Golang](/tutorials/lab2-go/README.md). Видео мастер-класс [gORM и шаблоны Golang](https://vk.com/video-211704031_456239173)
+* [Методические указания NestJS](/tutorials/lab2-nest/README.md)
 
 #### Лабораторная 3
 
