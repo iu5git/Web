@@ -67,7 +67,7 @@
 * [Примеры](/reports/) документации - РПЗ. 
 * [Примеры](/tutorials/homework) UML и ER диаграмм. Видео мастер-классов по UML [ER и структура системы](https://vk.com/video-211704031_456239172) и [Бизнес процесс, развертывание и запросы](https://vk.com/video-211704031_456239171)
 * [Установка](/tutorials/install/README.md) `Python`, `NodeJS`, `Git`, `Docker` на Windows, MacOS, Linux
-* [Основные команды git и описание Docker Compose](/tutorials/git-docker/). Подробные мастер-классы по [основам Git](https://iu5edu.ru/wiki/devops/docs/master-classes/git/) и [основам Docker](https://iu5edu.ru/wiki/devops/docs/master-classes/docker/)
+* [Основные команды git и описание Docker Compose](/tutorials/git-docker/). Подробные мастер-классы по [основам Git](https://devops.science.iu5.bmstu.ru/gitcicd/git/lectures/gitcicd/git/) и [основам Docker](https://devops.science.iu5.bmstu.ru/docker/containers/intro/)
 * Образ виртуальной машины Linux [Ubuntu 22.04](https://github.com/iu5git/Standards/blob/main/Linux/Linux.md) для компьютеров с ограниченной оперативной памятью 
 
 
@@ -117,7 +117,7 @@
 
 Обязательно наличие 5 или более статусов `заявок`: черновик, удалён, сформирован, завершён, отклонён. У каждого пользователя не более одной заявки в статусе `черновик`. Названия таблиц и их полей должны соответствовать предметной области. Одно из доп. полей `заявки` или `м-м` рассчитывается при завершении заявки.
 
-* [Установка в Docker и использование](/tutorials/lab2-db/README.md) PostgreSQL. [Курс](https://iu5edu.ru/wiki/devops/docs/master-classes/postgresql/) по основам PostgreSQL. [Лабораторные](https://github.com/iu5git/Database) по PostgreSQL, индексы, Tauri, чат-бот
+* [Установка в Docker и использование](/tutorials/lab2-db/README.md) PostgreSQL. [Лабораторные](https://github.com/iu5git/Database) по PostgreSQL, индексы, Tauri, чат-бот
 * [Методические указания Golang](/tutorials/lab2-go/README.md). Видео мастер-класс [gORM и шаблоны Golang](https://vk.com/video-211704031_456239173)
 * [Методические указания NestJS](/tutorials/lab2-nest/README.md)
 
