@@ -91,7 +91,8 @@
 * [Методические указания](/tutorials/lab1-design/README.md) по верстке и дизайну Figma [arabic Figma](/tutorials/lab1-design/arabic.md). [Видеоуроки](https://www.youtube.com/watch?v=DWicd2qo2pk) по Figma
 * [Методические указания Golang](/tutorials/lab1-go/README.md)
 * [Методические указания NestJS](/tutorials/lab1-nest/README.md)
-* [Установка и администрирование Minio](https://github.com/iu5git/Networking/tree/main/S3)
+* [Методические указания FastAPI](/tutorials/lab1-fastapi/FastAPI_ReadME.md)
+* [Установка и администрирование Minio](/tutorials/minio/MinIO_bucket_setup_ReadMe.md)
 
 #### Лабораторная 2
 
