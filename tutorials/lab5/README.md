@@ -561,7 +561,7 @@ export default StartPage
 
 Предположим, у нас уже есть рабочий API (В примере используется API ITunes). Мы можем получить список сущностей, отфильтровать их и вывести в понятном виде пользователю.
 
-> **Мобильная вёрстка.** В этом разделе мы верстаем приложение под вертикальный экран телефона (ширина ~390px). Медиа-запросы для адаптивной вёрстки не используем — вся вёрстка рассчитана на мобильный формат.
+В этой лабораторной интерфейс сразу проектируется под **вертикальный экран телефона**: в браузере на компьютере приложение отображается узкой колонкой фиксированной ширины по центру. Мы **не** добавляем медиазапросы и адаптивную вёрстку под разные разрешения — только мобильный макет.
 
 ### 6.1. Страница албомов iTunes
 
@@ -577,11 +577,13 @@ npm i react-bootstrap bootstrap
 import 'bootstrap/dist/css/bootstrap.min.css'
 ```
 
-Создадим страницу для отрисовки треков из ITunes.
+Создадим страницу для отрисовки треков из ITunes. На этом шаге карточки выводим **в один столбец** — так удобнее на узком экране телефона. Общую оболочку приложения и нижнюю таб-панель добавим в п. 6.3.
 
 ### ITunesPage
 
 #### ITunesPage.css
+
+Контейнер страницы — вертикальный flex-блок с отступами. Класс `.cardsList` (добавим в п. 6.2) складывает карточки друг под другом с промежутком между ними.
 
 ```css
 .container {
@@ -603,6 +605,8 @@ import 'bootstrap/dist/css/bootstrap.min.css'
 
 #### ITunesPage.tsx
 
+Запрос к API iTunes возвращает массив `results`. Мы оставляем только элементы с `wrapperType === "track"` — отдельные треки. У каждого трека в ответе API есть обложка `artworkUrl100` (статичное изображение 100×100). Поле `previewUrl` — ссылка на короткий аудиофрагмент трека; на странице «Подробнее» (п. 6.3) именно оно будет воспроизводиться в `<video>`.
+
 ```tsx
 import { FC, useState} from 'react'
 import { Card, Button, Spinner } from 'react-bootstrap'
@@ -614,6 +618,8 @@ interface ITunesMusic {
     artistName: string
     collectionCensoredName: string
     trackViewUrl: string
+    trackId: number
+    previewUrl?: string
 }
 
 interface ITunesResult {
@@ -635,10 +641,10 @@ const ITunesPage: FC = () => {
     const [music, setMusic] = useState<ITunesMusic[]>([])
 
     const handleSearch = async () =>{
-        await setLoading(true)
+        setLoading(true)
         const { results } = await getMusicByName(searchValue)
-        await setMusic(results.filter(item => item.wrapperType === "track"))
-        await setLoading(false)
+        setMusic(results.filter(item => item.wrapperType === "track"))
+        setLoading(false)
     }
 
     return (
@@ -655,8 +661,8 @@ const ITunesPage: FC = () => {
             </div>}
 
             <div className="cardsList">
-                {music.map((item, index)=> (
-                    <Card key={index} className="card">
+                {music.map((item)=> (
+                    <Card key={item.trackId} className="card">
                         <Card.Img className="cardImage" variant="top" src={item.artworkUrl100} height={100} width={100}  />
                         <Card.Body>
                             <div className="textStyle">
@@ -667,7 +673,6 @@ const ITunesPage: FC = () => {
                                     {item.collectionCensoredName}
                                 </Card.Text>
                             </div>
-                            <Button className="cardButton" href={item.trackViewUrl} target="_blank" variant="primary">Открыть в ITunes</Button>
                         </Card.Body>
                     </Card>
                 ))}
@@ -679,13 +684,15 @@ const ITunesPage: FC = () => {
 export default ITunesPage
 ```
 
+На этом этапе карточки только отображают данные. Переход на страницу «Подробнее» и воспроизведение превью добавим в п. 6.3.
+
 ![Gif 3](assets/3.gif)
 
 ### 6.2. Делим страницу на компоненты
 
-Для того, чтобы в будущем было куда удобнее разрабатывать, стоит разделять страницу на компоненты, и разделять логику в разных файлах.
+Для того, чтобы в будущем было удобнее разрабатывать, стоит разделять страницу на компоненты и выносить логику в отдельные файлы.
 
-На данном этапе у нас есть тонна кода в одном файле. Вынесем в директорию `components` карточку и поле ввода. Работу с сетью вынесем в директорию `modules`.
+На данном этапе у нас много кода в одном файле. Вынесем в директорию `components` карточку и поле ввода. Работу с сетью вынесем в директорию `modules`. Интерфейс `ITunesMusic` дополним полями `trackId` и `previewUrl` — они понадобятся для навигации и страницы «Подробнее».
 
 ### components/InputField
 
@@ -721,13 +728,18 @@ interface Props {
     buttonTitle?: string
 }
 
-export const InputField: FC<Props> = ({ value, setValue, onSubmit, loading, placeholder, buttonTitle = 'Искать' }) => (
+const InputField: FC<Props> = ({ value, setValue, onSubmit, loading, placeholder, buttonTitle = 'Искать' }) => (
     <div className="inputField">
         <input value={value} placeholder={placeholder} onChange={(event => setValue(event.target.value))}/>
         <Button disabled={loading} onClick={onSubmit}>{buttonTitle}</Button>
     </div>
 )
+
+export default InputField
+export { InputField }
 ```
+
+Компонент экспортируем и как `default`, и как именованный экспорт — так его удобнее импортировать из других файлов.
 
 ### components/MusicCard
 
@@ -762,37 +774,41 @@ export const InputField: FC<Props> = ({ value, setValue, onSubmit, loading, plac
 
 #### MusicCard.tsx
 
+Карточка показывает обложку, название альбома и исполнителя. В п. 6.3 сделаем всю карточку кликабельной — по нажатию откроется страница «Подробнее».
+
 ```tsx
 import { FC } from 'react'
-import { Button, Card } from 'react-bootstrap'
+import { Card } from 'react-bootstrap'
 import './MusicCard.css'
 
 interface Props {
     artworkUrl100: string
     artistName: string
     collectionCensoredName: string
-    trackViewUrl: string
 }
 
-export const MusicCard: FC<Props> = ({ artworkUrl100, artistName, collectionCensoredName, trackViewUrl }) => (
+const MusicCard: FC<Props> = ({ artworkUrl100, artistName, collectionCensoredName }) => (
     <Card className="card">
         <Card.Img className="cardImage" variant="top" src={artworkUrl100} height={100} width={100}  />
         <Card.Body>            
             <div className="textStyle">
-                <Card.Title>{artistName}</Card.Title>
+                <Card.Title>{collectionCensoredName}</Card.Title>
             </div>
             <div className="textStyle">
                 <Card.Text>
-                    {collectionCensoredName}
+                    {artistName}
                 </Card.Text>
             </div>
-            <Button className="cardButton" href={trackViewUrl} target="_blank" variant="primary">Открыть в ITunes</Button>
         </Card.Body>
     </Card>
 )
+
+export default MusicCard;
 ```
 
 ### modules/itunesApi.ts
+
+Типы и функция поиска вынесены в отдельный модуль. Поле `trackId` — уникальный числовой идентификатор трека в каталоге iTunes; по нему мы будем строить адрес страницы «Подробнее» (`/detail/1441163401`). Поле `previewUrl` — URL короткого аудиопревью (~30 секунд), который API отдаёт вместе с остальными полями трека.
 
 ```ts
 export interface ITunesMusic {
@@ -801,6 +817,8 @@ export interface ITunesMusic {
     artistName: string
     collectionCensoredName: string
     trackViewUrl: string
+    trackId: number
+    previewUrl?: string
 }
 
 export interface ITunesResult {
@@ -816,6 +834,8 @@ export const getMusicByName = async (name = ''): Promise<ITunesResult> =>{
 ```
 
 ### ITunesPage.tsx
+
+Страница использует вынесенные компоненты. После успешного поиска массив треков сохраняется в локальный `state` и отрисовывается в `.cardsList` — один столбец карточек.
 
 ```tsx
 import { FC, useState} from 'react'
@@ -853,8 +873,8 @@ const ITunesPage: FC = () => {
             </div>}
 
             <div className="cardsList">
-                {music.map((item, index)=> (
-                    <MusicCard key={index} {...item} />
+                {music.map((item)=> (
+                    <MusicCard key={item.trackId} {...item} />
                 ))}
             </div>
         </div>
@@ -864,17 +884,53 @@ const ITunesPage: FC = () => {
 export default ITunesPage
 ```
 
-В итоге у нас получилось приложение для поиска музыки в ITunes. В этом приложении мы использовали функциональные компоненты, хуки жизненного цикла и стейт приложения.
+В итоге у нас получилось приложение для поиска музыки в ITunes. В этом приложении мы использовали функциональные компоненты, хуки состояния и запросы к внешнему API.
 
 
 
 ### 6.3. Мобильная вёрстка, таб-панель и страница Подробнее
 
-Добавим мобильную оболочку приложения, нижнюю таб-панель навигации и страницу «Подробнее» в стиле вертикальной ленты (как в TikTok).
+На предыдущих шагах мы выводили только **статичные обложки** (`artworkUrl100`) в списке карточек. Теперь добавим вторую страницу — **Подробнее** — в вертикальном формате, как в TikTok: медиа на весь экран, текст поверх, кнопка «Далее». Навигация между экранами — через **нижнюю таб-панель**, как в мобильных приложениях.
 
-Список найденных треков нужно передавать между страницами «Список» и «Подробнее». **React Context в курсе не используем** — храним список карточек в `AppLayout` через `useState` и передаём его дочерним страницам через `Outlet` context React Router.
+**Откуда берётся «видео» на странице Подробнее**
+
+Тот же API iTunes, что и для поиска (`https://itunes.apple.com/search`), для каждого трека в ответе JSON отдаёт поле **`previewUrl`** — прямую ссылку на короткий аудиофрагмент трека (обычно около 30 секунд). Это не полноценный клип, а превью из каталога Apple. Мы подставляем этот URL в тег `<video>`: браузер воспроизводит превью на фоне страницы. Атрибуты `autoPlay`, `loop`, `muted` и `playsInline` нужны, чтобы автозапуск работал в мобильных браузерах (без звука по умолчанию).
+
+Если у трека нет `previewUrl` (так бывает у mock-данных или у части записей API), вместо `<video>` показываем **обложку** `artworkUrl100` или изображение по умолчанию — так же, как раньше отображались только фото.
+
+**Идентификатор трека `trackId`**
+
+В URL страницы «Подробнее» используется **`trackId`** — уникальный числовой идентификатор трека в iTunes (например, `/detail/1441163401`). Это не порядковый номер в списке и не «id + 1»: номера треков в каталоге произвольные и с пропусками. Для загрузки одного трека по id есть отдельный запрос `https://itunes.apple.com/lookup?id=...`.
+
+**Поведение навигации**
+
+- вкладка **Список** (`/`) — поиск и карточки в один столбец;
+- **клик по карточке** — переход на `/detail/:trackId` выбранного трека;
+- вкладка **Подробнее** в таб-панели — открывает **первую** карточку из текущего списка результатов (если список пуст, переход не выполняется);
+- кнопка **Далее** на странице Подробнее — переход к **следующей** карточке **по порядку в том списке**, который вернул последний поиск (массив `cards`). Мы находим индекс текущего `trackId` в этом массиве и переходим на `trackId` следующего элемента. Это не арифметика «текущий id + 1»: если следующего элемента в списке нет (вы на последней карточке), кнопка ничего не делает;
+- список карточек хранится в родительском layout и передаётся дочерним страницам через **`Outlet` context** React Router (не путать с `React.createContext` — в этой лабораторной `React Context` не используем).
+
+Создадим общую обёртку приложения, таб-панель, страницу Подробнее и обновим роутинг.
+
+#### Routes.tsx
+
+Константы маршрутов и подписи для таб-панели.
+
+```ts
+export const ROUTES = {
+  LIST: "/",
+  DETAIL: "/detail",
+}
+export type RouteKeyType = keyof typeof ROUTES;
+export const ROUTE_LABELS: { [key in RouteKeyType]: string } = {
+  LIST: "Список",
+  DETAIL: "Подробнее",
+};
+```
 
 #### MobileApp.css
+
+Обёртка `appShell` фиксирует ширину под телефон (390px) и центрирует приложение в окне браузера на компьютере. Нижний отступ у контента — чтобы таб-панель не перекрывала прокрутку.
 
 ```css
 body {
@@ -899,102 +955,9 @@ body {
 }
 ```
 
-#### Routes.tsx
-
-```ts
-export const ROUTES = {
-  LIST: "/",
-  DETAIL: "/detail",
-};
-export type RouteKeyType = keyof typeof ROUTES;
-export const ROUTE_LABELS: { [key in RouteKeyType]: string } = {
-  LIST: "Список",
-  DETAIL: "Подробнее",
-};
-```
-
-#### modules/itunesApi.ts
-
-Добавим поля `trackId` и `previewUrl` — для навигации используем **идентификатор трека** (`trackId`), а не альбома:
-
-```ts
-export interface ITunesMusic {
-  wrapperType: string;
-  artworkUrl100: string;
-  artistName: string;
-  collectionCensoredName: string;
-  trackViewUrl: string;
-  trackId: number;
-  previewUrl?: string;
-}
-
-export interface ITunesResult {
-  resultCount: number;
-  results: ITunesMusic[];
-}
-
-export const getMusicByName = async (name = ""): Promise<ITunesResult> => {
-  return fetch(`https://itunes.apple.com/search?term=${name}`).then(
-    (response) => response.json()
-  );
-};
-
-export const getTrackById = async (
-  id: number | string
-): Promise<ITunesResult> => {
-  return fetch(`https://itunes.apple.com/lookup?id=${id}`).then(
-    (response) => response.json()
-  );
-};
-```
-
-#### components/MusicCard
-
-Сделаем всю карточку кликабельной:
-
-```tsx
-import { FC } from "react";
-import { Card } from "react-bootstrap";
-import "./MusicCard.css";
-
-interface ICardProps {
-  artworkUrl100: string;
-  artistName: string;
-  collectionCensoredName: string;
-  onClick: () => void;
-}
-
-export const MusicCard: FC<ICardProps> = ({
-  artworkUrl100,
-  artistName,
-  collectionCensoredName,
-  onClick,
-}) => {
-  return (
-    <Card className="card" onClick={onClick}>
-      <Card.Img
-        className="cardImage"
-        variant="top"
-        src={artworkUrl100}
-        height={100}
-        width={100}
-      />
-      <Card.Body>
-        <div className="textStyle">
-          <Card.Title>{collectionCensoredName}</Card.Title>
-        </div>
-        <div className="textStyle">
-          <Card.Text>{artistName}</Card.Text>
-        </div>
-      </Card.Body>
-    </Card>
-  );
-};
-```
-
 #### AppLayout.tsx
 
-Компонент-обёртка хранит список карточек и рендерит `Outlet` + `TabBar`:
+Здесь живёт **общий список карточек** `cards`. После каждого поиска страница списка обновляет его через `setCards`. Страница «Подробнее» читает тот же массив — поэтому кнопка «Далее» знает порядок карточек. `Outlet` с `context={{ cards, setCards }}` передаёт эти данные вложенным маршрутам без Redux и без React Context.
 
 ```tsx
 import { FC, useState } from "react";
@@ -1022,9 +985,13 @@ export const AppLayout: FC = () => {
 };
 ```
 
-#### components/TabBar
+#### TabBar.tsx и TabBar.css
 
-Нижняя навигация с двумя вкладками: **Список** (☰) и **Подробнее** (▶).
+Таб-панель закреплена внизу экрана. Активная вкладка подсвечивается классом `tabBarItemActive` — сравниваем `location.pathname` с маршрутами.
+
+При нажатии **Список** вызывается `navigate("/")`.
+
+При нажатии **Подробнее** берётся `trackId` **первой** карточки в `cards` и выполняется переход на `/detail/{trackId}`. Если пользователь ещё ничего не искал и `cards` пуст, кнопка не сработает.
 
 ```tsx
 import "./TabBar.css";
@@ -1076,8 +1043,6 @@ export const TabBar: FC<Props> = ({ cards }) => {
 };
 ```
 
-#### TabBar.css
-
 ```css
 .tabBar {
     position: fixed;
@@ -1116,9 +1081,88 @@ export const TabBar: FC<Props> = ({ cards }) => {
 }
 ```
 
+#### modules/itunesApi.ts
+
+Добавим функцию `getTrackById` — запрос одного трека по `trackId`, если пользователь открыл «Подробнее» по прямой ссылке, а карточки ещё нет в общем списке.
+
+```ts
+export interface ITunesMusic {
+  wrapperType: string;
+  artworkUrl100: string;
+  artistName: string;
+  collectionCensoredName: string;
+  trackViewUrl: string;
+  trackId: number;
+  previewUrl?: string;
+}
+
+export interface ITunesResult {
+  resultCount: number;
+  results: ITunesMusic[];
+}
+
+export const getMusicByName = async (name = ""): Promise<ITunesResult> => {
+  return fetch(`https://itunes.apple.com/search?term=${name}`).then(
+    (response) => response.json()
+  );
+};
+
+export const getTrackById = async (
+  id: number | string
+): Promise<ITunesResult> => {
+  return fetch(`https://itunes.apple.com/lookup?id=${id}`).then(
+    (response) => response.json()
+  );
+};
+```
+
+#### components/MusicCard
+
+Вся карточка становится кликабельной: обработчик `onClick` передаётся снаружи и ведёт на страницу «Подробнее» с нужным `trackId`.
+
+```tsx
+import { FC } from "react";
+import { Card } from "react-bootstrap";
+import "./MusicCard.css";
+
+interface ICardProps {
+  artworkUrl100: string;
+  artistName: string;
+  collectionCensoredName: string;
+  onClick: () => void;
+}
+
+export const MusicCard: FC<ICardProps> = ({
+  artworkUrl100,
+  artistName,
+  collectionCensoredName,
+  onClick,
+}) => {
+  return (
+    <Card className="card" onClick={onClick}>
+      <Card.Img
+        className="cardImage"
+        variant="top"
+        src={artworkUrl100}
+        height={100}
+        width={100}
+      />
+      <Card.Body>
+        <div className="textStyle">
+          <Card.Title>{collectionCensoredName}</Card.Title>
+        </div>
+        <div className="textStyle">
+          <Card.Text>{artistName}</Card.Text>
+        </div>
+      </Card.Body>
+    </Card>
+  );
+};
+```
+
 #### ITunesPage
 
-После поиска сохраняем список в родительское состояние через `useOutletContext`. Клик по карточке ведёт на страницу «Подробнее» по `trackId`:
+После поиска сохраняем результаты и в локальный `music` (для отрисовки), и в общий `setCards` (для «Далее» и вкладки «Подробнее»). `trackId` из URL параметра передаём в `navigate`.
 
 ```tsx
 import "./ITunesPage.css";
@@ -1140,14 +1184,15 @@ const ITunesPage: FC = () => {
 
   const handleSearch = () => {
     setLoading(true);
-    getMusicByName(searchValue).then((response) => {
-      const results = response.results.filter(
-        (item) => item.wrapperType === "track"
-      );
-      setMusic(results);
-      setCards(results);
-      setLoading(false);
-    });
+    getMusicByName(searchValue)
+      .then((response) => {
+        const results = response.results.filter(
+          (item) => item.wrapperType === "track"
+        );
+        setMusic(results);
+        setCards(results);
+        setLoading(false);
+      });
   };
 
   const handleCardClick = (trackId: number) => {
@@ -1191,9 +1236,13 @@ const ITunesPage: FC = () => {
 export default ITunesPage;
 ```
 
-#### DetailPage
+#### DetailPage.tsx и DetailPage.css
 
-Страница «Подробнее» в стиле вертикальной ленты: на весь экран — превью трека (видео с автовоспроизведением или обложка), снизу — название, исполнитель и кнопка «Далее» для перехода к следующему треку из списка:
+Параметр `:id` в адресе — это `trackId` в виде строки. Сначала ищем трек в общем списке `cards` (данные уже есть после поиска). Если не нашли — запрашиваем `getTrackById(id)`.
+
+**Воспроизведение:** при наличии `previewUrl` рендерим `<video src={previewUrl} ... />`. Иначе — `<img>` с обложкой.
+
+**Кнопка «Далее»:** в `handleNext` ищем индекс текущего трека в массиве `cards` по совпадению `trackId`. Берём элемент `cards[currentIndex + 1]` и переходим на его `trackId`. Если индекс последний или список пуст — `nextItem` будет `undefined`, переход не выполняется (кнопка нажимается, но страница не меняется).
 
 ```tsx
 import "./DetailPage.css";
@@ -1204,6 +1253,8 @@ import { ITunesMusic, getTrackById } from "../modules/itunesApi";
 import { ROUTES } from "../Routes";
 import { AppOutletContext } from "../AppLayout";
 
+const defaultImage = "/DefaultImage.jpg";
+
 export const DetailPage: FC = () => {
   const [pageData, setPageData] = useState<ITunesMusic>();
   const { id } = useParams();
@@ -1212,12 +1263,16 @@ export const DetailPage: FC = () => {
 
   useEffect(() => {
     if (!id) return;
+
     const fromList = cards.find((item) => String(item.trackId) === id);
     if (fromList) {
       setPageData(fromList);
       return;
     }
-    getTrackById(id).then((response) => setPageData(response.results[0]));
+
+    getTrackById(id).then((response) => {
+      setPageData(response.results[0]);
+    });
   }, [id, cards]);
 
   const handleNext = () => {
@@ -1253,7 +1308,7 @@ export const DetailPage: FC = () => {
       ) : (
         <img
           className="detailVideo"
-          src={pageData.artworkUrl100}
+          src={pageData.artworkUrl100 || defaultImage}
           alt={pageData.collectionCensoredName}
         />
       )}
@@ -1268,8 +1323,6 @@ export const DetailPage: FC = () => {
   );
 };
 ```
-
-#### DetailPage.css
 
 ```css
 .detailPage {
@@ -1321,7 +1374,7 @@ export const DetailPage: FC = () => {
 
 #### App.tsx
 
-Вложенные маршруты с `AppLayout`:
+Вложенные маршруты: общий `AppLayout` оборачивает список и страницу «Подробнее». Параметр `:id` в пути — `trackId` трека.
 
 ```tsx
 import { BrowserRouter, Route, Routes } from "react-router-dom";
@@ -1352,11 +1405,12 @@ export default App;
 
 ### 7.1. Реализовать получение данных из mock-объектов
 
-Доработать страницу приложения по вашему варианту. Наполнение данных осуществить через mock-объекты.
+По заданию лабораторной на этом этапе данные для карточек берутся **только из mock-объектов** (без вашего бэкенда). Запросы к iTunes остаются в коде как пример работы с API; при ошибке сети, пустом ответе или для демонстрации без интернета подставляем данные из `mock.ts`.
 
-Для этого создадим файл mock.ts:
+В mock у каждой записи должен быть **`trackId`** — по нему строятся ссылки `/detail/1`, `/detail/2` и работает кнопка «Далее». Поле **`previewUrl`** в mock можно оставить пустым: тогда на странице «Подробнее» вместо видео покажется обложка или дефолтное изображение (см. п. 7.2).
 
 #### modules/mock.ts
+
 ```ts
 import { ITunesResult } from "./itunesApi";
 
@@ -1394,15 +1448,16 @@ export const SONGS_MOCK: ITunesResult = {
 };
 ```
 
-Примеры использования:
-
 #### ITunesPage
+
+При первом открытии приложения кладём mock в список и в общий `cards` — иначе вкладка «Подробнее» и «Далее» не будут знать, какие карточки показывать. При поиске сначала пробуем iTunes; если результатов нет или запрос упал — фильтруем mock по началу названия альбома и снова обновляем `setCards`, чтобы порядок «Далее» совпадал с отображаемым списком.
+
 ```tsx
 import "./ITunesPage.css";
-import { FC, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import { Spinner } from "react-bootstrap";
 import { useNavigate, useOutletContext } from "react-router-dom";
-import { ITunesMusic, getMusicByName } from "../modules/itunesApi";
+import { getMusicByName } from "../modules/itunesApi";
 import { InputField } from "../components/InputField";
 import { ROUTES } from "../Routes";
 import { MusicCard } from "../components/MusicCard";
@@ -1412,9 +1467,25 @@ import { SONGS_MOCK } from "../modules/mock";
 const ITunesPage: FC = () => {
   const [searchValue, setSearchValue] = useState("");
   const [loading, setLoading] = useState(false);
-  const [music, setMusic] = useState<ITunesMusic[]>([]);
+  const [music, setMusic] = useState(SONGS_MOCK.results);
   const { setCards } = useOutletContext<AppOutletContext>();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    setCards(SONGS_MOCK.results);
+  }, [setCards]);
+
+  const applyMock = () => {
+    const results = SONGS_MOCK.results.filter((item) =>
+      item.collectionCensoredName
+        .toLowerCase()
+        .startsWith(searchValue.toLowerCase())
+    );
+    const list = results.length ? results : SONGS_MOCK.results;
+    setMusic(list);
+    setCards(list);
+    setLoading(false);
+  };
 
   const handleSearch = () => {
     setLoading(true);
@@ -1423,126 +1494,91 @@ const ITunesPage: FC = () => {
         const results = response.results.filter(
           (item) => item.wrapperType === "track"
         );
-        setMusic(results);
-        setCards(results);
-        setLoading(false);
+        if (results.length) {
+          setMusic(results);
+          setCards(results);
+          setLoading(false);
+          return;
+        }
+        applyMock();
       })
-      .catch(() => {
-        const filtered = SONGS_MOCK.results.filter((item) =>
-          item.collectionCensoredName
-            .toLocaleLowerCase()
-            .startsWith(searchValue.toLocaleLowerCase())
-        );
-        setMusic(filtered);
-        setCards(filtered);
-        setLoading(false);
-      });
+      .catch(applyMock);
   };
 
   const handleCardClick = (trackId: number) => {
     navigate(`${ROUTES.DETAIL}/${trackId}`);
   };
 
-  // тот же JSX, что в разделе 6.3
+  // разметка как в п. 6.3
 };
 
 export default ITunesPage;
 ```
 
-### 7.2. Добавим дефолтное изображение
-
-Добавим дефолтное изображение и используем его в `MusicCard` и на странице `DetailPage`:
-
-```tsx
-import { FC } from "react";
-import { Card } from "react-bootstrap";
-import "./MusicCard.css";
-import image from "/DefaultImage.jpg";
-
-interface Props {
-  artworkUrl100: string;
-  artistName: string;
-  collectionCensoredName: string;
-  onClick: () => void;
-}
-
-export const MusicCard: FC<Props> = ({
-  artworkUrl100,
-  artistName,
-  collectionCensoredName,
-  onClick,
-}) => (
-  <Card className="card" onClick={onClick}>
-    <Card.Img
-      className="cardImage"
-      variant="top"
-      src={artworkUrl100 || image}
-      height={100}
-      width={100}
-    />
-    <Card.Body>
-      <div className="textStyle">
-        <Card.Title>{collectionCensoredName}</Card.Title>
-      </div>
-      <div className="textStyle">
-        <Card.Text>{artistName}</Card.Text>
-      </div>
-    </Card.Body>
-  </Card>
-);
-```
-
-Теперь, если изображение не пришло, будет отрисовываться дефолтное.
-
 #### DetailPage
 
+Если трека нет в общем списке и `getTrackById` не вернул данные, ищем запись в mock по `trackId` из адреса — чтобы страница «Подробнее» открывалась и офлайн.
+
 ```tsx
-import "./DetailPage.css";
-import { FC, useEffect, useState } from "react";
-import { useNavigate, useOutletContext, useParams } from "react-router-dom";
-import { Button, Spinner } from "react-bootstrap";
-import { ITunesMusic, getTrackById } from "../modules/itunesApi";
-import { ROUTES } from "../Routes";
-import { AppOutletContext } from "../AppLayout";
-import { SONGS_MOCK } from "../modules/mock";
-import defaultImage from "/DefaultImage.jpg";
-
-export const DetailPage: FC = () => {
-  const [pageData, setPageData] = useState<ITunesMusic>();
-  const { id } = useParams();
-  const navigate = useNavigate();
-  const { cards } = useOutletContext<AppOutletContext>();
-
-  useEffect(() => {
-    if (!id) return;
-    const fromList = cards.find((item) => String(item.trackId) === id);
-    if (fromList) {
-      setPageData(fromList);
-      return;
-    }
-    getTrackById(id)
-      .then((response) => setPageData(response.results[0]))
-      .catch(
-        () =>
-          setPageData(
-            SONGS_MOCK.results.find(
-              (track) => String(track.trackId) === id
-            )
-          )
-      );
-  }, [id, cards]);
-
-  // остальной JSX из раздела 6.3, с defaultImage вместо artworkUrl100
-};
+// фрагмент useEffect в DetailPage.tsx
+getTrackById(id)
+  .then((response) => {
+    const data = response.results[0];
+    setPageData(
+      data ??
+        SONGS_MOCK.results.find((track) => String(track.trackId) === id)
+    );
+  })
+  .catch(() =>
+    setPageData(
+      SONGS_MOCK.results.find((track) => String(track.trackId) === id)
+    )
+  );
 ```
+
+### 7.2. Добавим дефолтное изображение
+
+У многих mock-записей и части ответов API нет обложки (`artworkUrl100` пустой). Положите файл **`DefaultImage.jpg`** в папку `public/` — он будет доступен по пути `/DefaultImage.jpg`.
+
+В **списке** подставляем дефолт в `MusicCard`, если обложка отсутствует. На **странице «Подробнее»** дефолт используется в ветке без `previewUrl` (когда показываем `<img>` вместо `<video>`).
+
+```tsx
+// MusicCard.tsx
+const defaultImage = "/DefaultImage.jpg";
+
+<Card.Img
+  className="cardImage"
+  variant="top"
+  src={artworkUrl100 || defaultImage}
+  height={100}
+  width={100}
+/>
+```
+
+```tsx
+// DetailPage.tsx — fallback, когда нет previewUrl
+<img
+  className="detailVideo"
+  src={pageData.artworkUrl100 || defaultImage}
+  alt={pageData.collectionCensoredName}
+/>
+```
+
+Теперь, если изображение не пришло из API или mock, отрисуется заглушка и в списке, и на экране «Подробнее».
 
 ![Gif 5](./assets/5.gif)
 
-## 7.3. Нижняя таб-панель навигации
+### 7.3. Нижняя таб-панель навигации
 
-Главное меню приложения реализовано в виде нижней таб-панели — компонент `TabBar` из [раздела 6.3](#63-мобильная-вёрстка-таб-панель-и-страница-подробнее). Две вкладки (**Список** ☰ и **Подробнее** ▶) закреплены внизу мобильной оболочки и переключают маршруты `ROUTES.LIST` и `ROUTES.DETAIL`.
+Главное меню приложения в этой лабораторной — **нижняя таб-панель** (`TabBar`), а не верхний `Navbar`. Она уже реализована в п. 6.3; при защите работы кратко повторите её поведение:
 
-При необходимости доработайте стили `TabBar.css` (цвета активной вкладки, иконки) в соответствии с вашим вариантом.
+- две вкладки: **Список** и **Подробнее**;
+- **Список** всегда ведёт на `/` с полем поиска и карточками;
+- **Подробнее** открывает первую карточку из текущего массива `cards` (после поиска или mock);
+- активная вкладка подсвечивается по текущему URL;
+- панель закреплена внизу узкой колонки 390px и не прокручивается вместе с контентом.
+
+При выполнении задания по **вашей теме** замените подписи и иконки на свои, но сохраните два экрана и ту же логику переходов.
 
 ### 7.4. Подключение к собственному API из web-сервиса
 
