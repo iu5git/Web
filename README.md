@@ -8,7 +8,7 @@
 
 ## Лекции
 
-* [Лекция 1. История Web, MVC](lectures/Lecture_1_Web.pdf) 
+* [Лекция 1. История Web, MVC](lectures/Lecture_1_Web.pdf) 14 слайдов
 
 * [Лекция 2. Базы данных, ER, миграции, ORM](lectures/Lecture_2_Databases_ORM.pdf) 
 
