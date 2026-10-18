@@ -19,7 +19,7 @@
 13. [POST запрос](#13-POST-запрос)
 14. [GET запрос одной услуги и фильтры](#14-GET-запрос-одной-услуги-и-фильтры)
 15. [PUT и DELETE запросы](#15-PUT-и-DELETE-запросы)
-16. [MinIo](#16-MinIo)
+16. [Silo(MinIO)](#16-silominio)
 17. [Итоговая структура проекта](#17-итоговая-структура-проекта)
 18. [Полезные ссылки](#18-полезные-ссылки)
 
@@ -175,13 +175,13 @@ npm install --save-dev @types/node
 ```
 ---
 
-### 4.4 Настройка Docker для PostgreSQL, MinIo
+### 4.4 Настройка Docker для PostgreSQL, Silo(MinIO)
 
 Для выполнения лабораторной работы потребуется развернуть два сервиса:
 
     PostgreSQL — база данных для хранения структурированной информации
 
-    MinIO — объектное хранилище для загрузки и хранения изображений
+    Silo(MinIO) — объектное хранилище для загрузки и хранения изображений
 
 Создайте файл docker-compose.yml в корневой директории проекта. Этот файл содержит конфигурацию для одновременного запуска всех необходимых сервисов.
 
@@ -194,7 +194,7 @@ npm install --save-dev @types/node
 
 - На вашем компьютере база будет доступна по порту 5439
 
-Аналогично можно настроить порты для MinIO и других сервисов.
+Аналогично можно настроить порты для Silo(MinIO) и других сервисов.
 
 ```yaml
 version: '3.8'
@@ -228,9 +228,9 @@ services:
     networks:
       - bmstu_network
 
-  minio:
-    image: minio/minio:latest
-    container_name: bmstu_minio
+  silo:
+    image: pgsty/silo:latest
+    container_name: bmstu_silo
     command: server /data --console-address ":9001"
     environment:
       MINIO_ROOT_USER: minioadmin
@@ -239,7 +239,7 @@ services:
       - "9090:9000"  
       - "9091:9001"  
     volumes:
-      - minio_data:/data
+      - silo_data:/data
     networks:
       - bmstu_network
     healthcheck:
@@ -250,7 +250,7 @@ services:
 
 volumes:
   postgres_data:
-  minio_data:
+  silo_data:
 
 networks:
   bmstu_network:
@@ -652,7 +652,7 @@ bootstrap();
 
    ![](images/1.png)
 
-2. Проверьте, что `PostgreSQL` и `MinIo`в состоянии `listening`
+2. Проверьте, что `PostgreSQL` и `Silo(MinIO)` в состоянии `listening`
 3. Запустите ваш проект: `npm run start:dev`
 
     ![](images/2.png)
@@ -1255,16 +1255,16 @@ http://localhost:3000/api/products/1
 
 ---
 
-## 16. MinIo
+## 16. Silo(MinIO)
 
-**MinIO — это S3-совместимое объектное хранилище.**  
+**Silo(MinIO) — это S3-совместимое объектное хранилище.**
 Зачем оно нужно вместо сохранения файлов на диск сервера?
 1. **Масштабируемость** — файлы отдельно от приложения
 2. **Надежность** — репликация данных
 3. **Производительность** — отдача файлов напрямую из хранилища
 
 **Как это работает:**
-1. Файл → MinIO → возвращает URL
+1. Файл → Silo(MinIO) → возвращает URL
 2. URL сохраняем в БД
 3. При запросе генерируем временную ссылку (signed URL)
 
@@ -1278,7 +1278,7 @@ npm install minio
 npm install multer
 npm install -D @types/multer
 ```
-Создадим простой `MinIo` сервис
+Создадим простой сервис Silo(MinIO)
 **файл:** `rc/modules/products/services/minio.service.ts`
 
 ```typescript
@@ -1310,10 +1310,10 @@ export class MinioSimpleService {
       const exists = await this.minioClient.bucketExists(this.bucketName);
       if (!exists) {
         await this.minioClient.makeBucket(this.bucketName, 'us-east-1');
-        console.log(`Бакет "${this.bucketName}" создан в MinIO`);
+        console.log(`Бакет "${this.bucketName}" создан в Silo(MinIO)`);
       }
     } catch (error) {
-      console.error('Ошибка при инициализации бакета MinIO:', error.message);
+      console.error('Ошибка при инициализации бакета Silo(MinIO):', error.message);
     }
   }
 
@@ -1360,7 +1360,7 @@ export class MinioSimpleService {
     try {
       await this.minioClient.removeObject(this.bucketName, fileName);
     } catch (error) {
-      console.error('Ошибка при удалении файла из MinIO:', error.message);
+      console.error('Ошибка при удалении файла из Silo(MinIO):', error.message);
       throw error;
     }
   }
@@ -1556,7 +1556,7 @@ export class ProductsService {
         await this.deleteOldImage(product.imageUrl);
       }
 
-      // Загружаем новое изображение в MinIO
+      // Загружаем новое изображение в Silo(MinIO)
       const imageUrl = await this.minioService.uploadProductImage(
         file.buffer,
         id,
@@ -1596,7 +1596,7 @@ export class ProductsService {
       const urlParts = imageUrl.split('/');
       const fileName = urlParts[urlParts.length - 1];
       
-      // Удаляем файл из MinIO
+      // Удаляем файл из Silo(MinIO)
       await this.minioService.deleteFile(fileName);
     } catch (error) {
       console.warn('Не удалось удалить старое изображение:', error.message);
@@ -1790,7 +1790,7 @@ bmstu-lab/
    - [Официальная документация](https://www.postgresql.org/docs/)
    - [Руководство по установке](https://www.postgresql.org/download/)
 
-4. **MinIO**
-   - [Документация MinIO](https://min.io/docs/minio/linux/index.html)
+4. **Silo(MinIO)**
+  - [Документация Silo](https://github.com/pgsty/silo)
 
 ---
