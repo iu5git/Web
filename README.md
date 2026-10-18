@@ -92,7 +92,7 @@
 * [Методические указания Golang](/tutorials/lab1-go/README.md)
 * [Методические указания NestJS](/tutorials/lab1-nest/README.md)
 * [Методические указания FastAPI](/tutorials/lab1-fastapi/FastAPI_ReadME.md)
-* [Установка и администрирование Minio](/tutorials/minio/MinIO_bucket_setup_ReadMe.md)
+* [Установка и администрирование Silo (S3)](/tutorials/silo/README.md)
 
 #### Лабораторная 2
 
