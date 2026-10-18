@@ -28,9 +28,9 @@
 
 * [Лекция 10. Redux](lectures/Lecture_10_Redux.pdf)
 
-* [Лекция 11. POST, Axios. Диаграммы бизнес требований](lectures/Lecture_11_Axios.pdf)
+* [Лекция 11. POST, Axios. Диаграммы бизнес требований](lectures/Lecture_Axios.pdf)
 
-* [Лекция 12. Адаптивная верстка. PWA. Tauri](lectures/Lecture_12_PWA.pdf)
+* [Лекция 12. Адаптивная верстка. PWA. Tauri](lectures/Lecture_PWA.pdf)
 
 * [Лекция 13. Брокер, очереди, gRPC. WebSocket, Polling](lectures/Lecture_13_Async.pdf)
 
