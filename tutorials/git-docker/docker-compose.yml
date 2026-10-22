@@ -1,4 +1,4 @@
-version: "3.8" # версия вашего docker-compose
+version: "3.8" # версия вашего docker-compose, указываем только для совместимости с древней (<2023 года) версией docker-compose
 services:
   # имеджи, которые запустятся по вашему желанию
   db:
@@ -17,9 +17,9 @@ services:
       POSTGRES_USER: root
       POSTGRES_DB: RIP
       POSTGRES_PASSWORD: root
-  minio:
-    container_name: minio
-    image: minio/minio:latest
+  silo:
+    container_name: silo
+    image: pgsty/silo:latest
     ports:
       - "9000:9000"
       - "9001:9001"
@@ -28,7 +28,7 @@ services:
       MINIO_SECRET_KEY: root
       MINIO_CONSOLE_ADDRESS: ":9001"
     volumes:
-      - minio-data:/data
+      - silo-data:/data
     command: server /data
   redis:
     image: redis:6.2-alpine
@@ -43,7 +43,7 @@ volumes:
   # часть настроек для хранения данных
   postgresdb-data:
     driver: local
-  minio-data:
+  silo-data:
     driver: local
   redis-data:
     driver: local
